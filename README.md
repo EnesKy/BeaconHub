@@ -1,1 +1,1 @@
-# BeaconHub
+# BeaconMaps
