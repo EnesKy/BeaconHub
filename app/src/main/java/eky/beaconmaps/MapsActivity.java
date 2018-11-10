@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.estimote.coresdk.common.config.EstimoteSDK;
 import com.estimote.coresdk.recognition.utils.EstimoteBeacons;
@@ -38,7 +39,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted.
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
-    private static final int DEFAULT_ZOOM = 15;
+    private static final int ZOOM_LEVEL = 18;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
 
@@ -74,6 +75,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //EstimoteSDK.initialize(applicationContext, appId, appToken);
         // Optional, debug logging.
         EstimoteSDK.enableDebugLogging(true);
+
     }
 
     /**
@@ -91,7 +93,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json));
+        //googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json));
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+
+                Toast.makeText(
+                        MapsActivity.this,
+                        "Lat : " + latLng.latitude + " , "
+                                + "Long : " + latLng.longitude,
+                        Toast.LENGTH_LONG).show();
+
+                // Creating a marker
+                MarkerOptions markerOptions = new MarkerOptions();
+
+                // Setting the position for the marker
+                markerOptions.position(latLng);
+
+                // Setting the title for the marker.
+                // This will be displayed on taping the marker
+                markerOptions.title(latLng.latitude + " : " + latLng.longitude);
+
+                // Clears the previously touched position
+                mMap.clear();
+
+                // Animating to the touched position
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+
+                // Placing a marker on the touched position
+                mMap.addMarker(markerOptions);
+            }
+        });
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Toast.makeText(
+                        MapsActivity.this,
+                        "Clicked to marker",
+                        Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
 
         // Prompt the user for permission.
         getLocationPermission();
@@ -123,12 +167,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             mLastKnownLocation = task.getResult();
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     new LatLng(mLastKnownLocation.getLatitude(),
-                                            mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                                            mLastKnownLocation.getLongitude()), ZOOM_LEVEL));
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
                             mMap.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+                                    .newLatLngZoom(mDefaultLocation, ZOOM_LEVEL));
                             mMap.getUiSettings().setMyLocationButtonEnabled(false);
                         }
                     }
