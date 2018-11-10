@@ -75,15 +75,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //EstimoteSDK.initialize(applicationContext, appId, appToken);
         // Optional, debug logging.
         EstimoteSDK.enableDebugLogging(true);
-
-//
-//        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
-//            @Override
-//            public boolean onMyLocationButtonClick() {
-//                Toast.makeText(getApplicationContext(),yourLocationText,Toast.LENGTH_SHORT).show();
-//                return true;
-//            }
-//        });
     }
 
     /**
@@ -119,7 +110,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Setting the position for the marker
                 markerOptions.position(latLng);
 
-                // Setting the title for the marker.
+                // Setting the title for the marke
                 // This will be displayed on taping the marker
                 markerOptions.title(latLng.latitude + " : " + latLng.longitude);
 
@@ -137,13 +128,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Toast.makeText(
-                        MapsActivity.this,
-                        "Clicked to marker",
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(MapsActivity.this,"Clicked to the marker", Toast.LENGTH_LONG).show();
                 return true;
             }
         });
+
+        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {@Override
+        public boolean onMyLocationButtonClick() {
+            Toast.makeText(getApplicationContext(),"Clicked to the button",Toast.LENGTH_SHORT).show();
+            return true; }});
 
         // Prompt the user for permission.
         getLocationPermission();
