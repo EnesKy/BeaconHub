@@ -9,33 +9,33 @@
 
     <EditText
         android:id="@+id/etEmail"
-        android:layout_width="wrap_content"
+        android:layout_width="326dp"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="textEmailAddress"
         android:hint="Enter your email here"
-        app:layout_constraintVertical_bias="0.245"
+        android:inputType="textEmailAddress"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.245" />
 
     <EditText
         android:id="@+id/etPassword"
-        android:layout_width="wrap_content"
+        android:layout_width="326dp"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="textPassword"
         android:hint="Enter your password here"
-        app:layout_constraintVertical_bias="0.088"
+        android:inputType="textPassword"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etEmail"/>
+        app:layout_constraintTop_toBottomOf="@id/etEmail"
+        app:layout_constraintVertical_bias="0.088" />
 
     <Button
         android:id="@+id/buLogin"
-        android:layout_width="wrap_content"
+        android:layout_width="197dp"
         android:layout_height="wrap_content"
         android:text="LogIn"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -46,7 +46,7 @@
 
     <CheckBox
         android:id="@+id/cbRememberMe"
-        android:layout_width="wrap_content"
+        android:layout_width="134dp"
         android:layout_height="wrap_content"
         android:text="Remember Me"
         app:layout_constraintBottom_toBottomOf="parent"
