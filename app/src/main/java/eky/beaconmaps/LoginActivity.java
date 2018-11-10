@@ -24,6 +24,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this); // bind butterknife after setContectView(..)
         //Now you can access all view after bind your activity with butterknife
+
+        //TODO: FirebaseAuthentication ekle..
     }
 
     // Single view button click event

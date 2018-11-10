@@ -36,9 +36,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
-    // A default location (Sydney, Australia) and default zoom to use when location permission is
-    // not granted.
-    private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
+    // A default location (FSMVU Halic) and default zoom to use when location permission is not granted.
+    private final LatLng mDefaultLocation = new LatLng(41.0463356,28.9432943);
+    private String defaultLocationText = "41.0463356, 28.9432943";
     private static final int ZOOM_LEVEL = 18;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
@@ -76,6 +76,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Optional, debug logging.
         EstimoteSDK.enableDebugLogging(true);
 
+//
+//        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+//            @Override
+//            public boolean onMyLocationButtonClick() {
+//                Toast.makeText(getApplicationContext(),yourLocationText,Toast.LENGTH_SHORT).show();
+//                return true;
+//            }
+//        });
     }
 
     /**
@@ -174,6 +182,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             mMap.moveCamera(CameraUpdateFactory
                                     .newLatLngZoom(mDefaultLocation, ZOOM_LEVEL));
                             mMap.getUiSettings().setMyLocationButtonEnabled(false);
+                            defaultLocationText = "Your Location : " + defaultLocationText;
                         }
                     }
                 });
