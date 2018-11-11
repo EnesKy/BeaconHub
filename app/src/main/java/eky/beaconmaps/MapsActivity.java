@@ -1,5 +1,7 @@
 package eky.beaconmaps;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -9,6 +11,12 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.estimote.coresdk.common.config.EstimoteSDK;
@@ -26,6 +34,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -51,6 +64,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
+    //Spinner item lists
+    List<String> beaconList = new ArrayList();
+    List<String> functionList = new ArrayList();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Intent i = getIntent();
@@ -75,6 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //EstimoteSDK.initialize(applicationContext, appId, appToken);
         // Optional, debug logging.
         EstimoteSDK.enableDebugLogging(true);
+
     }
 
     /**
@@ -102,7 +120,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         MapsActivity.this,
                         "Lat : " + latLng.latitude + " , "
                                 + "Long : " + latLng.longitude,
-                        Toast.LENGTH_LONG).show();
+                        Toast.LENGTH_SHORT).show();
 
                 // Creating a marker
                 MarkerOptions markerOptions = new MarkerOptions();
@@ -128,7 +146,88 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Toast.makeText(MapsActivity.this,"Clicked to the marker", Toast.LENGTH_LONG).show();
+                Toast.makeText(MapsActivity.this,"Clicked to the marker", Toast.LENGTH_SHORT).show();
+
+                final Dialog beacon_dialog = new Dialog(MapsActivity.this);
+                beacon_dialog.setTitle("Select Beacon and It's Function");
+                beacon_dialog.setContentView(R.layout.select_beacon_dialog);
+                beacon_dialog.show();
+
+                TextView tvBeacon = beacon_dialog.findViewById(R.id.tv_beacon);
+                Spinner spnBeacon = beacon_dialog.findViewById(R.id.spn_beacon);
+                TextView tvFunc = beacon_dialog.findViewById(R.id.tv_function);
+                Spinner spnFunc = beacon_dialog.findViewById(R.id.spn_function);
+                Button btnCancel = beacon_dialog.findViewById(R.id.btn_cancel);
+                Button btnDone = beacon_dialog.findViewById(R.id.btn_done);
+
+                beaconList.add("Beacon 1");
+                beaconList.add("Beacon 2");
+                beaconList.add("Beacon 3");
+
+
+                functionList.add("Function 1");
+                functionList.add("Function 2");
+                functionList.add("Function 3");
+
+                // Spinner click listener
+                spnBeacon.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        Toast.makeText(MapsActivity.this,parent.getSelectedItem().toString(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                spnFunc.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                        Toast.makeText(MapsActivity.this,parent.getSelectedItem().toString(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                // Creating adapter for spinner
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getApplicationContext(),
+                                                    android.R.layout.simple_spinner_item, beaconList);
+
+                // Drop down layout style - list view with radio button
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                spnBeacon.setAdapter(dataAdapter);
+
+                // Creating adapter for spinner
+                ArrayAdapter<String> dataAdapter2 = new ArrayAdapter<String>(getApplicationContext(),
+                        android.R.layout.simple_spinner_item, functionList);
+
+                // Drop down layout style - list view with radio button
+                dataAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                spnFunc.setAdapter(dataAdapter2);
+
+                btnCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(getApplicationContext(), "Cancel", Toast.LENGTH_SHORT).show();
+                        beacon_dialog.cancel();
+                    }
+                });
+
+                btnDone.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(getApplicationContext(), "Done", Toast.LENGTH_SHORT).show();
+                        beacon_dialog.dismiss();
+                    }
+                });
+
                 return true;
             }
         });
