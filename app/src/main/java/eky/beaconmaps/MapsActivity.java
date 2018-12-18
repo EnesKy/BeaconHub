@@ -1,6 +1,5 @@
 package eky.beaconmaps;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -37,10 +36,22 @@ import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import butterknife.BindView;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+
+    @BindView(R.id.tv_beacon)
+    TextView tvBeacon;
+    @BindView(R.id.spn_beacon)
+    Spinner spnBeacon;
+    @BindView(R.id.tv_function)
+    TextView tvFunc;
+    @BindView(R.id.spn_function)
+    Spinner spnFunc;
+    @BindView(R.id.btn_cancel)
+    Button btnCancel;
+    @BindView(R.id.btn_done)
+    Button btnDone;
 
     private GoogleMap mMap;
     private static final String TAG = MapsActivity.class.getSimpleName();
@@ -88,11 +99,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        //TODO: get your AppId and AppToken you need to create new application in Estimote Cloud.
-        //EstimoteSDK.initialize(applicationContext, appId, appToken);
+        // TODO: get your AppId and AppToken you need to create new application in Estimote Cloud.
+        // EstimoteSDK.initialize(applicationContext, appId, appToken);
         // Optional, debug logging.
         EstimoteSDK.enableDebugLogging(true);
 
+        // if you want to access Estimote Cloud credentials from MyApplication:
+        // EstimoteCloudCredentials estimoteCloudCredentials = ((MyApplication) getApplication()).estimoteCloudCredentials;
     }
 
     /**
@@ -124,8 +137,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 // Creating a marker
                 MarkerOptions markerOptions = new MarkerOptions();
-
-                // Setting the position for the marker
                 markerOptions.position(latLng);
 
                 // Setting the title for the marke
@@ -153,19 +164,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 beacon_dialog.setContentView(R.layout.select_beacon_dialog);
                 beacon_dialog.show();
 
-                TextView tvBeacon = beacon_dialog.findViewById(R.id.tv_beacon);
-                Spinner spnBeacon = beacon_dialog.findViewById(R.id.spn_beacon);
-                TextView tvFunc = beacon_dialog.findViewById(R.id.tv_function);
-                Spinner spnFunc = beacon_dialog.findViewById(R.id.spn_function);
-                Button btnCancel = beacon_dialog.findViewById(R.id.btn_cancel);
-                Button btnDone = beacon_dialog.findViewById(R.id.btn_done);
-
                 beaconList.add("Beacon 1");
                 beaconList.add("Beacon 2");
                 beaconList.add("Beacon 3");
 
-
-                functionList.add("Function 1");
+                functionList.add("Notification");
                 functionList.add("Function 2");
                 functionList.add("Function 3");
 
