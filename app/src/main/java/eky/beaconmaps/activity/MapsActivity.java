@@ -1,14 +1,10 @@
-package eky.beaconmaps;
+package eky.beaconmaps.activity;
 
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,8 +14,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.estimote.coresdk.common.config.EstimoteSDK;
-import com.estimote.coresdk.recognition.utils.EstimoteBeacons;
+import com.estimote.proximity_sdk.api.EstimoteCloudCredentials;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,7 +23,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -36,28 +30,19 @@ import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.List;
-import butterknife.BindView;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
+import eky.beaconmaps.BeaconMaps;
+import eky.beaconmaps.R;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-
-    @BindView(R.id.tv_beacon)
-    TextView tvBeacon;
-    @BindView(R.id.spn_beacon)
-    Spinner spnBeacon;
-    @BindView(R.id.tv_function)
-    TextView tvFunc;
-    @BindView(R.id.spn_function)
-    Spinner spnFunc;
-    @BindView(R.id.btn_cancel)
-    Button btnCancel;
-    @BindView(R.id.btn_done)
-    Button btnDone;
 
     private GoogleMap mMap;
     private static final String TAG = MapsActivity.class.getSimpleName();
     private CameraPosition mCameraPosition;
-
-    // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
     // A default location (FSMVU Halic) and default zoom to use when location permission is not granted.
@@ -66,9 +51,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int ZOOM_LEVEL = 18;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
-
-    // The geographical location where the device is currently located. That is, the last-known
-    // location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation;
 
     // Keys for storing activity state.
@@ -78,6 +60,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //Spinner item lists
     List<String> beaconList = new ArrayList();
     List<String> functionList = new ArrayList();
+    private int funcPos = -1;
+
+    private Dialog beacon_dialog;
+    TextView tvBeacon;
+    Spinner spnBeacon;
+    TextView tvFunc;
+    Spinner spnFunc;
+    Button btnCancel;
+    Button btnDone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,17 +86,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        // TODO: get your AppId and AppToken you need to create new application in Estimote Cloud.
-        // EstimoteSDK.initialize(applicationContext, appId, appToken);
-        // Optional, debug logging.
-        EstimoteSDK.enableDebugLogging(true);
+        // if you want to access Estimote Cloud credentials from BeaconMaps:
+        EstimoteCloudCredentials estimoteCloudCredentials = ((BeaconMaps) getApplication()).cloudCredentials;
 
-        // if you want to access Estimote Cloud credentials from MyApplication:
-        // EstimoteCloudCredentials estimoteCloudCredentials = ((MyApplication) getApplication()).estimoteCloudCredentials;
+        beacon_dialog = new Dialog(MapsActivity.this);
+        beacon_dialog.setTitle("Select Beacon and It's Function");
+        beacon_dialog.setContentView(R.layout.select_beacon_dialog);
+
+        tvBeacon = beacon_dialog.findViewById(R.id.tv_beacon);
+        spnBeacon = beacon_dialog.findViewById(R.id.spn_beacon);
+        tvFunc = beacon_dialog.findViewById(R.id.tv_function);
+        spnFunc = beacon_dialog.findViewById(R.id.spn_function);
+        btnCancel = beacon_dialog.findViewById(R.id.btn_cancel);
+        btnDone = beacon_dialog.findViewById(R.id.btn_done);
+
     }
 
     /**
@@ -129,26 +126,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMapClick(LatLng latLng) {
 
-                Toast.makeText(
-                        MapsActivity.this,
-                        "Lat : " + latLng.latitude + " , "
-                                + "Long : " + latLng.longitude,
-                        Toast.LENGTH_SHORT).show();
-
-                // Creating a marker
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(latLng);
-
-                // Setting the title for the marke
-                // This will be displayed on taping the marker
                 markerOptions.title(latLng.latitude + " : " + latLng.longitude);
 
                 // Clears the previously touched position
                 mMap.clear();
-
                 // Animating to the touched position
                 mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-
                 // Placing a marker on the touched position
                 mMap.addMarker(markerOptions);
             }
@@ -159,66 +144,62 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public boolean onMarkerClick(Marker marker) {
                 Toast.makeText(MapsActivity.this,"Clicked to the marker", Toast.LENGTH_SHORT).show();
 
-                final Dialog beacon_dialog = new Dialog(MapsActivity.this);
-                beacon_dialog.setTitle("Select Beacon and It's Function");
-                beacon_dialog.setContentView(R.layout.select_beacon_dialog);
                 beacon_dialog.show();
 
+                //TODO: Spinnerları kaldır. Edittext koy. Dialog koy. Recycler viewlı tam ekranda görünür olsun
+                //TODO: Beacon seçim cell tasarımında icon, ID, vs vs bilgiler olsun....
+
+                beaconList.add("Select a Beacon");
                 beaconList.add("Beacon 1");
                 beaconList.add("Beacon 2");
                 beaconList.add("Beacon 3");
 
+                functionList.add("Select a function");
                 functionList.add("Notification");
                 functionList.add("Function 2");
-                functionList.add("Function 3");
 
-                // Spinner click listener
                 spnBeacon.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        Toast.makeText(MapsActivity.this,parent.getSelectedItem().toString(), Toast.LENGTH_SHORT).show();
+                        //Beacon ID bilgisini çek
+                        Log.d("spnBeacon","Selected item = " + parent.getSelectedItem().toString());
                     }
 
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
-
+                        Log.d("spnBeacon","---NothingSelected---");
                     }
                 });
 
                 spnFunc.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-                        Toast.makeText(MapsActivity.this,parent.getSelectedItem().toString(), Toast.LENGTH_SHORT).show();
+                        switch (parent.getSelectedItem().toString()) {
+                            case "Notification":
+                                funcPos = 1;
+                                break;
+                        }
+                        Log.d("spnFunc","Selected item = " + parent.getSelectedItem().toString());
                     }
 
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
-
+                        Log.d("spnBeacon","---NothingSelected---");
                     }
                 });
 
-                // Creating adapter for spinner
                 ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getApplicationContext(),
                                                     android.R.layout.simple_spinner_item, beaconList);
-
-                // Drop down layout style - list view with radio button
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
                 spnBeacon.setAdapter(dataAdapter);
-
-                // Creating adapter for spinner
                 ArrayAdapter<String> dataAdapter2 = new ArrayAdapter<String>(getApplicationContext(),
                         android.R.layout.simple_spinner_item, functionList);
-
-                // Drop down layout style - list view with radio button
                 dataAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
                 spnFunc.setAdapter(dataAdapter2);
 
                 btnCancel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(getApplicationContext(), "Cancel", Toast.LENGTH_SHORT).show();
                         beacon_dialog.cancel();
                     }
                 });
@@ -226,7 +207,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 btnDone.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(getApplicationContext(), "Done", Toast.LENGTH_SHORT).show();
+                        Log.d("beaconDialog","Clicked Done Button");
+                        if (funcPos == 1) {
+                            Intent i = new Intent(MapsActivity.this, NotificationActivity.class);
+                            startActivity(i);
+                        }
                         beacon_dialog.dismiss();
                     }
                 });
@@ -254,11 +239,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * Gets the current location of the device, and positions the map's camera.
      */
     private void getDeviceLocation() {
-        /*
-         * Get the best and most recent location of the device, which may be null in rare
-         * cases when a location is not available.
-         */
-
         try {
             if (mLocationPermissionGranted) {
                 Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();

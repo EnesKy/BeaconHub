@@ -1,4 +1,38 @@
 <resources>
     <string name="app_name">BeaconMaps</string>
     <string name="title_activity_maps">Map</string>
+
+    <!-- Common -->
+    <string name="label_dummy_text">-</string>
+    <string name="label_okay">Okay</string>
+    <string name="label_cancel">Cancel</string>
+    <string name="label_try_again">Try again</string>
+    <string name="message_internet_connection_not_available">Check your internet connection.</string>
+
+    <!-- Login Screen -->
+    <string name="label_login_screen">Login</string>
+    <string name="label_login_user_name">Username</string>
+    <string name="label_login_password">Password</string>
+    <string name="label_login_button">Login</string>
+    <string name="message_no_username_input">Enter username</string>
+    <string name="message_no_user_password_input">Enter password</string>
+    <string name="message_invalid_login">Invalid username or password.</string>
+
+    <!-- Map Activity -->
+    <string name="label_beacon_map_label">BeaconMap</string>
+    <string name="lable_no_beacons_found_error">There is no beacon in the area</string>
+
+    <!-- Notification Activity -->
+    <string name="label_notification_title">Notifications</string>
+    <string name="label_notification_icon">Select notification icon</string>
+    <string name="label_entrance_notification_explanation">The notification template at the bottom will appear when you enter the beacon area</string>
+    <string name="label_exit_notification_explanation">The notification template at the bottom will appear when you exit the beacon area</string>
+    <string name="label_distance_explanation">Please choose beacon notification radius from below</string>
+
+    <!-- Bottom Navigation -->
+    <string name="title_activity_bottom_nav">bottomNav</string>
+    <string name="title_search">Search</string>
+    <string name="title_map">BeaconMap</string>
+    <string name="title_profile">Profile</string>
+
 </resources>
