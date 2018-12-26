@@ -102,7 +102,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         spnFunc = beacon_dialog.findViewById(R.id.spn_function);
         btnCancel = beacon_dialog.findViewById(R.id.btn_cancel);
         btnDone = beacon_dialog.findViewById(R.id.btn_done);
-
     }
 
     /**
@@ -120,7 +119,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        //googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json));
+        //mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json));
+
+        LatLng loc = new LatLng(41.007700, 28.931707);
+        //mMap.addMarker(new MarkerOptions().position(loc).title("Blue Beacon").icon(BitmapDescriptorFactory.fromResource(R.drawable.-----)));
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
@@ -177,6 +179,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         switch (parent.getSelectedItem().toString()) {
                             case "Notification":
                                 funcPos = 1;
+                                break;
+                            case "Function 2":
+                                Intent i = new Intent(MapsActivity.this, ConnectBeaconActivity.class);
+                                startActivity(i);
                                 break;
                         }
                         Log.d("spnFunc","Selected item = " + parent.getSelectedItem().toString());

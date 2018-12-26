@@ -2,15 +2,15 @@ package eky.beaconmaps;
 
 import android.app.Application;
 
-import com.estimote.coresdk.common.config.EstimoteSDK;
 import com.estimote.proximity_sdk.api.EstimoteCloudCredentials;
+import com.estimote.sdk.EstimoteSDK;
 
 import eky.beaconmaps.notification.NotificationsManager;
 
 public class BeaconMaps extends Application {
 
-    private String appID = "";
-    private String appToken = "";
+    private String appID = "beaconmap-7na";
+    private String appToken = "406b37d7508496b9349808f7634c2b58";
 
     public EstimoteCloudCredentials cloudCredentials = new EstimoteCloudCredentials(appID, appToken);
     private NotificationsManager notificationsManager;

@@ -32,11 +32,25 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.NotificationActivity" />
+        <activity
+            android:name=".activity.BaseActivity"
+            android:label="@string/title_activity_bottom_nav" />
+        <activity
+            android:name=".activity.ProfileActivity"
+            android:label="@string/title_activity_profile"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".activity.ConfigureBeaconActivity"
+            android:label="@string/title_activity_bottom_nav" />
+        <activity
+            android:name=".activity.ConnectBeaconActivity"
+            android:label="@string/title_activity_profile"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <!-- API Key at .gradle/gradle.properties -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCVnUO55qsloeTK64ySniJok4mtDsVKCyA" />
+            android:value="${ApiKey}" />
 
         <!--
          This resolves the error.
@@ -46,9 +60,7 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
-        <activity
-            android:name=".activity.BaseActivity"
-            android:label="@string/title_activity_bottom_nav"></activity>
+
     </application>
 
 </manifest>

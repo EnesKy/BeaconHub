@@ -17,12 +17,10 @@ import com.estimote.proximity_sdk.api.ProximityZoneContext;
 
 import androidx.core.app.NotificationCompat;
 import eky.beaconmaps.BeaconMaps;
-import eky.beaconmaps.activity.MapsActivity;
 import eky.beaconmaps.R;
+import eky.beaconmaps.activity.MapsActivity;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
-
-import static com.estimote.mgmtsdk.repackaged.dfu_v0_6_1.no.nordicsemi.android.dfu.DfuBaseService.NOTIFICATION_ID;
 
 public class NotificationsManager  {
 
@@ -76,7 +74,7 @@ public class NotificationsManager  {
         builder.addAction(android.R.drawable.ic_menu_view, "Show on Map", pendingIntent); //TODO: add map icon and location intent
 
         Intent buttonIntent = new Intent(context, NotificationReceiver.class);
-        buttonIntent.putExtra("notificationId", NOTIFICATION_ID);
+        buttonIntent.putExtra("notificationId", 1);
         PendingIntent dismissIntent = PendingIntent.getBroadcast(context, 0, buttonIntent, 0);
         builder.addAction(android.R.drawable.ic_menu_view, "Dismiss", dismissIntent);
 
@@ -97,8 +95,9 @@ public class NotificationsManager  {
                         .build();
 
         ProximityZone zone = new ProximityZoneBuilder()
-                .forTag("TAG")
-                .inCustomRange(1.0)
+                //.forTag("beaconmap-notification-3yb") //todo: BURAYA TAG DOLDUR
+                .forTag("electronics")
+                .inCustomRange(2.0)
                 .onEnter(new Function1<ProximityZoneContext, Unit>() {
                     @Override
                     public Unit invoke(ProximityZoneContext proximityContext) {

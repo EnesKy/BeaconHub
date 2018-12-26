@@ -15,7 +15,9 @@ import com.estimote.mustard.rx_goodness.rx_requirements_wizard.RequirementsWizar
 
 import java.util.List;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import eky.beaconmaps.BeaconMaps;
 import eky.beaconmaps.R;
 import kotlin.Unit;
@@ -42,7 +44,17 @@ public class NotificationActivity extends AppCompatActivity implements View.OnCl
     protected void onCreate(Bundle savedInstanceState) {
         Intent i = getIntent();
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_func_notification);
+        setContentView(R.layout.activity_notification);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.label_notification_title);
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+        }
 
         entranceTitle = findViewById(R.id.hello_title);
         entranceDesc = findViewById(R.id.hello_desc);
@@ -122,7 +134,7 @@ public class NotificationActivity extends AppCompatActivity implements View.OnCl
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        Toast.makeText(this, "" + progress + 1, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "" + (progress + 1), Toast.LENGTH_SHORT).show();
     }
 
     @Override
