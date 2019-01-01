@@ -32,14 +32,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import eky.beaconmaps.R;
 
 public class ConfigureBeaconActivity extends AppCompatActivity {
 
     private static final String TAG = "ConfigureBeaconActivity";
+    private static String tag = "";
 
     private ConfigurableDevice configurableDevice;
     private DeviceConnection connection;
@@ -50,7 +53,6 @@ public class ConfigureBeaconActivity extends AppCompatActivity {
 
     private TextView beaconIdTextView;
     private TextView geolocationValuesTextView;
-    private TextView deneme1, deneme2;
     private Button saveButton;
     private ProgressDialog progressDialog;
 
@@ -86,14 +88,23 @@ public class ConfigureBeaconActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configure_beacon);
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        TextView toolbarTitle = toolbar.findViewById(R.id.tv_toolbar_title);
+        toolbarTitle.setText(R.string.title_activity_configure_beacon);
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+        }
+
         Intent intent = getIntent();
         configurableDevice = intent.getParcelableExtra(ConnectBeaconActivity.EXTRA_SCAN_RESULT_ITEM_DEVICE);
 
-        beaconIdTextView = findViewById(R.id.beacon_id_textView);
-        deneme1 = findViewById(R.id.textView7);
-        deneme2 = findViewById(R.id.textView8);
+        beaconIdTextView = findViewById(R.id.tv_beacon_id);
         beaconIdTextView.setText(configurableDevice.deviceId.toString());
-        geolocationValuesTextView = findViewById(R.id.geolocation_values_textView);
+        geolocationValuesTextView = findViewById(R.id.tv_geo_value);
         geolocationValuesTextView.setText("Searching");
         saveButton = findViewById(R.id.save_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -103,9 +114,9 @@ public class ConfigureBeaconActivity extends AppCompatActivity {
             }
         });
 
-        tagsSpinner = findViewById(R.id.tags_spinner);
-        aisleNumberTextField = findViewById(R.id.aisle_number_text_field);
-        placementSpinner = findViewById(R.id.placement_spinner);
+        tagsSpinner = findViewById(R.id.spn_tag);
+        aisleNumberTextField = findViewById(R.id.tv_aisle);
+        placementSpinner = findViewById(R.id.spn_placement);
 
         ArrayAdapter<String> adapterTags = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item,
@@ -123,7 +134,9 @@ public class ConfigureBeaconActivity extends AppCompatActivity {
         connectToDevice();
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -200,6 +213,8 @@ public class ConfigureBeaconActivity extends AppCompatActivity {
     */
 
     /**
+     * todo: Bu metodun sonunda bilgilerin bir kısmını database e ekle. Location dahil.
+     *  todo: MapsActivity açılışında databaseden bilgileri çekerek haritaya pin ekle.
      * Bu metodu iyice karıştır öğren
      * Tags kısmına ve UUID kısmına özellikle
      */
@@ -210,7 +225,8 @@ public class ConfigureBeaconActivity extends AppCompatActivity {
         // You might want all your beacons to have a certain UUID.
         edit.set(connection.settings.beacon.proximityUUID(), UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"));
         edit.set(connection.settings.beacon.major(), tagsMajorsMapping.get((String) tagsSpinner.getSelectedItem()));
-        edit.set(connection.settings.beacon.transmitPower(), placementPowerMapping.get((String) placementSpinner.getSelectedItem()).powerInDbm);
+        tag = (String) tagsSpinner.getSelectedItem();
+        edit.set(connection.settings.beacon.transmitPower(), placementPowerMapping.get(placementSpinner.getSelectedItem().toString()).powerInDbm);
         if (currentLocation != null) {
             edit.set(connection.settings.deviceInfo.geoLocation(), currentLocation);
         }
@@ -247,10 +263,11 @@ public class ConfigureBeaconActivity extends AppCompatActivity {
         builder.setMessage("Success");
         builder.setCancelable(true);
         builder.setPositiveButton(
-                "Next One",
+                "Add Notification",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
+                        Intent i = new Intent(ConfigureBeaconActivity.this, NotificationActivity.class);
+                        startActivity(i);
                         finish();
                     }
                 });
@@ -281,8 +298,8 @@ public class ConfigureBeaconActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    geolocationValuesTextView.setText(String.format("%.2f", locationF.getLatitude())
-                            + ", " + String.format("%.2f", locationF.getLongitude())
+                    geolocationValuesTextView.setText("" + locationF.getLatitude()
+                            + ", " + locationF.getLongitude()
                             + " ±" + locationF.getAccuracy());
                 }
             });
@@ -303,4 +320,8 @@ public class ConfigureBeaconActivity extends AppCompatActivity {
 
         }
     };
+
+    public static String getTag() {
+        return tag;
+    }
 }

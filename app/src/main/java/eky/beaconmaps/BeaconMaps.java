@@ -5,6 +5,7 @@ import android.app.Application;
 import com.estimote.proximity_sdk.api.EstimoteCloudCredentials;
 import com.estimote.sdk.EstimoteSDK;
 
+import eky.beaconmaps.activity.ConfigureBeaconActivity;
 import eky.beaconmaps.notification.NotificationsManager;
 
 public class BeaconMaps extends Application {
@@ -25,7 +26,7 @@ public class BeaconMaps extends Application {
 
     public void enableBeaconNotifications(String helloTitle, String helledesc, String byeTitle, String byeDesc) {
         notificationsManager = new NotificationsManager(this, helloTitle, helledesc, byeTitle, byeDesc);
-        notificationsManager.startMonitoring();
+        notificationsManager.startMonitoring(ConfigureBeaconActivity.getTag());
     }
 
 }

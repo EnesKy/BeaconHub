@@ -17,6 +17,7 @@
     <string name="message_no_username_input">Enter username</string>
     <string name="message_no_user_password_input">Enter password</string>
     <string name="message_invalid_login">Invalid username or password.</string>
+    <string name="label_sign_up">New to BeaconMaps? Sign up now.</string>
 
     <!-- Map Activity -->
     <string name="label_beacon_map_label">BeaconMap</string>
@@ -66,5 +67,8 @@
         <item>beauty</item>
         <item>groceries</item>
     </string-array>
+
+    <!-- ConfigureBeaconActivity -->
+    <string name="title_activity_configure_beacon">Beacon Configuration</string>
 
 </resources>

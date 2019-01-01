@@ -39,10 +39,8 @@ public class NotificationsManager  {
         this.helloNotification = buildNotification(helloTitle, helledesc);
         this.goodbyeNotification = buildNotification(byeTitle, byeDesc);
         notificationManager.notify(1,helloNotification);
-        notificationManager.notify(1,goodbyeNotification);
+        //notificationManager.notify(2,goodbyeNotification);
     }
-
-
 
     private Notification buildNotification(String title, String text) {
 
@@ -81,7 +79,7 @@ public class NotificationsManager  {
         return builder.build();
     }
 
-    public void startMonitoring() {
+    public void startMonitoring(String tag) {
         ProximityObserver proximityObserver =
                 new ProximityObserverBuilder(context, ((BeaconMaps) context).cloudCredentials)
                         .onError(new Function1<Throwable, Unit>() {
@@ -96,7 +94,7 @@ public class NotificationsManager  {
 
         ProximityZone zone = new ProximityZoneBuilder()
                 //.forTag("beaconmap-notification-3yb") //todo: BURAYA TAG DOLDUR
-                .forTag("electronics")
+                .forTag(tag)
                 .inCustomRange(2.0)
                 .onEnter(new Function1<ProximityZoneContext, Unit>() {
                     @Override

@@ -1,12 +1,18 @@
 package eky.beaconmaps.activity;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -15,18 +21,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.estimote.proximity_sdk.api.EstimoteCloudCredentials;
+import com.estimote.sdk.SystemRequirementsChecker;
+import com.estimote.sdk.connection.scanner.ConfigurableDevicesScanner;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,10 +49,11 @@ import androidx.fragment.app.FragmentActivity;
 import eky.beaconmaps.BeaconMaps;
 import eky.beaconmaps.R;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements View.OnClickListener, OnMapReadyCallback {
 
     private GoogleMap mMap;
     private static final String TAG = MapsActivity.class.getSimpleName();
+    public static final String EXTRA_SCAN_RESULT_ITEM_DEVICE = "com.estimote.configuration.SCAN_RESULT_ITEM_DEVICE";
     private CameraPosition mCameraPosition;
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
@@ -58,9 +70,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String KEY_LOCATION = "location";
 
     //Spinner item lists
-    List<String> beaconList = new ArrayList();
+    List<String> beaconSpnList = new ArrayList();
     List<String> functionList = new ArrayList();
+    List<ConfigurableDevicesScanner.ScanResultItem> beaconList;
     private int funcPos = -1;
+    private int spnBeaconPos = 0;
+    ConfigurableDevicesScanner.ScanResultItem beacon = null;
 
     private Dialog beacon_dialog;
     TextView tvBeacon;
@@ -69,6 +84,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Spinner spnFunc;
     Button btnCancel;
     Button btnDone;
+    FloatingActionButton fButton;
+    Animation animShake;
+
+    private ConfigurableDevicesScanner devicesScanner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +121,158 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         spnFunc = beacon_dialog.findViewById(R.id.spn_function);
         btnCancel = beacon_dialog.findViewById(R.id.btn_cancel);
         btnDone = beacon_dialog.findViewById(R.id.btn_done);
+
+        beaconSpnList.add("Select a Beacon");
+        beaconSpnList.add("Select Closest Beacon");
+
+        functionList.add("Select a function");
+        functionList.add("Notification");
+
+        fButton = findViewById(R.id.floating_button);
+        fButton.setOnClickListener(this);
+        animShake = AnimationUtils.loadAnimation(this, R.anim.shake_animation);
+
+        //Configuration
+        devicesScanner = new ConfigurableDevicesScanner(this);
+    }
+
+    @Override
+    public void onClick(View view) {
+        int viewId = view.getId();
+        switch (viewId) {
+            case R.id.floating_button:
+                beacon_dialog.show();
+
+                //TODO: Spinnerları kaldır. Edittext koy. Dialog koy. Recycler viewlı tam ekranda görünür olsun
+                //TODO: Beacon seçim cell tasarımında icon, ID, vs vs bilgiler olsun....
+
+                spnBeacon.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        if (position > 1) {
+                            position = 7;
+                        }
+
+                        spnBeaconPos = position;
+
+                        switch (position) {
+                            case 7:
+                                devicesScanner.stopScanning();
+                                beacon = getDeviceFromId(parent.getSelectedItem().toString());
+                                break;
+                        }
+                        Log.d("spnBeacon","Selected item = " + parent.getSelectedItem().toString());
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        Log.d("spnBeacon","---NothingSelected---");
+                    }
+                });
+
+                spnFunc.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                        switch (parent.getSelectedItem().toString()) {
+                            case "Notification":
+                                funcPos = 1;
+                                break;
+                        }
+                        Log.d("spnFunc","Selected item = " + parent.getSelectedItem().toString());
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        Log.d("spnBeacon","---NothingSelected---");
+                    }
+                });
+
+                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getApplicationContext(),
+                                                    android.R.layout.simple_spinner_item, beaconSpnList);
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spnBeacon.setAdapter(dataAdapter);
+
+                ArrayAdapter<String> dataAdapter2 = new ArrayAdapter<String>(getApplicationContext(),
+                                                    android.R.layout.simple_spinner_item, functionList);
+                dataAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spnFunc.setAdapter(dataAdapter2);
+
+                btnCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        beacon_dialog.cancel();
+                    }
+                });
+
+                btnDone.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d("beaconDialog","Clicked Done Button");
+                        /*if (funcPos == 1 && spnBeaconPos) {
+                            Intent i = new Intent(MapsActivity.this, NotificationActivity.class);
+                            startActivity(i);
+                        }*/
+                        if (funcPos != 1 && spnBeaconPos == 0) {
+                            spnFunc.startAnimation(animShake);
+                            spnBeacon.startAnimation(animShake);
+                            Toast.makeText(getApplicationContext(),"Please make a selection.",Toast.LENGTH_SHORT).show();
+                        }
+                        else if (funcPos != 1) {
+                            spnFunc.startAnimation(animShake);
+                            Toast.makeText(getApplicationContext(),"Please select a function.",Toast.LENGTH_SHORT).show();
+                        }
+                        else if(spnBeaconPos == 0) {
+                            spnBeacon.startAnimation(animShake);
+                            Toast.makeText(getApplicationContext(),"Please select a beacon.",Toast.LENGTH_SHORT).show();
+                        }
+                        else if(spnBeaconPos == 1 && funcPos == 1){
+                            Intent i = new Intent(MapsActivity.this, ConnectBeaconActivity.class);
+                            startActivity(i);
+                            beacon_dialog.dismiss();
+                        }
+
+                        else if (spnBeaconPos == 7 && funcPos == 1) {
+                            if (beacon != null) {
+                                Intent intent = new Intent(MapsActivity.this, ConfigureBeaconActivity.class);
+                                intent.putExtra(EXTRA_SCAN_RESULT_ITEM_DEVICE, beacon.device);
+                                startActivity(intent);
+                            }
+                        }
+                    }
+                });
+                break;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (SystemRequirementsChecker.checkWithDefaultDialogs(this)) {
+            devicesScanner.scanForDevices(new ConfigurableDevicesScanner.ScannerCallback() {
+                @Override
+                public void onDevicesFound(List<ConfigurableDevicesScanner.ScanResultItem> list) {
+                    beaconList = list;
+                    if (!beaconList.isEmpty() && beaconSpnList.size() == 2) {
+                        fButton.startAnimation(animShake);
+                        for (ConfigurableDevicesScanner.ScanResultItem item : beaconList) {
+                            if (!beaconSpnList.contains(item.device.deviceId.toString())) {
+                                beaconSpnList.add(item.device.deviceId.toString());
+                            }
+                        }
+                    }
+                    if (beaconSpnList.size() > 2 && list.get(0).device.deviceId.toString() != beaconSpnList.get(2)) {
+                        beaconSpnList.clear();
+                        beaconSpnList.add("Select a Beacon");
+                        beaconSpnList.add("Select Closest Beacon");
+                        fButton.startAnimation(animShake);
+                        for (ConfigurableDevicesScanner.ScanResultItem beacon : list) {
+                            beaconSpnList.add(beacon.device.deviceId.toString());
+                        }
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -121,107 +292,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         //mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.style_json));
 
-        LatLng loc = new LatLng(41.007700, 28.931707);
-        //mMap.addMarker(new MarkerOptions().position(loc).title("Blue Beacon").icon(BitmapDescriptorFactory.fromResource(R.drawable.-----)));
-
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
 
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(latLng);
-                markerOptions.title(latLng.latitude + " : " + latLng.longitude);
-
                 // Clears the previously touched position
                 mMap.clear();
-                // Animating to the touched position
+
+                mMap.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        //.icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_icons8_plus))
+                        .title("Beacon"))
+                        .showInfoWindow();
+
+                /*InfoWindowData info = new InfoWindowData();
+                //info.setImage("snowqualmie");
+                info.setId("Beacon ID");
+                info.setName("Beacon Name");
+
+                MapInfoWindowAdapter customInfoWindow = new MapInfoWindowAdapter(getApplicationContext());
+                mMap.setInfoWindowAdapter(customInfoWindow);
+
+                Marker m = mMap.addMarker(new MarkerOptions().position(latLng));
+                m.setTag(info);
+                m.showInfoWindow();*/
+
                 mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-                // Placing a marker on the touched position
-                mMap.addMarker(markerOptions);
+
+                //BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.ic_icons8_plus);
+                //markerOptions.icon(icon);
             }
         });
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Toast.makeText(MapsActivity.this,"Clicked to the marker", Toast.LENGTH_SHORT).show();
-
-                beacon_dialog.show();
-
-                //TODO: Spinnerları kaldır. Edittext koy. Dialog koy. Recycler viewlı tam ekranda görünür olsun
-                //TODO: Beacon seçim cell tasarımında icon, ID, vs vs bilgiler olsun....
-
-                beaconList.add("Select a Beacon");
-                beaconList.add("Beacon 1");
-                beaconList.add("Beacon 2");
-                beaconList.add("Beacon 3");
-
-                functionList.add("Select a function");
-                functionList.add("Notification");
-                functionList.add("Function 2");
-
-                spnBeacon.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        //Beacon ID bilgisini çek
-                        Log.d("spnBeacon","Selected item = " + parent.getSelectedItem().toString());
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                        Log.d("spnBeacon","---NothingSelected---");
-                    }
-                });
-
-                spnFunc.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-                        switch (parent.getSelectedItem().toString()) {
-                            case "Notification":
-                                funcPos = 1;
-                                break;
-                            case "Function 2":
-                                Intent i = new Intent(MapsActivity.this, ConnectBeaconActivity.class);
-                                startActivity(i);
-                                break;
-                        }
-                        Log.d("spnFunc","Selected item = " + parent.getSelectedItem().toString());
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                        Log.d("spnBeacon","---NothingSelected---");
-                    }
-                });
-
-                ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getApplicationContext(),
-                                                    android.R.layout.simple_spinner_item, beaconList);
-                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spnBeacon.setAdapter(dataAdapter);
-                ArrayAdapter<String> dataAdapter2 = new ArrayAdapter<String>(getApplicationContext(),
-                        android.R.layout.simple_spinner_item, functionList);
-                dataAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spnFunc.setAdapter(dataAdapter2);
-
-                btnCancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        beacon_dialog.cancel();
-                    }
-                });
-
-                btnDone.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Log.d("beaconDialog","Clicked Done Button");
-                        if (funcPos == 1) {
-                            Intent i = new Intent(MapsActivity.this, NotificationActivity.class);
-                            startActivity(i);
-                        }
-                        beacon_dialog.dismiss();
-                    }
-                });
-
+                marker.showInfoWindow();
                 return true;
             }
         });
@@ -333,6 +439,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
         }
+    }
+
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    private ConfigurableDevicesScanner.ScanResultItem getDeviceFromId (String id){
+        for (String deviceId : beaconSpnList) {
+            if (deviceId.equals(id)) {
+                for (ConfigurableDevicesScanner.ScanResultItem item : beaconList) {
+                    if (item.device.deviceId.toString().equals(id)) {
+                        return item;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 }
