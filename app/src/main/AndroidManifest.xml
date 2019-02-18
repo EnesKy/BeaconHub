@@ -50,7 +50,7 @@
         <!-- API Key at .gradle/gradle.properties -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="${ApiKey}" />
+            android:value="AIzaSyAFFBPNyTPU-1a4eDOBCRptVwoKs4YT9CM" />
 
         <!--
          This resolves the error.

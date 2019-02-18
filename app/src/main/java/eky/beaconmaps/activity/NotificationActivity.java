@@ -19,7 +19,9 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import eky.beaconmaps.BeaconMaps;
+import eky.beaconmaps.FirebaseUtil;
 import eky.beaconmaps.R;
+import eky.beaconmaps.datamodel.NotificationData;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
@@ -118,6 +120,12 @@ public class NotificationActivity extends AppCompatActivity implements View.OnCl
                         !exitTitle.getText().toString().isEmpty() && !exitDesc.getText().toString().isEmpty()) {
                     setNotifications(entranceTitle.getText().toString(),entranceDesc.getText().toString(),
                             exitTitle.getText().toString(), exitDesc.getText().toString());
+
+                    NotificationData notificationData = new NotificationData(ConfigureBeaconActivity.getBeaconUuid(),
+                            ConfigureBeaconActivity.getTag(), entranceTitle.getText().toString(),
+                            entranceDesc.getText().toString(), exitTitle.getText().toString(), exitDesc.getText().toString());
+                    FirebaseUtil.saveNotificationData(notificationData);
+
                     Intent i = new Intent(NotificationActivity.this, MapsActivity.class);
                     startActivity(i);
                 } else {

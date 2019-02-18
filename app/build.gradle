@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 28
@@ -39,8 +40,12 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    //----Estimote API--------
     //implementation 'com.estimote:sdk:1.4.5'
     implementation 'com.estimote:proximity-sdk:1.0.3'
     implementation 'com.estimote:mustard:0.2.1'
     implementation 'com.estimote:sdk:0.16.0@aar'
+
+    implementation 'com.google.firebase:firebase-database:16.0.5'
 }

@@ -41,6 +41,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.buLogin:
                 Intent i = new Intent(LoginActivity.this, MapsActivity.class);
                 startActivity(i);
+                //FirebaseUtil.saveBeacon();
                 break;
             case R.id.cbRememberMe:
                 break;

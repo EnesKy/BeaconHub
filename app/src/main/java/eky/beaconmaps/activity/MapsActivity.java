@@ -38,9 +38,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -48,6 +55,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import eky.beaconmaps.BeaconMaps;
 import eky.beaconmaps.R;
+import eky.beaconmaps.datamodel.BeaconData;
 
 public class MapsActivity extends FragmentActivity implements View.OnClickListener, OnMapReadyCallback {
 
@@ -58,12 +66,12 @@ public class MapsActivity extends FragmentActivity implements View.OnClickListen
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
     // A default location (FSMVU Halic) and default zoom to use when location permission is not granted.
-    private final LatLng mDefaultLocation = new LatLng(41.0463356,28.9432943);
+    private final LatLng mDefaultLocation = new LatLng(41.0463356, 28.9432943);
     private String defaultLocationText = "41.0463356, 28.9432943";
     private static final int ZOOM_LEVEL = 18;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
-    private Location mLastKnownLocation;
+    private static Location mLastKnownLocation;
 
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
@@ -88,6 +96,8 @@ public class MapsActivity extends FragmentActivity implements View.OnClickListen
     Animation animShake;
 
     private ConfigurableDevicesScanner devicesScanner;
+    private BeaconData beacondata;
+    private List<BeaconData> beaconDataList = new ArrayList();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +144,37 @@ public class MapsActivity extends FragmentActivity implements View.OnClickListen
 
         //Configuration
         devicesScanner = new ConfigurableDevicesScanner(this);
+
+        //
+        ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    BeaconData temp = childSnapshot.getValue(BeaconData.class);
+                    beaconDataList.add(temp);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("beaconData", "Yakalanamadı :/");
+            }
+        };
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference databaseBook = database.child("beaconData");
+        database.addValueEventListener(valueEventListener);
+
+        Timer myTimer = new Timer();
+        myTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                updatePins();
+            }
+
+        }, 0, 3000);
+
     }
 
     @Override
@@ -161,12 +202,12 @@ public class MapsActivity extends FragmentActivity implements View.OnClickListen
                                 beacon = getDeviceFromId(parent.getSelectedItem().toString());
                                 break;
                         }
-                        Log.d("spnBeacon","Selected item = " + parent.getSelectedItem().toString());
+                        Log.d("spnBeacon", "Selected item = " + parent.getSelectedItem().toString());
                     }
 
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
-                        Log.d("spnBeacon","---NothingSelected---");
+                        Log.d("spnBeacon", "---NothingSelected---");
                     }
                 });
 
@@ -178,22 +219,22 @@ public class MapsActivity extends FragmentActivity implements View.OnClickListen
                                 funcPos = 1;
                                 break;
                         }
-                        Log.d("spnFunc","Selected item = " + parent.getSelectedItem().toString());
+                        Log.d("spnFunc", "Selected item = " + parent.getSelectedItem().toString());
                     }
 
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
-                        Log.d("spnBeacon","---NothingSelected---");
+                        Log.d("spnBeacon", "---NothingSelected---");
                     }
                 });
 
                 ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getApplicationContext(),
-                                                    android.R.layout.simple_spinner_item, beaconSpnList);
+                        android.R.layout.simple_spinner_item, beaconSpnList);
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spnBeacon.setAdapter(dataAdapter);
 
                 ArrayAdapter<String> dataAdapter2 = new ArrayAdapter<String>(getApplicationContext(),
-                                                    android.R.layout.simple_spinner_item, functionList);
+                        android.R.layout.simple_spinner_item, functionList);
                 dataAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spnFunc.setAdapter(dataAdapter2);
 
@@ -207,7 +248,7 @@ public class MapsActivity extends FragmentActivity implements View.OnClickListen
                 btnDone.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Log.d("beaconDialog","Clicked Done Button");
+                        Log.d("beaconDialog", "Clicked Done Button");
                         /*if (funcPos == 1 && spnBeaconPos) {
                             Intent i = new Intent(MapsActivity.this, NotificationActivity.class);
                             startActivity(i);
@@ -215,23 +256,18 @@ public class MapsActivity extends FragmentActivity implements View.OnClickListen
                         if (funcPos != 1 && spnBeaconPos == 0) {
                             spnFunc.startAnimation(animShake);
                             spnBeacon.startAnimation(animShake);
-                            Toast.makeText(getApplicationContext(),"Please make a selection.",Toast.LENGTH_SHORT).show();
-                        }
-                        else if (funcPos != 1) {
+                            Toast.makeText(getApplicationContext(), "Please make a selection.", Toast.LENGTH_SHORT).show();
+                        } else if (funcPos != 1) {
                             spnFunc.startAnimation(animShake);
-                            Toast.makeText(getApplicationContext(),"Please select a function.",Toast.LENGTH_SHORT).show();
-                        }
-                        else if(spnBeaconPos == 0) {
+                            Toast.makeText(getApplicationContext(), "Please select a function.", Toast.LENGTH_SHORT).show();
+                        } else if (spnBeaconPos == 0) {
                             spnBeacon.startAnimation(animShake);
-                            Toast.makeText(getApplicationContext(),"Please select a beacon.",Toast.LENGTH_SHORT).show();
-                        }
-                        else if(spnBeaconPos == 1 && funcPos == 1){
+                            Toast.makeText(getApplicationContext(), "Please select a beacon.", Toast.LENGTH_SHORT).show();
+                        } else if (spnBeaconPos == 1 && funcPos == 1) {
                             Intent i = new Intent(MapsActivity.this, ConnectBeaconActivity.class);
                             startActivity(i);
                             beacon_dialog.dismiss();
-                        }
-
-                        else if (spnBeaconPos == 7 && funcPos == 1) {
+                        } else if (spnBeaconPos == 7 && funcPos == 1) {
                             if (beacon != null) {
                                 Intent intent = new Intent(MapsActivity.this, ConfigureBeaconActivity.class);
                                 intent.putExtra(EXTRA_SCAN_RESULT_ITEM_DEVICE, beacon.device);
@@ -261,18 +297,21 @@ public class MapsActivity extends FragmentActivity implements View.OnClickListen
                             }
                         }
                     }
-                    if (beaconSpnList.size() > 2 && list.get(0).device.deviceId.toString() != beaconSpnList.get(2)) {
-                        beaconSpnList.clear();
-                        beaconSpnList.add("Select a Beacon");
-                        beaconSpnList.add("Select Closest Beacon");
-                        fButton.startAnimation(animShake);
-                        for (ConfigurableDevicesScanner.ScanResultItem beacon : list) {
-                            beaconSpnList.add(beacon.device.deviceId.toString());
+                    if (!beaconSpnList.isEmpty() && !list.isEmpty()) {
+                        if (beaconSpnList.size() > 2 && list.get(0).device.deviceId.toString() != beaconSpnList.get(2)) {
+                            beaconSpnList.clear();
+                            beaconSpnList.add("Select a Beacon");
+                            beaconSpnList.add("Select Closest Beacon");
+                            fButton.startAnimation(animShake);
+                            for (ConfigurableDevicesScanner.ScanResultItem beacon : list) {
+                                beaconSpnList.add(beacon.device.deviceId.toString());
+                            }
                         }
                     }
                 }
             });
         }
+
     }
 
     /**
@@ -332,10 +371,13 @@ public class MapsActivity extends FragmentActivity implements View.OnClickListen
             }
         });
 
-        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {@Override
-        public boolean onMyLocationButtonClick() {
-            Toast.makeText(getApplicationContext(),"Clicked to the button",Toast.LENGTH_SHORT).show();
-            return true; }});
+        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+            @Override
+            public boolean onMyLocationButtonClick() {
+                Toast.makeText(getApplicationContext(), "Clicked to the button", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
 
         // Prompt the user for permission.
         getLocationPermission();
@@ -374,7 +416,7 @@ public class MapsActivity extends FragmentActivity implements View.OnClickListen
                     }
                 });
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -436,7 +478,7 @@ public class MapsActivity extends FragmentActivity implements View.OnClickListen
                 mLastKnownLocation = null;
                 getLocationPermission();
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -450,7 +492,7 @@ public class MapsActivity extends FragmentActivity implements View.OnClickListen
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-    private ConfigurableDevicesScanner.ScanResultItem getDeviceFromId (String id){
+    private ConfigurableDevicesScanner.ScanResultItem getDeviceFromId(String id) {
         for (String deviceId : beaconSpnList) {
             if (deviceId.equals(id)) {
                 for (ConfigurableDevicesScanner.ScanResultItem item : beaconList) {
@@ -461,6 +503,33 @@ public class MapsActivity extends FragmentActivity implements View.OnClickListen
             }
         }
         return null;
+    }
+
+    public static Location getmLastKnownLocation() {
+        return mLastKnownLocation;
+    }
+
+    public void updatePins() {
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                LatLng temp;
+                if (!beaconDataList.isEmpty()) {
+                    for (BeaconData beacon : beaconDataList) {
+                        String beaconLoc = beacon.getLocation();
+                        temp = new LatLng(Double.parseDouble((beaconLoc.split(",")[0])),
+                                Double.parseDouble((beaconLoc.split(",")[1])));
+                        mMap.addMarker(new MarkerOptions()
+                                .position(temp)
+                                //.icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_icons8_plus))
+                                .title("Beacon - " + beacon.getuuid()))
+                                .showInfoWindow();
+                    }
+                }
+            }
+        });
+
     }
 
 }

@@ -37,12 +37,15 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import eky.beaconmaps.FirebaseUtil;
 import eky.beaconmaps.R;
+import eky.beaconmaps.datamodel.BeaconData;
 
 public class ConfigureBeaconActivity extends AppCompatActivity {
 
     private static final String TAG = "ConfigureBeaconActivity";
     private static String tag = "";
+    private static String beaconUuid = "";
 
     private ConfigurableDevice configurableDevice;
     private DeviceConnection connection;
@@ -65,16 +68,15 @@ public class ConfigureBeaconActivity extends AppCompatActivity {
     private Spinner tagsSpinner;
     private EditText aisleNumberTextField;
     private Spinner placementSpinner;
+    Location fsmD;
 
     public static final HashMap<String, Integer> tagsMajorsMapping = new HashMap<String, Integer>() {{
-        put("store entrance", 100);
-        put("cash registers", 200);
-        put("customer service", 300);
-        put("toys", 1001);
-        put("electronics", 1002);
-        put("clothing", 1003);
-        put("beauty", 1004);
-        put("groceries", 1005);
+        put("Store entrance", 100);
+        put("Cash registers", 200);
+        put("Customer service", 300);
+        put("Electronics", 1002);
+        put("Clothing", 1003);
+        put("Groceries", 1005);
     }};
 
     public static final HashMap<String, BroadcastingPower> placementPowerMapping = new HashMap<String, BroadcastingPower>() {{
@@ -104,8 +106,22 @@ public class ConfigureBeaconActivity extends AppCompatActivity {
 
         beaconIdTextView = findViewById(R.id.tv_beacon_id);
         beaconIdTextView.setText(configurableDevice.deviceId.toString());
+
         geolocationValuesTextView = findViewById(R.id.tv_geo_value);
-        geolocationValuesTextView.setText("Searching");
+
+        if (MapsActivity.getmLastKnownLocation() != null) {
+            currentLocation = MapsActivity.getmLastKnownLocation();
+            geolocationValuesTextView.setText("" + currentLocation.getLatitude()
+                    + ", " + currentLocation.getLongitude()
+                    + " ±" + currentLocation.getAccuracy());
+        } else {
+            geolocationValuesTextView.setText("Searching");
+        }
+
+        fsmD = new Location(LocationManager.GPS_PROVIDER);
+        fsmD.setLatitude(41.046566);
+        fsmD.setLongitude(28.943399);
+
         saveButton = findViewById(R.id.save_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -213,10 +229,7 @@ public class ConfigureBeaconActivity extends AppCompatActivity {
     */
 
     /**
-     * todo: Bu metodun sonunda bilgilerin bir kısmını database e ekle. Location dahil.
      *  todo: MapsActivity açılışında databaseden bilgileri çekerek haritaya pin ekle.
-     * Bu metodu iyice karıştır öğren
-     * Tags kısmına ve UUID kısmına özellikle
      */
     private void writeSettings() {
         SettingsEditor edit = connection.edit();
@@ -239,6 +252,11 @@ public class ConfigureBeaconActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         progressDialog.dismiss();
+                        BeaconData beaconData = new BeaconData( configurableDevice.deviceId.toString(),
+                                                                "not available",
+                                                                "not available",
+                                currentLocation.getLatitude() + ", " + currentLocation.getLongitude());
+                        FirebaseUtil.saveBeaconData(beaconData);
                         displaySuccess();
                     }
                 });
@@ -267,6 +285,7 @@ public class ConfigureBeaconActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Intent i = new Intent(ConfigureBeaconActivity.this, NotificationActivity.class);
+                        //toDO: Beacon bilgisini bundle la taşı
                         startActivity(i);
                         finish();
                     }
@@ -307,21 +326,31 @@ public class ConfigureBeaconActivity extends AppCompatActivity {
 
         @Override
         public void onStatusChanged(String s, int i, Bundle bundle) {
-
+            if (true) {
+                //
+            }
         }
 
         @Override
         public void onProviderEnabled(String s) {
-
+            if (true) {
+                //
+            }
         }
 
         @Override
         public void onProviderDisabled(String s) {
-
+            if (true) {
+                //
+            }
         }
     };
 
     public static String getTag() {
         return tag;
+    }
+
+    public static String getBeaconUuid() {
+        return beaconUuid;
     }
 }

@@ -38,8 +38,8 @@ public class NotificationsManager  {
         this.notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         this.helloNotification = buildNotification(helloTitle, helledesc);
         this.goodbyeNotification = buildNotification(byeTitle, byeDesc);
-        notificationManager.notify(1,helloNotification);
-        //notificationManager.notify(2,goodbyeNotification);
+        notificationManager.notify(notificationId,helloNotification);
+        //notificationManager.notify(notificationId,goodbyeNotification);
     }
 
     private Notification buildNotification(String title, String text) {
@@ -69,7 +69,7 @@ public class NotificationsManager  {
         Intent intent = new Intent(context, MapsActivity.class);
         //intent.putExtra("BeaconLocation",Location);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-        builder.addAction(android.R.drawable.ic_menu_view, "Show on Map", pendingIntent); //TODO: add map icon and location intent
+        builder.addAction(android.R.drawable.ic_menu_view, "Show on Map", pendingIntent);
 
         Intent buttonIntent = new Intent(context, NotificationReceiver.class);
         buttonIntent.putExtra("notificationId", 1);
@@ -93,9 +93,9 @@ public class NotificationsManager  {
                         .build();
 
         ProximityZone zone = new ProximityZoneBuilder()
-                //.forTag("beaconmap-notification-3yb") //todo: BURAYA TAG DOLDUR
-                .forTag(tag)
-                .inCustomRange(2.0)
+                //.forTag("beaconmap-notification-3yb")
+                .forTag(tag) //tag
+                .inCustomRange(1.0)
                 .onEnter(new Function1<ProximityZoneContext, Unit>() {
                     @Override
                     public Unit invoke(ProximityZoneContext proximityContext) {
