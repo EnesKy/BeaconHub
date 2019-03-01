@@ -1,4 +1,4 @@
-package eky.beaconmaps.notification;
+package eky.beaconmaps.oldSdk.notification;
 
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;

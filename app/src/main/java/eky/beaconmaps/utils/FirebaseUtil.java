@@ -1,4 +1,4 @@
-package eky.beaconmaps;
+package eky.beaconmaps.utils;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;

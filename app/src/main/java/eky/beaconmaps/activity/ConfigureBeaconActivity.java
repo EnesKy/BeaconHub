@@ -37,7 +37,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
-import eky.beaconmaps.FirebaseUtil;
+import eky.beaconmaps.utils.FirebaseUtil;
 import eky.beaconmaps.R;
 import eky.beaconmaps.datamodel.BeaconData;
 

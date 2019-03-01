@@ -1,4 +1,4 @@
-package eky.beaconmaps.notification;
+package eky.beaconmaps.oldSdk.notification;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -22,7 +22,7 @@ import eky.beaconmaps.activity.MapsActivity;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
-public class NotificationsManager  {
+public class NotificationsManager {
 
     private Context context;
     private NotificationManager notificationManager;

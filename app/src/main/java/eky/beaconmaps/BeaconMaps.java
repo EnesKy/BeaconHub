@@ -6,7 +6,7 @@ import com.estimote.proximity_sdk.api.EstimoteCloudCredentials;
 import com.estimote.sdk.EstimoteSDK;
 
 import eky.beaconmaps.activity.ConfigureBeaconActivity;
-import eky.beaconmaps.notification.NotificationsManager;
+import eky.beaconmaps.oldSdk.notification.NotificationsManager;
 
 public class BeaconMaps extends Application {
 

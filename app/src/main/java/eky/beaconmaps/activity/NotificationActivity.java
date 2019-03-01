@@ -19,7 +19,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import eky.beaconmaps.BeaconMaps;
-import eky.beaconmaps.FirebaseUtil;
+import eky.beaconmaps.utils.FirebaseUtil;
 import eky.beaconmaps.R;
 import eky.beaconmaps.datamodel.NotificationData;
 import kotlin.Unit;

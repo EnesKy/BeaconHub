@@ -36,10 +36,6 @@
             android:name=".activity.BaseActivity"
             android:label="@string/title_activity_bottom_nav" />
         <activity
-            android:name=".activity.ProfileActivity"
-            android:label="@string/title_activity_profile"
-            android:theme="@style/AppTheme.NoActionBar"/>
-        <activity
             android:name=".activity.ConfigureBeaconActivity"
             android:label="@string/title_activity_bottom_nav" />
         <activity
