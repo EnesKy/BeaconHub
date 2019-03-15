@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">BeaconMaps</string>
+
+    <!-- Common -->
+
+
+
+    <!-- SignIn Activity Related -->
+    <string name="title_signin_activity">SignIn</string>
+
+
+
+    <!-- SignUp Activity Related -->
+    <string name="title_signup_activity">SignUp</string>
+
+
+
+    <!-- Main Activity Related -->
+    <string name="title_main_activity">BeaconMaps</string>
+
+
+
 </resources>
