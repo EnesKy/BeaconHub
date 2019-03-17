@@ -6,9 +6,14 @@
 
 
     <!-- SignIn Activity Related -->
-    <string name="title_signin_activity">SignIn</string>
-
-
+    <string name="title_login_activity">Login</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="login_button_text">Login</string>
+    <string name="message_no_username_input">Enter username</string>
+    <string name="message_no_user_password_input">Enter password</string>
+    <string name="message_invalid_login">Invalid username or password.</string>
+    <string name="label_sign_up">New to BeaconMaps? \nSign up now.</string>
 
     <!-- SignUp Activity Related -->
     <string name="title_signup_activity">SignUp</string>

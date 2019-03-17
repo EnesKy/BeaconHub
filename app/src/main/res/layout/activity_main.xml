@@ -20,7 +20,8 @@
             android:id="@+id/tv_toolbar_title"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textColor="@android:color/white"
+            android:text="@string/title_main_activity"
+            android:textColor="@color/rallyGreen"
             android:textStyle="bold"
             android:textSize="22sp"
             android:gravity = "center"/>

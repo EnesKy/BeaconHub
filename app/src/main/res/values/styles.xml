@@ -2,11 +2,19 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/rallyGreen</item>
+        <item name="colorPrimaryDark">@color/rallyDarkGrey</item>
+        <item name="colorAccent">@color/rallyDarkGreen</item>
+
+        <item name="textInputStyle">@style/AppTextField</item>
+
+        <item name="android:windowBackground">@color/rallyLightGrey</item>
     </style>
+
+    <style name="AppTextField" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <item name="boxStrokeColor">@color/rallyGreen</item>
+        <item name="boxBackgroundColor">@android:color/white</item>
+    </style>
+
 
 </resources>
