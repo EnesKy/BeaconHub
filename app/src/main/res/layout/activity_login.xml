@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     tools:context=".activities.LoginActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -33,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.25"/>
+        app:layout_constraintGuide_percent="0.2" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_email"
@@ -46,8 +48,7 @@
             android:id="@+id/etEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Email"
-            android:focusedByDefault="false"
+            android:hint="@string/hint_email"
             android:textColorHint="@color/rallyGreen"
             android:inputType="textEmailAddress" />
 
@@ -64,8 +65,7 @@
             android:id="@+id/et_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Password"
-            android:focusedByDefault="false"
+            android:hint="@string/hint_password"
             android:textColorHint="@color/rallyGreen"
             android:inputType="textPassword" />
 
@@ -100,13 +100,15 @@
         android:id="@+id/tv_sign_up"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/label_sign_up"
         android:gravity="center"
+        android:text="@string/label_sign_up"
         android:textColor="@android:color/white"
         android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cbRememberMe"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintVertical_bias="0.384" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

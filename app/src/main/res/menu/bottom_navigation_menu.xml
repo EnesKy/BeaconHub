@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_beacons_nearby"
+        android:icon="@drawable/icon_beacons_nearby_24dp"
+        android:title="@string/menu_beacons_nearby" />
+
+    <item
+        android:id="@+id/navigation_beacon_map"
+        android:icon="@drawable/icon_map_24dp"
+        android:title="@string/menu_beacon_map" />
+
+    <item
+        android:id="@+id/navigation_profile"
+        android:icon="@drawable/icon_profile_outline__24dp"
+        android:title="@string/menu_profile" />
+
+</menu>

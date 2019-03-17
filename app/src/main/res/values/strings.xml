@@ -4,7 +4,6 @@
     <!-- Common -->
 
 
-
     <!-- SignIn Activity Related -->
     <string name="title_login_activity">Login</string>
     <string name="hint_email">Email</string>
@@ -19,10 +18,22 @@
     <string name="title_signup_activity">SignUp</string>
 
 
-
     <!-- Main Activity Related -->
     <string name="title_main_activity">BeaconMaps</string>
 
+    <!-- Bottom Navigation Related -->
+    <string name="menu_beacons_nearby">Beacons Nearby</string>
+    <string name="menu_beacon_map">BeaconMap</string>
+    <string name="menu_profile">Profile</string>
+    <string name="title_activity_maps">Map</string>
 
+    <!-- Beacons Nearby Fragment Related -->
+    <string name="title_beacons_nearby">Beacons Nearby</string>
+
+    <!-- BeaconMap Fragment Related -->
+    <string name="title_beacon_map">BeaconMap</string>
+
+    <!-- Profile Fragment Related -->
+    <string name="title_profile">Profile</string>
 
 </resources>
