@@ -3,11 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="eky.beaconmaps">
 
-    <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality.
-    -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
@@ -20,10 +15,13 @@
 
         <activity
             android:name=".activities.MainActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.LoginActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop">
+            <!--android:theme="@style/AppTheme.Login"-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

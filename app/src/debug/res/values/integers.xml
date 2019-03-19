@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="crew_holder">0</integer>
+    <integer name="form_holder">2</integer>
+    <integer name="item">1</integer>
+
+    <integer name="fragment_custom_animation_duration">300</integer>
+    <integer name="flip_animation_duration">500</integer>
+    <integer name="flip_animation_half_duration">250</integer>
+
+    <integer name="clock_wise_refresh_duration">1000</integer>
+    <integer name="activity_transition_short_duration">200</integer>
+    <integer name="activity_transition_medium_duration">300</integer>
+    <integer name="activity_transition_long_duration">400</integer>
+    <integer name="transition_start_offset_just_before_short">250</integer>
+    <integer name="transition_holding_duration">500</integer>
+
+    <integer name="very_short_anim_time">300</integer>
+    <integer name="short_anim_time">500</integer>
+    <integer name="long_anim_time">1000</integer>
+</resources>

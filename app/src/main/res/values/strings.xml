@@ -3,7 +3,6 @@
 
     <!-- Common -->
 
-
     <!-- SignIn Activity Related -->
     <string name="title_login_activity">Login</string>
     <string name="hint_email">Email</string>
@@ -14,9 +13,8 @@
     <string name="message_invalid_login">Invalid username or password.</string>
     <string name="label_sign_up">New to BeaconMaps? \nSign up now.</string>
 
-    <!-- SignUp Activity Related -->
-    <string name="title_signup_activity">SignUp</string>
-
+    <!-- SignUp Fragment Related -->
+    <string name="title_signup_fragment">SignUp</string>
 
     <!-- Main Activity Related -->
     <string name="title_main_activity">BeaconMaps</string>
@@ -35,5 +33,12 @@
 
     <!-- Profile Fragment Related -->
     <string name="title_profile">Profile</string>
+    <string name="menu_settings">Settings</string>
+
+    <!-- Settings Fragment Related -->
+    <string name="title_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

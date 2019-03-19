@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:zAdjustment="top">
+
+    <translate xmlns:android="http://schemas.android.com/apk/res/android"
+        android:duration="@integer/activity_transition_medium_duration"
+        android:fromYDelta="-100%"
+        android:interpolator="@android:anim/accelerate_interpolator"
+        android:startOffset="@integer/transition_start_offset_just_before_short"
+        android:toYDelta="0%" />
+</set>

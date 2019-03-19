@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -30,6 +31,17 @@
 
     </androidx.appcompat.widget.Toolbar>
 
+    <!-- Fragments Container -->
+
+    <include
+        layout="@layout/content_login"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="wrap_content"
@@ -49,7 +61,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/hint_email"
-            android:textColorHint="@color/rallyGreen"
+            android:textColor="@android:color/white"
             android:inputType="textEmailAddress" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -66,7 +78,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/hint_password"
-            android:textColorHint="@color/rallyGreen"
+            android:textColor="@android:color/white"
             android:inputType="textPassword" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -78,7 +90,6 @@
         android:layout_marginTop="@dimen/space_top_large"
         android:textAllCaps="false"
         android:text="@string/login_button_text"
-        android:textColor="@android:color/white"
         app:layout_constraintTop_toBottomOf="@id/til_password"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -90,7 +101,7 @@
         android:layout_marginTop="@dimen/space_top_large"
         android:text="Remember Me"
         android:textColor="@android:color/white"
-        android:textSize="15sp"
+        android:textSize="16sp"
         android:buttonTint="@color/rallyGreen"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -103,7 +114,7 @@
         android:gravity="center"
         android:text="@string/label_sign_up"
         android:textColor="@android:color/white"
-        android:textSize="14sp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
