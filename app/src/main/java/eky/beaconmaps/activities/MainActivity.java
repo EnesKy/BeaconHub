@@ -1,14 +1,17 @@
 package eky.beaconmaps.activities;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
@@ -18,20 +21,22 @@ import eky.beaconmaps.R;
 import eky.beaconmaps.fragments.BeaconMapFragment;
 import eky.beaconmaps.fragments.BeaconsNearbyFragment;
 import eky.beaconmaps.fragments.ProfileFragment;
-import eky.beaconmaps.fragments.SettingsFragment;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
-    final Fragment fragment1 = new BeaconMapFragment();
-    final Fragment fragment2 = new BeaconsNearbyFragment();
-    final Fragment fragment3 = new ProfileFragment();
-    final FragmentManager fm = getSupportFragmentManager();
-    Fragment active = fragment1;
+    private final Fragment fragment1 = new BeaconMapFragment();
+    private final Fragment fragment2 = new BeaconsNearbyFragment();
+    private final Fragment fragment3 = new ProfileFragment();
+    private final FragmentManager fm = getSupportFragmentManager();
+    private Fragment active = fragment1;
+    private Fragment lastOpened;
+    private List<Fragment> lastOpenedFragments = new ArrayList<>();
+    private HashMap<Fragment, Integer> fragmentsBar = new HashMap<>();
 
     private TextView toolbarTitle;
     private ImageButton buttonSettings;
     public static BottomNavigationView navigation;
-    private String openFragmentTag = "1";
+    private boolean backPressed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,60 +51,113 @@ public class MainActivity extends BaseActivity {
 
         buttonSettings = findViewById(R.id.ib_settings);
         buttonSettings.setOnClickListener(v -> {
-            navigation.setVisibility(View.GONE);
-            fm.beginTransaction().add(R.id.main_container, new SettingsFragment(), "4").commit();
-            Toast.makeText(this,"OnClickSettings",Toast.LENGTH_LONG).show();
+            openActivity(null, SettingsActivity.class);
         });
 
         navigation = findViewById(R.id.navigation);
         navigation.setSelectedItemId(R.id.navigation_beacon_map);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.setOnNavigationItemSelectedListener(this);
 
         fm.beginTransaction().addToBackStack(null);
         fm.beginTransaction().add(R.id.main_container, fragment1, "1").commit();
         fm.beginTransaction().add(R.id.main_container, fragment2, "2").hide(fragment2).commit();
         fm.beginTransaction().add(R.id.main_container, fragment3, "3").hide(fragment3).commit();
 
+        fragmentsBar.put(fragment1, R.id.navigation_beacon_map);
+        fragmentsBar.put(fragment2, R.id.navigation_beacons_nearby);
+        fragmentsBar.put(fragment3, R.id.navigation_profile);
+
     }
 
     @Override
     public void onBackPressed() {
-        if (!TextUtils.isEmpty(openFragmentTag)) {
-            //ToDo: add alert dialog that asks "are you sure to exit? ".
+        if (!lastOpenedFragments.isEmpty()) {
+            changeFragments();
         } else {
             super.onBackPressed();
         }
     }
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_beacons_nearby:
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.navigation_beacons_nearby:
+                if (!fragment2.isHidden()) {
+                    return true;
+                }
+                if (backPressed) {
+                    backPressed = false;
+                } else {
+                    lastOpenedFragments.add(active);
+                }
+                if (lastOpened == null) {
                     fm.beginTransaction().hide(active).show(fragment2).commit();
                     active = fragment2;
-                    toolbarTitle.setText(R.string.title_beacons_nearby);
-                    buttonSettings.setVisibility(View.GONE);
-                    return true;
+                }
+                toolbarTitle.setText(R.string.title_beacons_nearby);
+                buttonSettings.setVisibility(View.GONE);
+                return true;
 
-                case R.id.navigation_beacon_map:
+            case R.id.navigation_beacon_map:
+                if (!fragment1.isHidden()) {
+                    return true;
+                }
+                if (backPressed) {
+                    backPressed = false;
+                } else {
+                    lastOpenedFragments.add(active);
+                }
+                if (lastOpened == null) {
                     fm.beginTransaction().hide(active).show(fragment1).commit();
                     active = fragment1;
-                    toolbarTitle.setText(R.string.title_beacon_map);
-                    buttonSettings.setVisibility(View.GONE);
-                    return true;
+                }
+                toolbarTitle.setText(R.string.title_beacon_map);
+                buttonSettings.setVisibility(View.GONE);
+                return true;
 
-                case R.id.navigation_profile:
+            case R.id.navigation_profile:
+                if (!fragment3.isHidden()) {
+                    return true;
+                }
+                if (backPressed) {
+                    backPressed = false;
+                } else {
+                    lastOpenedFragments.add(active);
+                }
+                if (lastOpened == null) {
                     fm.beginTransaction().hide(active).show(fragment3).commit();
                     active = fragment3;
-                    toolbarTitle.setText(R.string.title_profile);
-                    buttonSettings.setVisibility(View.VISIBLE);
-                    return true;
-            }
-            return false;
+                }
+                toolbarTitle.setText(R.string.title_profile);
+                buttonSettings.setVisibility(View.VISIBLE);
+                return true;
         }
-    };
+        return false;
+    }
+
+    public void changeFragments() {
+        lastOpened = lastOpenedFragments.get(lastOpenedFragments.size() - 1);
+        lastOpenedFragments.remove(lastOpenedFragments.size() - 1);
+
+        fm.beginTransaction().hide(active).show(lastOpened).commit();
+
+        active = lastOpened;
+
+        backPressed = true;
+        navigation.setSelectedItemId(fragmentsBar.get(active));
+    }
+
+    public void openAlertDialog() {
+        AlertDialog.Builder alertBuild = new AlertDialog.Builder(this)
+                .setTitle("Warning")
+                .setMessage("Are you sure to exit?")
+                .setPositiveButton("OK", (dialog, which) -> super.onBackPressed())
+                .setNeutralButton("CANCEL", (dialog, which) -> {
+                    dialog.dismiss();
+                });
+
+        AlertDialog dialog = alertBuild.create();
+        dialog.show();
+    }
 
 }

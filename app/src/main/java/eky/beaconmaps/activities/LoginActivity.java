@@ -33,6 +33,7 @@ public class LoginActivity extends BaseActivity {
         TextView textViewsignUp = findViewById(R.id.tv_sign_up);
         textViewsignUp.setOnClickListener(v -> {
             openFragmentTag = "SignUp";
+            toolbarTitle.setText(getString(R.string.title_signup_fragment));
             openFragment(R.id.login_container, new SignUpFragment(), openFragmentTag,
                     R.anim.enter_from_bottom, R.anim.hold);
         });
