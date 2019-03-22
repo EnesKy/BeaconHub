@@ -13,8 +13,8 @@
     <string name="message_invalid_login">Invalid username or password.</string>
     <string name="label_sign_up">New to BeaconMaps? \nSign up now.</string>
 
-    <!-- SignUp Fragment Related -->
-    <string name="title_signup_fragment">SignUp</string>
+    <!-- SignUp Activity Related -->
+    <string name="title_signup_activity">SignUp</string>
 
     <!-- Main Activity Related -->
     <string name="title_main_activity">BeaconMaps</string>

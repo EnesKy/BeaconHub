@@ -1,29 +1,20 @@
 package eky.beaconmaps.activities;
 
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
 
-import androidx.appcompat.widget.Toolbar;
 import eky.beaconmaps.R;
-import eky.beaconmaps.fragments.SignUpFragment;
 
 public class LoginActivity extends BaseActivity {
-
-    private TextView toolbarTitle;
-    private String openFragmentTag = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbarTitle = toolbar.findViewById(R.id.tv_toolbar_title);
-        toolbarTitle.setText(R.string.title_login_activity);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(findViewById(R.id.toolbar));
 
         MaterialButton buttonLogin = findViewById(R.id.button_login);
         buttonLogin.setOnClickListener(v -> {
@@ -32,21 +23,9 @@ public class LoginActivity extends BaseActivity {
 
         TextView textViewsignUp = findViewById(R.id.tv_sign_up);
         textViewsignUp.setOnClickListener(v -> {
-            openFragmentTag = "SignUp";
-            toolbarTitle.setText(getString(R.string.title_signup_fragment));
-            openFragment(R.id.login_container, new SignUpFragment(), openFragmentTag,
-                    R.anim.enter_from_bottom, R.anim.hold);
+            openActivity(null, SignUpActivity.class);
         });
 
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (!TextUtils.isEmpty(openFragmentTag)) {
-            closeFragment(openFragmentTag, R.anim.hold, R.anim.exit_to_bottom);
-        } else {
-            super.onBackPressed();
-        }
     }
 
 }

@@ -74,6 +74,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         if (!lastOpenedFragments.isEmpty()) {
             changeFragments();
         } else {
+            lastOpened = null;
             super.onBackPressed();
         }
     }
@@ -89,8 +90,6 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                     backPressed = false;
                 } else {
                     lastOpenedFragments.add(active);
-                }
-                if (lastOpened == null) {
                     fm.beginTransaction().hide(active).show(fragment2).commit();
                     active = fragment2;
                 }
@@ -106,8 +105,6 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                     backPressed = false;
                 } else {
                     lastOpenedFragments.add(active);
-                }
-                if (lastOpened == null) {
                     fm.beginTransaction().hide(active).show(fragment1).commit();
                     active = fragment1;
                 }
@@ -123,8 +120,6 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                     backPressed = false;
                 } else {
                     lastOpenedFragments.add(active);
-                }
-                if (lastOpened == null) {
                     fm.beginTransaction().hide(active).show(fragment3).commit();
                     active = fragment3;
                 }
