@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="3dp"
     style="@style/CardView.ListItem">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -14,22 +15,11 @@
             android:id="@+id/tv_title_beacon_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="iBeacon :"
+            android:text="iBeacon"
             android:textSize="16dp"
             android:textColor="@android:color/black"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            />
-
-        <TextView
-            android:id="@+id/tv_beacon_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/space_medium"
-            android:text="12345678910"
-            android:textSize="16dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/tv_title_beacon_type"
             />
 
         <TextView
@@ -60,6 +50,18 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.5"
+            />
+
+        <TextView
+            android:id="@+id/tv_title_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Distance : "
+            android:textSize="16dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/tv_title_minor"
+            app:layout_constraintStart_toEndOf="@id/guideline_middle"
             />
 
         <TextView

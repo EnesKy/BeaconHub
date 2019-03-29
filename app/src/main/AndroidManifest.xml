@@ -4,6 +4,8 @@
     package="eky.beaconmaps">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -36,6 +38,11 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+
+        <service android:name="org.altbeacon.beacon.service.BeaconService"
+            tools:node="replace">
+            <meta-data android:name="longScanForcingEnabled" android:value="true"/>
+        </service>
     </application>
 
 </manifest>

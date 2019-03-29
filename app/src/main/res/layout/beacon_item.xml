@@ -29,7 +29,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             android:textSize="24sp"
             android:textColor="@color/cardTitleColor"
-            tools:text="Eddystone-UID+TLM"
+            tools:text="iBeacon"
             />
 
         <!-- Distance -->
@@ -125,7 +125,6 @@
             <include
                 layout="@layout/ibeacon_altbeacon_item"
                 android:id="@+id/ibeacon_altbeacon_item"
-                android:visibility="gone"
                 />
 
         </FrameLayout>

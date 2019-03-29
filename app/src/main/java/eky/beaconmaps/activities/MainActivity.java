@@ -50,9 +50,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         setSupportActionBar(toolbar);
 
         buttonSettings = findViewById(R.id.ib_settings);
-        buttonSettings.setOnClickListener(v -> {
-            openActivity(null, SettingsActivity.class);
-        });
+        buttonSettings.setOnClickListener(v -> openActivity(null, SettingsActivity.class));
 
         navigation = findViewById(R.id.navigation);
         navigation.setSelectedItemId(R.id.navigation_beacon_map);
@@ -147,9 +145,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                 .setTitle("Warning")
                 .setMessage("Are you sure to exit?")
                 .setPositiveButton("OK", (dialog, which) -> super.onBackPressed())
-                .setNeutralButton("CANCEL", (dialog, which) -> {
-                    dialog.dismiss();
-                });
+                .setNeutralButton("CANCEL", (dialog, which) -> dialog.dismiss());
 
         AlertDialog dialog = alertBuild.create();
         dialog.show();
