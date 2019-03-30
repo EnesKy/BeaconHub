@@ -3,6 +3,7 @@ package eky.beaconmaps.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.view.LayoutInflater;
@@ -18,9 +19,12 @@ import org.altbeacon.beacon.Region;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -69,13 +73,18 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         return rootView;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
 
         beaconList.clear();
         beaconList.addAll(beacons);
 
-        if (beacons.size() != 0) {
+        if (beaconList.size() != 0) {
+
+            Comparator<Beacon> beaconDistanceComparator = Comparator.comparing(Beacon::getDistance);
+            Collections.sort(beaconList, beaconDistanceComparator);
+
             if (adapter == null) {
                 adapter = new BeaconAdapter(beaconList);
                 recyclerView.setAdapter(adapter);

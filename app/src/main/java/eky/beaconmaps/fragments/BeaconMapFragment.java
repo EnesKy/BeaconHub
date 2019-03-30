@@ -49,7 +49,7 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(41.0463356, 28.9432943);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Fsmvü"));
-        float zoom_level = 10;
+        float zoom_level = 14;
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, zoom_level));
     }
 }
