@@ -5,6 +5,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.material.card.MaterialCardView;
+
 import org.altbeacon.beacon.Beacon;
 
 import java.text.DecimalFormat;
@@ -21,10 +23,12 @@ import eky.beaconmaps.R;
 public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder> {
 
     private List<Beacon> beaconList;
+    private ItemClickListener itemClickListener;
     DecimalFormat numberFormat = new DecimalFormat("#.00");
 
-    public BeaconAdapter(List<Beacon> beaconList) {
+    public BeaconAdapter(List<Beacon> beaconList, ItemClickListener itemClickListener) {
         this.beaconList = beaconList;
+        this.itemClickListener = itemClickListener;
     }
 
     @NonNull
@@ -55,6 +59,7 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
+        MaterialCardView item;
         TextView tvUuid;
         TextView tvMajor;
         TextView tvMinor;
@@ -66,13 +71,21 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
             super(itemView);
             itemView.setClickable(false);
 
+            item = itemView.findViewById(R.id.beacon_item);
             tvUuid = itemView.findViewById(R.id.proximity_uuid);
             tvMajor = itemView.findViewById(R.id.major);
             tvMinor = itemView.findViewById(R.id.minor);
             tvDistance = itemView.findViewById(R.id.distance);
             tvRssi = itemView.findViewById(R.id.rssi);
             tvTx = itemView.findViewById(R.id.tx);
+
+            item.setOnClickListener(v -> itemClickListener.onItemClick((getAdapterPosition()), itemView));
         }
+    }
+
+
+    public interface ItemClickListener {
+        void onItemClick(int position, View view);
     }
 
 }

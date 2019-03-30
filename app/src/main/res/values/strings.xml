@@ -27,6 +27,7 @@
 
     <!-- Beacons Nearby Fragment Related -->
     <string name="title_beacons_nearby">Beacons Nearby</string>
+    <string name="placeholder_no_beacon_found">There is no iBeacon nearby.</string>
 
     <!-- BeaconMap Fragment Related -->
     <string name="title_beacon_map">BeaconMap</string>
@@ -34,6 +35,8 @@
     <!-- Profile Fragment Related -->
     <string name="title_profile">Profile</string>
     <string name="menu_settings">Settings</string>
+    <string name="placeholder_no_beacon">You have no iBeacon. \n
+        If you want to buy iBeacon visit www.---.com </string>
 
     <!-- Settings Fragment Related -->
     <string name="title_settings">Settings</string>

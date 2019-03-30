@@ -5,15 +5,22 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
+import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
@@ -22,25 +29,32 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
 import eky.beaconmaps.adapter.BeaconAdapter;
-import eky.beaconmaps.recyclerview.DividerItemDecoration;
 
-public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, BeaconConsumer {
+public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, BeaconConsumer,
+                                            SearchView.OnQueryTextListener, BeaconAdapter.ItemClickListener {
 
     public static final String TAG = "BeaconsNearbyFragment";
+
     private BeaconManager beaconManager;
     private List<Beacon> beaconList;
-
     private RecyclerView recyclerView;
-    public RecyclerView.Adapter adapter;
+    private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
+    private SearchView searchView;
+    private CountDownTimer countDownTimer;
+    private String query;
+    private TextView placeholder;
+    private ProgressBar progressBarLoading;
 
     public BeaconsNearbyFragment() {
         // Required empty public constructor
@@ -64,11 +78,24 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
         View rootView = inflater.inflate(R.layout.fragment_beacons_nearby, container, false);
 
+        placeholder = rootView.findViewById(R.id.tv_placeholder);
+
+        progressBarLoading = rootView.findViewById(R.id.pb_loading);
+        progressBarLoading.setVisibility(View.VISIBLE);
+
         recyclerView = rootView.findViewById(R.id.rv_beacons);
         layoutManager = new LinearLayoutManager(inflater.getContext());
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addItemDecoration(new DividerItemDecoration(inflater.getContext(),
-                                           DividerItemDecoration.VERTICAL));
+
+        searchView = rootView.findViewById(R.id.beacon_search_view);
+
+        searchView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            public void onGlobalLayout() {
+                searchView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
+
+        searchView.setOnQueryTextListener(this);
 
         return rootView;
     }
@@ -82,24 +109,28 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
         if (beaconList.size() != 0) {
 
+            placeholder.setVisibility(View.GONE);
+
+            //Sorting the beacons by their distance to phone.
             Comparator<Beacon> beaconDistanceComparator = Comparator.comparing(Beacon::getDistance);
             Collections.sort(beaconList, beaconDistanceComparator);
 
             if (adapter == null) {
-                adapter = new BeaconAdapter(beaconList);
+                adapter = new BeaconAdapter(beaconList, this);
                 recyclerView.setAdapter(adapter);
             } else {
                 adapter.notifyDataSetChanged();
             }
+        } else {
+            placeholder.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
     public void onBeaconServiceConnect() {
         try {
-            // id1 ve id2 null olduğu sürece her beaconı görür.
-            beaconManager.startRangingBeaconsInRegion(
-                    new Region("myRangingUniqueId", null, null, null));
+            Region all = new Region("rangingId", null, null, null);
+            beaconManager.startRangingBeaconsInRegion(all);
             beaconManager.addRangeNotifier(this);
         } catch (RemoteException e) { }
     }
@@ -131,4 +162,53 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         //beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.URI_BEACON_LAYOUT));
     }
 
+    public void initializeCountDownTimer() {
+        countDownTimer = new CountDownTimer(750, 1000) {
+            public void onTick(long millisUntilFinished) {
+            }
+
+            public void onFinish() {
+                filterBeaconList(query);
+                countDownTimer.cancel();
+            }
+        };
+    }
+
+    private void filterBeaconList(String query) {
+        List<Beacon> temp = new ArrayList<>();
+        for (Beacon beacon : beaconList) {
+            for (Identifier identifier : beacon.getIdentifiers()) {
+                if (identifier.toString().contains(query)) {
+                    temp.add(beacon);
+                }
+            }
+        }
+        //TODO: change list with temp. When query used stop scanning beacon until query cancelled.
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        newText = newText.toUpperCase(Locale.US);
+        countDownTimer.start();
+        if (!TextUtils.isEmpty(newText)) {
+            if (countDownTimer != null) {
+                countDownTimer.cancel();
+            }
+            countDownTimer.start();
+        }
+        query = newText;
+        return false;
+    }
+
+    @Override
+    public void onItemClick(int position, View view) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(TAG, beaconList.get(position));
+        Toast.makeText(getActivity(),"Clicked to beacon with uuid: " + beaconList.get(position).getId1(),Toast.LENGTH_LONG).show();
+    }
 }
