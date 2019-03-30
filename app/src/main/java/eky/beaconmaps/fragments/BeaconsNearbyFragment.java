@@ -1,5 +1,6 @@
 package eky.beaconmaps.fragments;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -15,6 +16,8 @@ import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.button.MaterialButton;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -38,6 +41,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
+import eky.beaconmaps.activities.NotificationActivity;
 import eky.beaconmaps.adapter.BeaconAdapter;
 
 public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, BeaconConsumer,
@@ -73,8 +77,7 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_beacons_nearby, container, false);
 
@@ -210,5 +213,24 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         Bundle bundle = new Bundle();
         bundle.putParcelable(TAG, beaconList.get(position));
         Toast.makeText(getActivity(),"Clicked to beacon with uuid: " + beaconList.get(position).getId1(),Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(getActivity(), NotificationActivity.class);
+        startActivity(intent);
+    }
+
+    public void openActionDialog() {
+        Dialog beacon_dialog;
+        MaterialButton b1;
+        MaterialButton b2;
+        MaterialButton b3;
+
+        beacon_dialog = new Dialog(getActivity());
+        beacon_dialog.setTitle("Add action");
+        beacon_dialog.setContentView(R.layout.dialog_beacon_action);
+
+        b1 = beacon_dialog.findViewById(R.id.b1);
+        b2 = beacon_dialog.findViewById(R.id.b2);
+        b3 = beacon_dialog.findViewById(R.id.b3);
+
+        beacon_dialog.show();
     }
 }

@@ -38,10 +38,14 @@
     <string name="placeholder_no_beacon">You have no iBeacon. \n
         If you want to buy iBeacon visit www.---.com </string>
 
-    <!-- Settings Fragment Related -->
+    <!-- Settings Activity Related -->
     <string name="title_settings">Settings</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Notification Activity -->
+    <string name="label_notification_title">Notifications</string>
+    <string name="label_notification_icon">Select notification icon</string>
+    <string name="label_entrance_notification_explanation">The notification template at the bottom will appear when you enter the beacon area</string>
+    <string name="label_exit_notification_explanation">The notification template at the bottom will appear when you exit the beacon area</string>
+    <string name="label_distance_explanation">Please choose beacon notification radius from below</string>
 
 </resources>
