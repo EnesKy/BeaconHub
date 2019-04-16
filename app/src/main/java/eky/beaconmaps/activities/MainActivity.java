@@ -2,6 +2,7 @@ package eky.beaconmaps.activities;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -17,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import eky.beaconmaps.BeaconMaps;
 import eky.beaconmaps.R;
 import eky.beaconmaps.fragments.BeaconMapFragment;
 import eky.beaconmaps.fragments.BeaconsNearbyFragment;
@@ -64,6 +66,18 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         fragmentsBar.put(fragment1, R.id.navigation_beacon_map);
         fragmentsBar.put(fragment2, R.id.navigation_beacons_nearby);
         fragmentsBar.put(fragment3, R.id.navigation_profile);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        BeaconMaps app = (BeaconMaps) getApplication();
+        if (!app.isBeaconNotificationsEnabled()) {
+            Log.d("BaseActivity", "Enabling beacon notifications");
+            app.enableBeaconNotifications();
+        }
 
     }
 

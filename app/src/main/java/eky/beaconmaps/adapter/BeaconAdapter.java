@@ -10,6 +10,8 @@ import com.google.android.material.card.MaterialCardView;
 import org.altbeacon.beacon.Beacon;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -50,6 +52,10 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
         holder.tvRssi.setText("Rssi : " + beacon.getRssi());
         holder.tvTx.setText("Rx : " + beacon.getTxPower());
 
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        holder.tvLastSeen.setText(formatter.format(date));
+
     }
 
     @Override
@@ -66,6 +72,7 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
         TextView tvDistance;
         TextView tvRssi;
         TextView tvTx;
+        TextView tvLastSeen;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -78,6 +85,7 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
             tvDistance = itemView.findViewById(R.id.distance);
             tvRssi = itemView.findViewById(R.id.rssi);
             tvTx = itemView.findViewById(R.id.tx);
+            tvLastSeen = itemView.findViewById(R.id.last_seen);
 
             item.setOnClickListener(v -> itemClickListener.onItemClick((getAdapterPosition()), itemView));
         }

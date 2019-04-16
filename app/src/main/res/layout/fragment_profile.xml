@@ -17,7 +17,6 @@
             android:text="My Beacons"
             android:layout_margin="16dp"
             android:textSize="24sp"
-            android:textStyle="bold"
             android:textColor="@android:color/white"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/rv_beacons"/>

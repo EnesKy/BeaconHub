@@ -47,7 +47,7 @@ public class LoginActivity extends BaseActivity {
         etPassword = findViewById(R.id.et_password);
 
         signInButton = findViewById(R.id.sign_in_button);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);
+        signInButton.setSize(SignInButton.SIZE_WIDE);
 
         MaterialButton buttonLogin = findViewById(R.id.button_login);
         buttonLogin.setOnClickListener(v -> openActivity(null, MainActivity.class));

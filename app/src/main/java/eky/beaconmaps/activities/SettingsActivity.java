@@ -6,6 +6,7 @@ import eky.beaconmaps.R;
 
 public class SettingsActivity extends BaseActivity {
 
+    String TAG = "SettingsActivity";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -16,6 +17,5 @@ public class SettingsActivity extends BaseActivity {
         setSupportActionBar(findViewById(R.id.toolbar));
 
     }
-
 
 }

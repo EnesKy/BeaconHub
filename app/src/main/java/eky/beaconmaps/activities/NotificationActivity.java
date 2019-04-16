@@ -9,9 +9,7 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import eky.beaconmaps.BeaconMaps;
 import eky.beaconmaps.R;
 
@@ -37,35 +35,12 @@ public class NotificationActivity extends AppCompatActivity implements View.OnCl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.label_notification_title);
-        setSupportActionBar(toolbar);
-
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
-        }
-
         entranceTitle = findViewById(R.id.hello_title);
         entranceDesc = findViewById(R.id.hello_desc);
         exitTitle = findViewById(R.id.exit_title);
         exitDesc = findViewById(R.id.exit_desc);
         done = findViewById(R.id.btn_done);
         done.setOnClickListener(this);
-    }
-
-    public void initializeToolbar(){
-        /*Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.label_notification_title);
-
-        setSupportActionBar(toolbar);
-
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
-        }*/
     }
 
     public void setNotifications(final String helloTitle, final String helledesc,

@@ -2,12 +2,14 @@ package eky.beaconmaps.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import eky.beaconmaps.BeaconMaps;
 import eky.beaconmaps.R;
 import me.anwarshahriar.calligrapher.Calligrapher;
 
@@ -21,6 +23,16 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         Calligrapher calligrapher = new Calligrapher(this);
         calligrapher.setFont(this, "font/MuseoSans.otf", true);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        BeaconMaps app = (BeaconMaps) getApplication();
+        if (!app.isBeaconNotificationsEnabled()) {
+            Log.d("BaseActivity", "Enabling beacon notifications");
+            app.enableBeaconNotifications();
+        }
     }
 
     @Override
