@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.estimote.coresdk.common.requirements.SystemRequirementsChecker;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -23,6 +24,7 @@ import com.google.firebase.auth.FirebaseUser;
 import org.altbeacon.beacon.BeaconManager;
 
 import androidx.annotation.NonNull;
+import eky.beaconmaps.BeaconMaps;
 import eky.beaconmaps.R;
 
 public class LoginActivity extends BaseActivity {
@@ -65,6 +67,22 @@ public class LoginActivity extends BaseActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        BeaconMaps app = (BeaconMaps) getApplication();
+
+        if (!SystemRequirementsChecker.checkWithDefaultDialogs(this)) {
+            Log.e(TAG, "Can't scan for beacons, some pre-conditions were not met");
+            Log.e(TAG, "Read more about what's required at: http://estimote.github.io/Android-SDK/JavaDocs/com/estimote/sdk/SystemRequirementsChecker.html");
+            Log.e(TAG, "If this is fixable, you should see a popup on the app's screen right now, asking to enable what's necessary");
+        } else if (!app.isBeaconNotificationsEnabled()) {
+            Log.d(TAG, "Enabling beacon notifications");
+            app.enableBeaconNotifications();
+        }
     }
 
     private void updateUI(FirebaseUser currentUser) {

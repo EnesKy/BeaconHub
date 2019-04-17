@@ -44,8 +44,8 @@ dependencies {
     implementation 'me.anwarshahriar:calligrapher:1.0'
 
     //----Estimote SDK----
-    implementation 'com.estimote:sdk:1.4.5'
-    //implementation 'com.estimote:sdk:1.0.8'
+    //implementation 'com.estimote:sdk:1.4.5'
+    implementation 'com.estimote:sdk:1.0.8'
 
     //----AltBeacon Library----
     implementation 'org.altbeacon:android-beacon-library:2.16.1'

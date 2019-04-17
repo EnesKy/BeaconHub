@@ -43,7 +43,14 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
+
         Beacon beacon = beaconList.get(position);
+
+/*        if (iBeacon) {
+
+        } else { // Eddystone URL
+
+        }*/
 
         holder.tvUuid.setText("Uuid : " + beacon.getId1());
         holder.tvMajor.setText("Major : " + beacon.getId2());

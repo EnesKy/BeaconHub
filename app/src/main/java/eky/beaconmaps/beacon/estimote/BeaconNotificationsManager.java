@@ -72,8 +72,8 @@ public class BeaconNotificationsManager {
         beaconManager.connect(() -> {
             for (BeaconRegion region : regionsToMonitor) {
                 beaconManager.startMonitoring(region);
-                beaconManager.setForegroundScanPeriod(7000, 10000); // Scan during 7s every 10s
-                beaconManager.setBackgroundScanPeriod(10000, 60000); // Scan during 10s every 1min
+                beaconManager.setForegroundScanPeriod(4000, 5000); // Scan during 7s every 10s
+                beaconManager.setBackgroundScanPeriod(4000, 5000); // Scan during 10s every 1min
             }
         });
     }

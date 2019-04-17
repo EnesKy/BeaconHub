@@ -26,12 +26,11 @@ public class BeaconMaps extends Application {
 
     public void onCreate() {
         super.onCreate();
+
+        EstimoteSDK.initialize(getApplicationContext(), "beaconmap-7na"
+                , "406b37d7508496b9349808f7634c2b58");
+
         beaconManager = org.altbeacon.beacon.BeaconManager.getInstanceForApplication(this);
-
-        // wake up the app when a beacon is seen
-        backgroundPowerSaver = new BackgroundPowerSaver(this);
-
-        EstimoteSDK.initialize(this,"beaconmap-7na", "406b37d7508496b9349808f7634c2b58");
 
     }
 
