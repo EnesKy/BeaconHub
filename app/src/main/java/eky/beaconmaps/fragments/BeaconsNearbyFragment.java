@@ -140,7 +140,7 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
     @Override
     public Context getApplicationContext() {
-        return null;
+        return getActivity();
     }
 
     @Override
