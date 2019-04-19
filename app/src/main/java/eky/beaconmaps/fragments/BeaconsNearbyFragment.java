@@ -39,10 +39,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
-import eky.beaconmaps.adapter.BeaconAdapter;
+import eky.beaconmaps.adapter.BeaconItemAdapter;
 
 public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, BeaconConsumer,
-                                            SearchView.OnQueryTextListener, BeaconAdapter.ItemClickListener, View.OnClickListener {
+                                            SearchView.OnQueryTextListener, BeaconItemAdapter.ItemClickListener, View.OnClickListener {
 
     public static final String TAG = "BeaconsNearbyFragment";
 
@@ -104,8 +104,6 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
         searchView.setOnQueryTextListener(this);
 
-        all = new Region("rangingId", null, null, null);
-
         return rootView;
     }
 
@@ -146,43 +144,47 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
     @Override
     public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
 
-        beaconList.clear();
-        beaconList.addAll(beacons);
+        if (isScanEnabled) {
+            beaconList.clear();
+            beaconList.addAll(beacons);
+        }
 
-        if (beaconList.size() != 0) {
+        if (beaconList.size() != 0 && isScanEnabled) {
 
             placeholder.setVisibility(View.GONE);
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 //Sorting the beacons by their distance to phone.
-                Comparator<Beacon> beaconDistanceComparator = null;
-                beaconDistanceComparator = Comparator.comparing(Beacon::getDistance);
+                Comparator<Beacon> beaconDistanceComparator = Comparator.comparing(Beacon::getDistance);
                 Collections.sort(beaconList, beaconDistanceComparator);
             }
 
             if (adapter == null) {
-                adapter = new BeaconAdapter(beaconList, this);
+                adapter = new BeaconItemAdapter(beaconList, this);
                 recyclerView.setAdapter(adapter);
             } else {
                 if (isScanEnabled) {
                     adapter.notifyDataSetChanged();
                 }
             }
-        } else {
-            placeholder.setVisibility(View.VISIBLE);
+        } else if (beaconList.size() == 0) {
+                placeholder.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
     public void onBeaconServiceConnect() {
         try {
+            all = new Region("rangingId", null, null, null);
             beaconManager.startRangingBeaconsInRegion(all);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
         isScanEnabled = true;
-        beaconManager.setForegroundScanPeriod(3000);
-        beaconManager.setBackgroundScanPeriod(5000);
+        beaconManager.setForegroundScanPeriod(1000);
+        beaconManager.setForegroundBetweenScanPeriod(5000);
+        beaconManager.setBackgroundScanPeriod(1000);
+        beaconManager.setBackgroundBetweenScanPeriod(7000);
         beaconManager.addRangeNotifier(this);
     }
 
@@ -204,7 +206,7 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
     private void setBeaconsLayout() {
         beaconManager.getBeaconParsers().clear();
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")); //iBeacon
-        //beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_URL_LAYOUT));
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_URL_LAYOUT));
         // TODO: Bu satırı açarsan Adapterda getId2 de patlıyor oraya güncelleme yapmadan bunu açma
     }
 

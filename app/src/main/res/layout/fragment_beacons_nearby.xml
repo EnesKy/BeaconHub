@@ -29,7 +29,7 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/beacon_search_view"
-            tools:listitem="@layout/beacon_item"/>
+            tools:listitem="@layout/item_ibeacon"/>
 
         <TextView
             android:id="@+id/tv_placeholder"

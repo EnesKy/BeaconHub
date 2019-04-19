@@ -2,7 +2,7 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/beacon_item"
+    android:id="@+id/item_eddystone"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
@@ -26,12 +26,12 @@
             android:textSize="24sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:text="iBeacon" />
+            android:text="Eddystone URL" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/rallyGreen"
+            android:background="@color/rallyBlue"
             app:layout_constraintTop_toBottomOf="@id/beacon_type"
             app:layout_constraintRight_toRightOf="@id/beacon_type"
             app:layout_constraintLeft_toLeftOf="@id/beacon_type"
@@ -74,110 +74,44 @@
             app:layout_constraintTop_toBottomOf="@id/distance"
             tools:text="08/09/2019 22:07:38" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/beacon_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/last_seen">
-
-            <!-- Proximity UUID -->
-
-            <View
-                android:id="@+id/uuid_icon"
-                android:layout_width="2dp"
-                android:layout_height="20dp"
-                android:background="@color/rallyGreen"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
-
-            <TextView
-                android:id="@+id/proximity_uuid"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:textColor="@color/cardPropertyColor"
-                app:layout_constraintBottom_toBottomOf="@id/uuid_icon"
-                app:layout_constraintLeft_toRightOf="@+id/uuid_icon"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="@id/uuid_icon"
-                tools:text="UUID • 39e328af-7665-4dd6-8116-cef685f25ecb" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/inner_middle_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.5" />
-
-            <!-- Major -->
-            <LinearLayout
-                android:id="@+id/major_container"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@id/inner_middle_horizontal"
-                app:layout_constraintTop_toBottomOf="@+id/uuid_icon">
-
-                <View
-                    android:layout_width="2dp"
-                    android:layout_height="match_parent"
-                    android:background="@color/rallyGreen"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    />
-
-                <TextView
-                    android:id="@+id/major"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="8dp"
-                    android:textColor="@color/cardPropertyColor"
-                    tools:text="Major • 605" />
-            </LinearLayout>
-
-            <!-- Minor -->
-            <LinearLayout
-                android:id="@+id/minor_container"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal"
-                app:layout_constraintLeft_toRightOf="@id/inner_middle_horizontal"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/uuid_icon">
-
-                <View
-                    android:layout_width="2dp"
-                    android:layout_height="match_parent"
-                    android:background="@color/rallyGreen"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    />
-
-                <TextView
-                    android:id="@+id/minor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="8dp"
-                    android:textColor="@color/cardPropertyColor"
-                    tools:text="Minor • 605" />
-            </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/middle_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.5" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/eddystone_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/last_seen"
+            app:layout_constraintBottom_toTopOf="@id/rssi_container">
+
+            <View
+                android:id="@+id/url_icon"
+                android:layout_width="2dp"
+                android:layout_height="20dp"
+                android:background="@color/rallyBlue"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <TextView
+                android:id="@+id/tv_eddystone_url"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="@color/cardPropertyColor"
+                app:layout_constraintBottom_toBottomOf="@id/url_icon"
+                app:layout_constraintLeft_toRightOf="@+id/url_icon"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@id/url_icon"
+                tools:text="URL • www.fsmvu.com.tr" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- RSSI -->
         <LinearLayout
@@ -188,12 +122,12 @@
             android:layout_marginTop="8dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/middle_horizontal"
-            app:layout_constraintTop_toBottomOf="@+id/beacon_container">
+            app:layout_constraintTop_toBottomOf="@+id/eddystone_container">
 
             <View
                 android:layout_width="2dp"
                 android:layout_height="match_parent"
-                android:background="@color/rallyGreen"
+                android:background="@color/rallyBlue"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 />
@@ -221,7 +155,7 @@
             <View
                 android:layout_width="2dp"
                 android:layout_height="match_parent"
-                android:background="@color/rallyGreen"
+                android:background="@color/rallyBlue"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 />
