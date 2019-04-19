@@ -77,19 +77,10 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
             isManagerConnected = true;
             for (BeaconRegion region : regionsToMonitor) {
                 beaconManager.startMonitoring(region);
-                beaconManager.setForegroundScanPeriod(4000, 5000); // Scan during 7s every 10s
+                beaconManager.setForegroundScanPeriod(4500, 5000); // Scan during 7s every 10s
                 beaconManager.setBackgroundScanPeriod(4000, 5000); // Scan during 10s every 1min
             }
         });
-    }
-
-    public void stopMonitoring() {
-        beaconManager.disconnect(); // TODO: is this necessary??
-        for (BeaconRegion region : regionsToMonitor) {
-            beaconManager.stopMonitoring(region.getIdentifier());
-
-        }
-        isManagerConnected = false;
     }
 
     public void addNotification(BeaconID beaconID, String enterMessage, String exitMessage) {

@@ -39,11 +39,22 @@
             android:gravity="center"
             android:textColor="@android:color/white"
             android:textSize="16sp"
-            android:visibility="gone"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_scan_stopper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/rallyGreen"
+            android:src="@drawable/ic_pause_black_24dp"
+            app:maxImageSize="35dp"
+            android:layout_marginBottom="@dimen/text_size_xlarge"
+            android:layout_marginEnd="@dimen/text_size_xlarge"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"/>
 
         <ProgressBar
             android:id="@+id/pb_loading"
