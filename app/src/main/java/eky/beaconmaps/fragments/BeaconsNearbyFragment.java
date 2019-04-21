@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.RemoteException;
@@ -25,6 +26,7 @@ import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
+import org.altbeacon.beacon.utils.UrlBeaconUrlCompressor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +37,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 import androidx.appcompat.widget.SearchView;
+import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -272,22 +275,27 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
         beacon_dialog = new Dialog(Objects.requireNonNull(getActivity()));
         beacon_dialog.setTitle("Add action");
-        beacon_dialog.setContentView(R.layout.dialog_beacon_action);
+        beacon_dialog.setContentView(R.layout.dialog_nearby_beacons);
 
-        tvNotification = beacon_dialog.findViewById(R.id.tv_notification);
-        tvNotification.setOnClickListener(v -> {
-            scanControl();
-            Toast.makeText(getActivity(),"Clicked to notification.", Toast.LENGTH_SHORT).show();
-        });
-        tvWebUrl = beacon_dialog.findViewById(R.id.tv_web);
+        tvWebUrl = beacon_dialog.findViewById(R.id.tv_visit_website);
         tvWebUrl.setOnClickListener(v -> {
             scanControl();
-            Toast.makeText(getActivity(),"Clicked to web url.", Toast.LENGTH_SHORT).show();
+
+            if (isEddystone) {
+
+                String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                CustomTabsIntent customTabsIntent = builder.build();
+                customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
+
+            }
+
+            Toast.makeText(getActivity(),"Clicked to visit website.", Toast.LENGTH_SHORT).show();
         });
-        tvLocation = beacon_dialog.findViewById(R.id.tv_location);
+        tvLocation = beacon_dialog.findViewById(R.id.tv_go_location);
         tvLocation.setOnClickListener(v -> {
             scanControl();
-            Toast.makeText(getActivity(),"Clicked to location.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),"Clicked to go to location.", Toast.LENGTH_SHORT).show();
         });
 
         beacon_dialog.show();

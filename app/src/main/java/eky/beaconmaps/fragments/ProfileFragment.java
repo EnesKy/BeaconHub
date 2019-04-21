@@ -1,49 +1,37 @@
 package eky.beaconmaps.fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import androidx.fragment.app.Fragment;
 import eky.beaconmaps.R;
 
 public class ProfileFragment extends Fragment {
 
-    private TextView placeholder;
+    private TextView placeholder, title;
+    private FirebaseUser user;
 
     public ProfileFragment() {
         // Required empty public constructor
     }
 
-    /**
-     private void signOut() {
-        mAuth.signOut();
-     }
-
-     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-     if (user != null) {
-     // Name, email address, and profile photo Url
-     String name = user.getDisplayName();
-     String email = user.getEmail();
-     Uri photoUrl = user.getPhotoUrl();
-
-     // Check if user's email is verified
-     boolean emailVerified = user.isEmailVerified();
-
-     // The user's ID, unique to the Firebase project. Do NOT use this value to
-     // authenticate with your backend server, if you have one. Use
-     // FirebaseUser.getIdToken() instead.
-     String uid = user.getUid();
-     }
-     */
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
+
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -52,6 +40,19 @@ public class ProfileFragment extends Fragment {
 
         placeholder = rootView.findViewById(R.id.tv_placeholder);
         placeholder.setVisibility(View.VISIBLE);
+
+        title = rootView.findViewById(R.id.tv_title);
+
+        if (user != null) {
+
+            title.setText(user.getDisplayName() + "'s Beacons");
+
+            user.getIdToken(true).addOnSuccessListener(result -> {
+                String idToken = result.getToken();
+                //Do whatever
+                Log.d("ProfileFragment", "GetTokenResult result = " + idToken);
+            });
+        }
 
         return rootView;
     }

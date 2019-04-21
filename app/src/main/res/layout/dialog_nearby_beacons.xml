@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="250dp"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="@dimen/default_radius_large"
+    app:cardElevation="4dp"
+    android:backgroundTint="@color/rallyLightGrey">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/rallyDarkGrey"/>
+
+        <TextView
+            android:id="@+id/tv_go_location"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:textSize="@dimen/text_size_xlarge"
+            android:layout_margin="@dimen/space_small"
+            android:text="Go to Location"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/rallyGreen"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/rallyDarkGrey"/>
+
+        <TextView
+            android:id="@+id/tv_visit_website"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:textSize="@dimen/text_size_xlarge"
+            android:layout_margin="@dimen/space_small"
+            android:text="Visit Website"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/rallyGreen"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/rallyDarkGrey"/>
+
+        <TextView
+            android:id="@+id/tv_add_blocklist"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:textSize="@dimen/text_size_xlarge"
+            android:layout_margin="@dimen/space_small"
+            android:text="Add to Blocklist"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/rallyGreen"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/rallyDarkGrey"/>
+
+        <TextView
+            android:id="@+id/tv_claim_beacon"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:textSize="@dimen/text_size_xlarge"
+            android:layout_margin="@dimen/space_small"
+            android:text="Claim the Beacon"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/rallyGreen"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/rallyDarkGrey"/>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
