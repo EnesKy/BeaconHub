@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import androidx.core.app.NotificationCompat;
+import eky.beaconmaps.R;
 import eky.beaconmaps.activities.MainActivity;
 
 import static androidx.core.content.ContextCompat.getSystemService;
@@ -77,8 +78,8 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
             isManagerConnected = true;
             for (BeaconRegion region : regionsToMonitor) {
                 beaconManager.startMonitoring(region);
-                beaconManager.setForegroundScanPeriod(4500, 5000); // Scan during 7s every 10s
-                beaconManager.setBackgroundScanPeriod(4000, 5000); // Scan during 10s every 1min
+                beaconManager.setForegroundScanPeriod(4500, 5000); // Scan during 4.5s every 5s
+                beaconManager.setBackgroundScanPeriod(4000, 5000); // Scan during 4s every 5s
             }
         });
     }
@@ -99,7 +100,7 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             notification = new Notification.Builder(context, CHANNEL_ID)
-                    .setSmallIcon(android.R.drawable.ic_dialog_info)
+                    .setSmallIcon(R.mipmap.beacon_maps_no_background_icon)
                     .setContentTitle("BeaconMaps")
                     .setContentText(message)
                     .setAutoCancel(true)
@@ -107,7 +108,7 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
                     .build();
         } else {
             notification = new NotificationCompat.Builder(context, CHANNEL_ID)
-                    .setSmallIcon(android.R.drawable.ic_dialog_info)
+                    .setSmallIcon(R.mipmap.beacon_maps_no_background_icon)
                     .setContentTitle("BeaconMaps")
                     .setContentText(message)
                     .setDefaults(NotificationCompat.DEFAULT_ALL)

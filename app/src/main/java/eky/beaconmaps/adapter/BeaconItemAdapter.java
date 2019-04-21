@@ -1,8 +1,10 @@
 package eky.beaconmaps.adapter;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.card.MaterialCardView;
@@ -30,7 +32,21 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
     private static final int iBeacon = 1;
     private static final int eddystoneUrl = 2;
 
-    DecimalFormat numberFormat = new DecimalFormat("#.00");
+    @SuppressLint("SimpleDateFormat")
+    private SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    private DecimalFormat numberFormat = new DecimalFormat("#.00");
+
+    //View Components;
+    private MaterialCardView item;
+    private TextView tvUuid;
+    private TextView tvMajor;
+    private TextView tvMinor;
+    private TextView tvDistance;
+    private TextView tvRssi;
+    private TextView tvTx;
+    private TextView tvLastSeen;
+    private ImageView ivBelongstoUser;
+    private TextView tvUrl;
 
     public BeaconItemAdapter(List<Beacon> beaconList, ItemClickListener itemClickListener) {
         this.beaconList = beaconList;
@@ -83,18 +99,6 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
 
     public class iBeaconViewHolder extends BaseViewHolder<Beacon> {
 
-        MaterialCardView item;
-        TextView tvUuid;
-        TextView tvMajor;
-        TextView tvMinor;
-        TextView tvDistance;
-        TextView tvRssi;
-        TextView tvTx;
-        TextView tvLastSeen;
-
-        Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-
         private iBeaconViewHolder(View itemView) {
             super(itemView);
 
@@ -106,12 +110,18 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
             tvRssi = itemView.findViewById(R.id.rssi);
             tvTx = itemView.findViewById(R.id.tx);
             tvLastSeen = itemView.findViewById(R.id.last_seen);
+            ivBelongstoUser = itemView.findViewById(R.id.iv_belongs_to_user);
 
-            item.setOnClickListener(v -> itemClickListener.onItemClick((getAdapterPosition()), itemView));
+            item.setOnClickListener(v -> itemClickListener.onItemClick((getAdapterPosition()), false, itemView));
         }
 
+        @SuppressLint("SetTextI18n")
         @Override
         public void bind(Beacon beacon) {
+
+            //TODO: Check if its users and if it is
+            //ivBelongstoUser.setVisibility(View.VISIBLE);
+
             tvUuid.setText("Uuid : " + beacon.getId1());
             tvMajor.setText("Major : " + beacon.getId2());
             tvMinor.setText("Minor : " + beacon.getId3());
@@ -124,31 +134,26 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
 
     public class EddystoneUrlViewHolder extends BaseViewHolder<Beacon> {
 
-        MaterialCardView item;
-        TextView tvUrl;
-        TextView tvDistance;
-        TextView tvRssi;
-        TextView tvTx;
-        TextView tvLastSeen;
-
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-
         private EddystoneUrlViewHolder(View itemView) {
             super(itemView);
 
             item = itemView.findViewById(R.id.item_eddystone);
-
             tvUrl = itemView.findViewById(R.id.tv_eddystone_url);
             tvDistance = itemView.findViewById(R.id.distance);
             tvRssi = itemView.findViewById(R.id.rssi);
             tvTx = itemView.findViewById(R.id.tx);
             tvLastSeen = itemView.findViewById(R.id.last_seen);
+            ivBelongstoUser = itemView.findViewById(R.id.iv_belongs_to_user);
 
-            item.setOnClickListener(v -> itemClickListener.onItemClick((getAdapterPosition()), itemView));
+            item.setOnClickListener(v -> itemClickListener.onItemClick((getAdapterPosition()), true, itemView));
         }
 
+        @SuppressLint("SetTextI18n")
         @Override
         public void bind(Beacon beacon) {
+
+            //TODO: Check if its users and if it is
+            //ivBelongstoUser.setVisibility(View.VISIBLE);
 
             String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
 
@@ -166,7 +171,7 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
     }
 
     public interface ItemClickListener {
-        void onItemClick(int position, View view);
+        void onItemClick(int position, boolean isEddystone, View view);
     }
 
 }

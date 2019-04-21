@@ -207,7 +207,6 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         beaconManager.getBeaconParsers().clear();
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")); //iBeacon
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_URL_LAYOUT));
-        // TODO: Bu satırı açarsan Adapterda getId2 de patlıyor oraya güncelleme yapmadan bunu açma
     }
 
     public void initializeCountDownTimer() {
@@ -254,16 +253,18 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
     }
 
     @Override
-    public void onItemClick(int position, View view) {
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(TAG, beaconList.get(position));
-        Toast.makeText(getActivity(),"Clicked to beacon with uuid: " + beaconList.get(position).getId1(),Toast.LENGTH_LONG).show();
-        openActionDialog(beaconList.get(position));
+    public void onItemClick(int position, boolean isEddystone, View view) {
+        //Bundle bundle = new Bundle();
+        //bundle.putParcelable(TAG, beaconList.get(position));
         //Intent intent = new Intent(getActivity(), NotificationActivity.class);
         //startActivity(intent);
+
+        openActionDialog(beaconList.get(position), isEddystone);
+
+        Toast.makeText(getActivity(),"Clicked to beacon with uuid: " + beaconList.get(position).getId1(),Toast.LENGTH_LONG).show();
     }
 
-    public void openActionDialog(Beacon beacon) { // TODO: Beacon bilgisi ekle. ?? Kullanıcının ise farklı text göster.
+    public void openActionDialog(Beacon beacon, boolean isEddystone) { // TODO: Beacon bilgisi ekle. ?? Kullanıcının ise farklı text göster.
         Dialog beacon_dialog;
         TextView tvNotification;
         TextView tvWebUrl;
