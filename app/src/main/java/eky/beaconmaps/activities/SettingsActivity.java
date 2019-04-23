@@ -1,8 +1,11 @@
 package eky.beaconmaps.activities;
 
+import android.app.Dialog;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -12,6 +15,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
+import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.utils.UrlBeaconUrlCompressor;
+
+import androidx.browser.customtabs.CustomTabsIntent;
 import eky.beaconmaps.R;
 
 public class SettingsActivity extends BaseActivity {
@@ -63,10 +70,38 @@ public class SettingsActivity extends BaseActivity {
         mGoogleSignInClient.signOut();
 
         openActivity(null, LoginActivity.class);
+    }
 
-        // Google sign out
-        // mGoogleSignInClient.signOut().addOnCompleteListener(this,
-        //       task -> updateUI(null));
+    public void openActionDialog(Beacon beacon, boolean isEddystone) { // TODO: Beacon bilgisi ekle. ?? Kullanıcının ise farklı text göster.
+        Dialog beacon_dialog;
+        TextView tvNotification;
+        TextView tvWebUrl;
+        TextView tvLocation;
+
+        beacon_dialog = new Dialog(this);
+        beacon_dialog.setTitle("Add action");
+        beacon_dialog.setContentView(R.layout.dialog_nearby_beacons);
+
+        tvWebUrl = beacon_dialog.findViewById(R.id.tv_visit_website);
+        tvWebUrl.setOnClickListener(v -> {
+
+            if (isEddystone) {
+
+                String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                CustomTabsIntent customTabsIntent = builder.build();
+                customTabsIntent.launchUrl(this, Uri.parse(url));
+
+            }
+
+            Toast.makeText(this,"Clicked to visit website.", Toast.LENGTH_SHORT).show();
+        });
+        tvLocation = beacon_dialog.findViewById(R.id.tv_go_location);
+        tvLocation.setOnClickListener(v -> {
+            Toast.makeText(this,"Clicked to go to location.", Toast.LENGTH_SHORT).show();
+        });
+
+        beacon_dialog.show();
     }
 
 }

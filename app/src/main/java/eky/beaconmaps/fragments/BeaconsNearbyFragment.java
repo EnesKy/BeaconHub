@@ -43,6 +43,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
 import eky.beaconmaps.adapter.BeaconItemAdapter;
+import eky.beaconmaps.beacon.altbeacon.URLParser;
 
 public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, BeaconConsumer,
                                             SearchView.OnQueryTextListener, BeaconItemAdapter.ItemClickListener, View.OnClickListener {
@@ -291,11 +292,25 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
             }
 
             Toast.makeText(getActivity(),"Clicked to visit website.", Toast.LENGTH_SHORT).show();
+            beacon_dialog.dismiss();
         });
         tvLocation = beacon_dialog.findViewById(R.id.tv_go_location);
         tvLocation.setOnClickListener(v -> {
             scanControl();
             Toast.makeText(getActivity(),"Clicked to go to location.", Toast.LENGTH_SHORT).show();
+            beacon_dialog.dismiss();
+        });
+
+        tvNotification = beacon_dialog.findViewById(R.id.tv_add_blocklist);
+        tvNotification.setOnClickListener(v -> {
+            scanControl();
+
+            //URLParser.urlParse("http://www.google.com", getActivity(), beacon);
+            URLParser.urlParsing(getActivity(),beacon);
+
+            Toast.makeText(getActivity(),"Clicked to add blocklist.", Toast.LENGTH_SHORT).show();
+
+            beacon_dialog.dismiss();
         });
 
         beacon_dialog.show();

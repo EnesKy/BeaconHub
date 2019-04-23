@@ -1,16 +1,25 @@
 package eky.beaconmaps.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import org.altbeacon.beacon.Beacon;
+import org.altbeacon.beacon.utils.UrlBeaconUrlCompressor;
+
+import java.util.Objects;
+
+import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.fragment.app.Fragment;
 import eky.beaconmaps.R;
 
@@ -55,6 +64,38 @@ public class ProfileFragment extends Fragment {
         }
 
         return rootView;
+    }
+
+    public void openActionDialog(Beacon beacon, boolean isEddystone) { // TODO: Beacon bilgisi ekle. ?? Kullanıcının ise farklı text göster.
+        Dialog beacon_dialog;
+        TextView tvNotification;
+        TextView tvWebUrl;
+        TextView tvLocation;
+
+        beacon_dialog = new Dialog(Objects.requireNonNull(getActivity()));
+        beacon_dialog.setTitle("Add action");
+        beacon_dialog.setContentView(R.layout.dialog_nearby_beacons);
+
+        tvWebUrl = beacon_dialog.findViewById(R.id.tv_visit_website);
+        tvWebUrl.setOnClickListener(v -> {
+
+            if (isEddystone) {
+
+                String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                CustomTabsIntent customTabsIntent = builder.build();
+                customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
+
+            }
+
+            Toast.makeText(getActivity(),"Clicked to visit website.", Toast.LENGTH_SHORT).show();
+        });
+        tvLocation = beacon_dialog.findViewById(R.id.tv_go_location);
+        tvLocation.setOnClickListener(v -> {
+            Toast.makeText(getActivity(),"Clicked to go to location.", Toast.LENGTH_SHORT).show();
+        });
+
+        beacon_dialog.show();
     }
 
 }
