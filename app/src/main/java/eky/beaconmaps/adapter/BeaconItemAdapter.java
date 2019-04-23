@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.card.MaterialCardView;
@@ -20,6 +21,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
+import eky.beaconmaps.fragments.ProfileFragment;
 
 /**
  * Created by Enes Kamil YILMAZ on 28.03.2019.
@@ -29,6 +31,7 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
 
     private List<Beacon> beaconList;
     private ItemClickListener itemClickListener;
+    private Boolean isNearby, isSettings;
     private static final int iBeacon = 1;
     private static final int eddystoneUrl = 2;
 
@@ -42,15 +45,19 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
     private TextView tvMajor;
     private TextView tvMinor;
     private TextView tvDistance;
+    private LinearLayout llDistance;
     private TextView tvRssi;
     private TextView tvTx;
     private TextView tvLastSeen;
     private ImageView ivBelongstoUser;
     private TextView tvUrl;
 
-    public BeaconItemAdapter(List<Beacon> beaconList, ItemClickListener itemClickListener) {
+    public BeaconItemAdapter(List<Beacon> beaconList, boolean isNearby, boolean isSettings,
+                             ItemClickListener itemClickListener) {
         this.beaconList = beaconList;
         this.itemClickListener = itemClickListener;
+        this.isNearby = isNearby;
+        this.isSettings = isSettings;
     }
 
     @Override
@@ -91,7 +98,6 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
     public static abstract class BaseViewHolder<T> extends RecyclerView.ViewHolder {
         private BaseViewHolder(View itemView) {
             super(itemView);
-
         }
 
         public abstract void bind(T type);
@@ -107,6 +113,7 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
             tvMajor = itemView.findViewById(R.id.major);
             tvMinor = itemView.findViewById(R.id.minor);
             tvDistance = itemView.findViewById(R.id.distance);
+            llDistance = itemView.findViewById(R.id.ll_distance);
             tvRssi = itemView.findViewById(R.id.rssi);
             tvTx = itemView.findViewById(R.id.tx);
             tvLastSeen = itemView.findViewById(R.id.last_seen);
@@ -119,8 +126,13 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
         @Override
         public void bind(Beacon beacon) {
 
-            //TODO: Check if its users and if it is
-            //ivBelongstoUser.setVisibility(View.VISIBLE);
+            if (!isNearby) {
+                llDistance.setVisibility(View.GONE);
+                tvLastSeen.setVisibility(View.GONE);
+            }
+            if (isNearby || isSettings)
+                if (ProfileFragment.myBeaconsList != null && ProfileFragment.myBeaconsList.contains(beacon))
+                    ivBelongstoUser.setVisibility(View.VISIBLE);
 
             tvUuid.setText("Uuid : " + beacon.getId1());
             tvMajor.setText("Major : " + beacon.getId2());
@@ -140,6 +152,7 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
             item = itemView.findViewById(R.id.item_eddystone);
             tvUrl = itemView.findViewById(R.id.tv_eddystone_url);
             tvDistance = itemView.findViewById(R.id.distance);
+            llDistance = itemView.findViewById(R.id.ll_distance);
             tvRssi = itemView.findViewById(R.id.rssi);
             tvTx = itemView.findViewById(R.id.tx);
             tvLastSeen = itemView.findViewById(R.id.last_seen);
@@ -152,8 +165,14 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
         @Override
         public void bind(Beacon beacon) {
 
-            //TODO: Check if its users and if it is
-            //ivBelongstoUser.setVisibility(View.VISIBLE);
+            if (!isNearby) {
+                llDistance.setVisibility(View.GONE);
+                tvLastSeen.setVisibility(View.GONE);
+            }
+            if (isNearby || isSettings)
+                if (ProfileFragment.myBeaconsList != null && ProfileFragment.myBeaconsList.contains(beacon))
+                    ivBelongstoUser.setVisibility(View.VISIBLE);
+
 
             String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
 

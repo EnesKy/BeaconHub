@@ -34,6 +34,7 @@ import org.altbeacon.beacon.BeaconManager;
 import androidx.annotation.NonNull;
 import eky.beaconmaps.BeaconMaps;
 import eky.beaconmaps.R;
+import eky.beaconmaps.utils.FirebaseUtil;
 
 public class LoginActivity extends BaseActivity {
 
@@ -154,6 +155,11 @@ public class LoginActivity extends BaseActivity {
 
         if (currentUser != null) {
             openActivity(null, MainActivity.class);
+            currentUser.getIdToken(true).addOnSuccessListener(result -> {
+                String idToken = result.getToken();
+                FirebaseUtil.setUserIdToken(idToken);
+                Log.d(TAG, "GetTokenResult result = " + idToken);
+            });
         } else {
             //continue
         }

@@ -34,8 +34,8 @@
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:src="@drawable/ic_person_black_24dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginStart="30dp"
+        android:layout_marginTop="@dimen/space_large"
+        android:layout_marginStart="@dimen/space_large"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"/>
 
@@ -44,7 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Username"
-        android:textSize="@dimen/text_size_xlarge"
+        android:textSize="@dimen/text_size_large"
         android:textColor="@android:color/white"
         android:layout_marginTop="@dimen/space_medium"
         android:layout_marginStart="@dimen/space_medium"
@@ -56,7 +56,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Email"
-        android:textSize="@dimen/text_size_xlarge"
+        android:textSize="@dimen/text_size_large"
         android:textColor="@android:color/white"
         android:layout_marginTop="@dimen/space_medium"
         android:layout_marginStart="@dimen/space_medium"
@@ -68,7 +68,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Blocklist"
-        android:layout_marginTop="@dimen/space_top_large"
+        android:layout_marginTop="@dimen/space_large"
         android:layout_marginStart="@dimen/space_large"
         android:textSize="24sp"
         android:textColor="@android:color/white"
@@ -85,14 +85,32 @@
         app:layout_constraintTop_toBottomOf="@id/tv_blocked_beacons" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/rv_blocked_beacons"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        tools:listitem="@layout/item_ibeacon"
+        android:layout_marginTop="15dp"
+        android:scrollbars="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@id/line"
-        app:layout_constraintStart_toStartOf="@id/line"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="@id/line">
+        app:layout_constraintBottom_toBottomOf="parent">
 
     </androidx.recyclerview.widget.RecyclerView>
+
+    <TextView
+        android:id="@+id/tv_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/placeholder_blocked_beacon"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_sign_out"

@@ -3,9 +3,9 @@ package eky.beaconmaps.activities;
 import android.app.Dialog;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -18,28 +18,50 @@ import com.squareup.picasso.Picasso;
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.utils.UrlBeaconUrlCompressor;
 
-import androidx.browser.customtabs.CustomTabsIntent;
-import eky.beaconmaps.R;
+import java.util.ArrayList;
+import java.util.List;
 
-public class SettingsActivity extends BaseActivity {
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import eky.beaconmaps.R;
+import eky.beaconmaps.adapter.BeaconItemAdapter;
+import eky.beaconmaps.utils.PreferencesUtil;
+
+public class SettingsActivity extends BaseActivity implements BeaconItemAdapter.ItemClickListener {
 
     public static final String TAG = "SettingsActivity";
 
     private MaterialButton btnSignOut;
+    private TextView name, email, placeholder;
+    private ImageView profilepic;
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseUser user;
-    private TextView name, email;
-    private ImageView profilepic;
+    private PreferencesUtil preferencesUtil;
+    private List<Beacon> blockedBeaconsList;
+
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getIntent();
         setContentView(R.layout.activity_settings);
-
         setSupportActionBar(findViewById(R.id.toolbar));
+
+        preferencesUtil = new PreferencesUtil(this);
+        blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
+        if (blockedBeaconsList == null) {
+            blockedBeaconsList = new ArrayList<>();
+        }
+
+        placeholder = findViewById(R.id.tv_placeholder);
+        if (blockedBeaconsList.size() == 0)
+            placeholder.setVisibility(View.VISIBLE);
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -52,6 +74,12 @@ public class SettingsActivity extends BaseActivity {
 
         btnSignOut = findViewById(R.id.btn_sign_out);
         btnSignOut.setOnClickListener(v -> signOut());
+
+        recyclerView = findViewById(R.id.rv_blocked_beacons);
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        adapter = new BeaconItemAdapter(blockedBeaconsList,false, true,this);
+        recyclerView.setAdapter(adapter);
 
         if (user != null) {
             name = findViewById(R.id.tv_user_name);
@@ -74,13 +102,22 @@ public class SettingsActivity extends BaseActivity {
 
     public void openActionDialog(Beacon beacon, boolean isEddystone) { // TODO: Beacon bilgisi ekle. ?? Kullanıcının ise farklı text göster.
         Dialog beacon_dialog;
-        TextView tvNotification;
-        TextView tvWebUrl;
-        TextView tvLocation;
+        TextView tvUnblock, tvWebUrl, tvLocation;
 
         beacon_dialog = new Dialog(this);
         beacon_dialog.setTitle("Add action");
-        beacon_dialog.setContentView(R.layout.dialog_nearby_beacons);
+        beacon_dialog.setContentView(R.layout.dialog_blocked_beacons);
+
+        tvUnblock = beacon_dialog.findViewById(R.id.tv_unblock);
+        tvUnblock.setOnClickListener(v -> {
+            blockedBeaconsList.remove(beacon);
+            preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
+
+            blockedBeaconsList.clear();
+            blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
+            adapter.notifyDataSetChanged();
+            beacon_dialog.dismiss();
+        });
 
         tvWebUrl = beacon_dialog.findViewById(R.id.tv_visit_website);
         tvWebUrl.setOnClickListener(v -> {
@@ -94,14 +131,19 @@ public class SettingsActivity extends BaseActivity {
 
             }
 
-            Toast.makeText(this,"Clicked to visit website.", Toast.LENGTH_SHORT).show();
+            beacon_dialog.dismiss();
         });
         tvLocation = beacon_dialog.findViewById(R.id.tv_go_location);
         tvLocation.setOnClickListener(v -> {
-            Toast.makeText(this,"Clicked to go to location.", Toast.LENGTH_SHORT).show();
+
+            beacon_dialog.dismiss();
         });
 
         beacon_dialog.show();
     }
 
+    @Override
+    public void onItemClick(int position, boolean isEddystone, View view) {
+        openActionDialog(blockedBeaconsList.get(position), isEddystone);
+    }
 }

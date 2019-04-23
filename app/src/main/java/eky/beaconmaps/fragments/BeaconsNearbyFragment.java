@@ -43,7 +43,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
 import eky.beaconmaps.adapter.BeaconItemAdapter;
-import eky.beaconmaps.beacon.altbeacon.URLParser;
+import eky.beaconmaps.utils.PreferencesUtil;
 
 public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, BeaconConsumer,
                                             SearchView.OnQueryTextListener, BeaconItemAdapter.ItemClickListener, View.OnClickListener {
@@ -64,6 +64,9 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
     private Boolean isScanEnabled = false;
     private Region all;
+    private List<Beacon> mBeaconDataList;
+    private PreferencesUtil preferencesUtil;
+    private List<Beacon> blockedBeaconsList;
 
     public BeaconsNearbyFragment() {
         // Required empty public constructor
@@ -72,6 +75,12 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        preferencesUtil = new PreferencesUtil(Objects.requireNonNull(getActivity()));
+        blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
+        if (blockedBeaconsList == null) {
+            blockedBeaconsList = new ArrayList<>();
+        }
 
         beaconManager = BeaconManager.getInstanceForApplication(Objects.requireNonNull(getActivity()));
         setBeaconsLayout();
@@ -111,6 +120,14 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         return rootView;
     }
 
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
+        if (blockedBeaconsList == null) {
+            blockedBeaconsList = new ArrayList<>();
+        }
+    }
 
     @Override
     public void onClick(View v) {
@@ -122,27 +139,32 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
     }
 
     private void scanControl() {
+        if (isScanEnabled)
+            stopScanning();
+        else
+            startScanning();
+    }
 
-        if (isScanEnabled) {
-            isScanEnabled = false;
-            fabScanControl.setImageDrawable(getResources().getDrawable(R.drawable.ic_play_arrow_black_24dp));
-            try {
-                beaconManager.stopMonitoringBeaconsInRegion(all);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-            progressBarLoading.setVisibility(View.GONE);
-        } else {
-            isScanEnabled = true;
-            fabScanControl.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_black_24dp));
-            try {
-                beaconManager.startRangingBeaconsInRegion(all);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-            progressBarLoading.setVisibility(View.VISIBLE);
+    private void startScanning() {
+        isScanEnabled = true;
+        fabScanControl.setImageDrawable(getResources().getDrawable(R.drawable.ic_pause_black_24dp));
+        try {
+            beaconManager.startRangingBeaconsInRegion(all);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
+        progressBarLoading.setVisibility(View.VISIBLE);
+    }
 
+    private void stopScanning() {
+        isScanEnabled = false;
+        fabScanControl.setImageDrawable(getResources().getDrawable(R.drawable.ic_play_arrow_black_24dp));
+        try {
+            beaconManager.stopMonitoringBeaconsInRegion(all);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        progressBarLoading.setVisibility(View.GONE);
     }
 
     @Override
@@ -151,6 +173,10 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         if (isScanEnabled) {
             beaconList.clear();
             beaconList.addAll(beacons);
+
+            for (Beacon blocked : beacons)
+                if (blockedBeaconsList != null && blockedBeaconsList.contains(blocked))
+                    beaconList.remove(blocked);
         }
 
         if (beaconList.size() != 0 && isScanEnabled) {
@@ -164,7 +190,7 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
             }
 
             if (adapter == null) {
-                adapter = new BeaconItemAdapter(beaconList, this);
+                adapter = new BeaconItemAdapter(beaconList, true, false,this);
                 recyclerView.setAdapter(adapter);
             } else {
                 if (isScanEnabled) {
@@ -186,9 +212,9 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         }
         isScanEnabled = true;
         beaconManager.setForegroundScanPeriod(1000);
-        beaconManager.setForegroundBetweenScanPeriod(5000);
+        beaconManager.setForegroundBetweenScanPeriod(2000);
         beaconManager.setBackgroundScanPeriod(1000);
-        beaconManager.setBackgroundBetweenScanPeriod(7000);
+        beaconManager.setBackgroundBetweenScanPeriod(10000);
         beaconManager.addRangeNotifier(this);
     }
 
@@ -262,6 +288,7 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         //bundle.putParcelable(TAG, beaconList.get(position));
         //Intent intent = new Intent(getActivity(), NotificationActivity.class);
         //startActivity(intent);
+        stopScanning();
 
         openActionDialog(beaconList.get(position), isEddystone);
 
@@ -273,6 +300,7 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         TextView tvNotification;
         TextView tvWebUrl;
         TextView tvLocation;
+        TextView tvClaimBeacon;
 
         beacon_dialog = new Dialog(Objects.requireNonNull(getActivity()));
         beacon_dialog.setTitle("Add action");
@@ -280,8 +308,6 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
         tvWebUrl = beacon_dialog.findViewById(R.id.tv_visit_website);
         tvWebUrl.setOnClickListener(v -> {
-            scanControl();
-
             if (isEddystone) {
 
                 String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
@@ -296,24 +322,44 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         });
         tvLocation = beacon_dialog.findViewById(R.id.tv_go_location);
         tvLocation.setOnClickListener(v -> {
-            scanControl();
             Toast.makeText(getActivity(),"Clicked to go to location.", Toast.LENGTH_SHORT).show();
             beacon_dialog.dismiss();
         });
 
         tvNotification = beacon_dialog.findViewById(R.id.tv_add_blocklist);
         tvNotification.setOnClickListener(v -> {
-            scanControl();
-
             //URLParser.urlParse("http://www.google.com", getActivity(), beacon);
-            URLParser.urlParsing(getActivity(),beacon);
+            //URLParser.urlParsing(getActivity(),beacon);
 
-            Toast.makeText(getActivity(),"Clicked to add blocklist.", Toast.LENGTH_SHORT).show();
+            blockedBeaconsList.add(beacon);
+            preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
+
+            beacon_dialog.dismiss();
+        });
+
+        tvClaimBeacon = beacon_dialog.findViewById(R.id.tv_claim_beacon);
+        tvClaimBeacon.setOnClickListener(v -> {
+            Toast.makeText(getActivity(),"Clicked to claim beacon.", Toast.LENGTH_SHORT).show();
+
+            claimBeacon(beacon);
 
             beacon_dialog.dismiss();
         });
 
         beacon_dialog.show();
+    }
+
+    public void claimBeacon(Beacon beacon) {
+
+        mBeaconDataList = preferencesUtil.getMyBeaconsList();
+
+        if (mBeaconDataList == null) {
+            mBeaconDataList = new ArrayList<>();
+        }
+
+        mBeaconDataList.add(beacon);
+        preferencesUtil.saveMyBeaconsList(mBeaconDataList);
+        Toast.makeText(getActivity(),"Beacon claim successful.", Toast.LENGTH_SHORT).show();
     }
 
 }

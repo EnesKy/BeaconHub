@@ -19,6 +19,55 @@
             android:background="@color/rallyDarkGrey"/>
 
         <TextView
+            android:id="@+id/tv_see_notification"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:textSize="@dimen/text_size_xlarge"
+            android:layout_margin="@dimen/space_small"
+            android:text="See Notification"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/rallyGreen"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/rallyDarkGrey"/>
+
+        <TextView
+            android:id="@+id/tv_go_location"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:textSize="@dimen/text_size_xlarge"
+            android:layout_margin="@dimen/space_small"
+            android:text="Go to Location"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/rallyGreen"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/rallyDarkGrey"/>
+
+        <TextView
+            android:id="@+id/tv_visit_website"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:textSize="@dimen/text_size_xlarge"
+            android:layout_margin="@dimen/space_small"
+            android:text="Visit Website"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/rallyGreen"
+            android:visibility="gone"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/rallyDarkGrey"/>
+
+        <TextView
             android:id="@+id/tv_add_notification"
             android:layout_width="match_parent"
             android:layout_height="40dp"
@@ -43,7 +92,8 @@
             android:text="Add Website"
             android:gravity="center"
             android:textStyle="bold"
-            android:textColor="@color/rallyGreen"/>
+            android:textColor="@color/rallyGreen"
+            android:visibility="gone"/>
 
         <View
             android:layout_width="match_parent"
@@ -73,38 +123,6 @@
             android:textSize="@dimen/text_size_xlarge"
             android:layout_margin="@dimen/space_small"
             android:text="Add to Blocklist"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/rallyGreen"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/rallyDarkGrey"/>
-
-        <TextView
-            android:id="@+id/tv_visit_website"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:textSize="@dimen/text_size_xlarge"
-            android:layout_margin="@dimen/space_small"
-            android:text="Visit Website"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/rallyGreen"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/rallyDarkGrey"/>
-
-        <TextView
-            android:id="@+id/tv_go_location"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:textSize="@dimen/text_size_xlarge"
-            android:layout_margin="@dimen/space_small"
-            android:text="Go to Location"
             android:gravity="center"
             android:textStyle="bold"
             android:textColor="@color/rallyGreen"/>
@@ -155,7 +173,8 @@
             android:text="Update Website"
             android:gravity="center"
             android:textStyle="bold"
-            android:textColor="@color/rallyGreen"/>
+            android:textColor="@color/rallyGreen"
+            android:visibility="gone"/>
 
         <View
             android:layout_width="match_parent"
