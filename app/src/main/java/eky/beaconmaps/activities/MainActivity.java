@@ -66,7 +66,6 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         fragmentsBar.put(fragment1, R.id.navigation_beacon_map);
         fragmentsBar.put(fragment2, R.id.navigation_beacons_nearby);
         fragmentsBar.put(fragment3, R.id.navigation_profile);
-
     }
 
     @Override
@@ -83,11 +82,13 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
     @Override
     public void onBackPressed() {
+        //TODO:onBackPressed için iki kere geri tuşuna basılması gereken durumlar oluşmuş. Kontrol et.
         if (!lastOpenedFragments.isEmpty()) {
             changeFragments();
         } else {
             lastOpened = null;
-            super.onBackPressed();
+            openAlertDialog();
+            //super.onBackPressed();
         }
     }
 
@@ -101,7 +102,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                 if (backPressed) {
                     backPressed = false;
                 } else {
-                    lastOpenedFragments.add(active);
+                    addTolastOpenedFragments(active);
                     fm.beginTransaction().hide(active).show(fragment2).commit();
                     active = fragment2;
                 }
@@ -116,7 +117,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                 if (backPressed) {
                     backPressed = false;
                 } else {
-                    lastOpenedFragments.add(active);
+                    addTolastOpenedFragments(active);
                     fm.beginTransaction().hide(active).show(fragment1).commit();
                     active = fragment1;
                 }
@@ -131,7 +132,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                 if (backPressed) {
                     backPressed = false;
                 } else {
-                    lastOpenedFragments.add(active);
+                    addTolastOpenedFragments(active);
                     fm.beginTransaction().hide(active).show(fragment3).commit();
                     active = fragment3;
                 }
@@ -154,12 +155,21 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         navigation.setSelectedItemId(fragmentsBar.get(active));
     }
 
+    public boolean addTolastOpenedFragments(Fragment fragment) {
+        if (lastOpenedFragments.size() < 5) {
+            lastOpenedFragments.add(fragment);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public void openAlertDialog() {
         AlertDialog.Builder alertBuild = new AlertDialog.Builder(this)
                 .setTitle("Warning")
                 .setMessage("Are you sure to exit?")
                 .setPositiveButton("OK", (dialog, which) -> super.onBackPressed())
-                .setNeutralButton("CANCEL", (dialog, which) -> dialog.dismiss());
+                .setNegativeButton("CANCEL", (dialog, which) -> dialog.dismiss());
 
         AlertDialog dialog = alertBuild.create();
         dialog.show();
