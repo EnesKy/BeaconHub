@@ -27,8 +27,7 @@ public class FirebaseUtil {
     public static void saveNotificationData(NotificationData notification) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference databaseBook = database.child("beaconNotification");
-        database.child("notification-" + notification.getBeaconUuid().
-                    substring(1,notification.getBeaconUuid().length()-1)).setValue(notification);
+        //database.child("notification-" + notification.getBeaconId().substring(1,notification.getBeaconId().length()-1)).setValue(notification);
     }
 
     public static String getUserIdToken() {

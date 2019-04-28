@@ -19,19 +19,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import org.altbeacon.beacon.BeaconManager;
 
-import androidx.annotation.NonNull;
 import eky.beaconmaps.BeaconMaps;
 import eky.beaconmaps.R;
 import eky.beaconmaps.utils.FirebaseUtil;
@@ -45,6 +42,7 @@ public class LoginActivity extends BaseActivity {
     private EditText etEmail;
     private EditText etPassword;
     private SignInButton signInButton;
+    MaterialButton buttonLogin;
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
@@ -71,8 +69,8 @@ public class LoginActivity extends BaseActivity {
         signInButton.setSize(SignInButton.SIZE_WIDE);
         signInButton.setOnClickListener(v -> signIn());
 
-        MaterialButton buttonLogin = findViewById(R.id.button_login);
-        buttonLogin.setOnClickListener(v -> openActivity(null, MainActivity.class));
+        buttonLogin = findViewById(R.id.button_login);
+        buttonLogin.setOnClickListener(v -> signIn(etEmail.getText().toString(), etPassword.getText().toString()));
 
         TextView textViewsignUp = findViewById(R.id.tv_sign_up);
         textViewsignUp.setOnClickListener(v -> openActivity(null, SignUpActivity.class));
@@ -155,6 +153,7 @@ public class LoginActivity extends BaseActivity {
 
         if (currentUser != null) {
             openActivity(null, MainActivity.class);
+            finish();
             currentUser.getIdToken(true).addOnSuccessListener(result -> {
                 String idToken = result.getToken();
                 FirebaseUtil.setUserIdToken(idToken);
@@ -171,36 +170,25 @@ public class LoginActivity extends BaseActivity {
         if (!validateForm()) {
             return;
         }
-
-        //showProgressDialog();
-
-        // [START sign_in_with_email]
         mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUI(null);
-                        }
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d(TAG, "signInWithEmail:success");
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        updateUI(user);
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w(TAG, "signInWithEmail:failure", task.getException());
+                        Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                Toast.LENGTH_SHORT).show();
+                        updateUI(null);
+                    }
 
-                        // [START_EXCLUDE]
-                        if (!task.isSuccessful()) {
-                            //mStatusTextView.setText(R.string.auth_failed);
-                        }
-                        //hideProgressDialog();
-                        // [END_EXCLUDE]
+                    if (!task.isSuccessful()) {
+                        showAlertDialog("Error", "Please check your info to login.");
                     }
                 });
-        // [END sign_in_with_email]
     }
 
     private boolean validateForm() {
@@ -223,6 +211,19 @@ public class LoginActivity extends BaseActivity {
         }
 
         return valid;
+    }
+
+    private void showAlertDialog(String title, String message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.setCancelable(true);
+        builder.setPositiveButton(
+                "Ok",
+                (dialog, id) -> dialog.cancel());
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private void verifyBluetooth() {

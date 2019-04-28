@@ -1,43 +1,47 @@
 package eky.beaconmaps.model;
 
+import eky.beaconmaps.beacon.estimote.BeaconID;
+
 public class NotificationData {
 
-    String beaconUuid;
-    String helloTitle;
-    String helloDesc;
-    String exitTitle;
-    String exitDesc;
+    private BeaconID beaconId;
+    private String enterTitle;
+    private String enterDesc;
+    private String exitTitle;
+    private String exitDesc;
 
-    public NotificationData(String beaconUuid, String helloTitle, String helloDesc, String exitTitle, String exitDesc) {
-        this.beaconUuid = beaconUuid;
-        this.helloTitle = helloTitle;
-        this.helloDesc = helloDesc;
+    public NotificationData() {}
+
+    public NotificationData(BeaconID beaconID, String enterTitle, String enterDesc, String exitTitle, String exitDesc) {
+        this.beaconId = beaconID;
+        this.enterTitle = enterTitle;
+        this.enterDesc = enterDesc;
         this.exitTitle = exitTitle;
         this.exitDesc = exitDesc;
     }
 
-    public String getBeaconUuid() {
-        return beaconUuid;
+    public BeaconID getBeaconId() {
+        return beaconId;
     }
 
-    public void setBeaconUuid(String beaconUuid) {
-        this.beaconUuid = beaconUuid;
+    public void setBeaconId(BeaconID beaconID) {
+        this.beaconId = beaconID;
     }
 
-    public String getHelloTitle() {
-        return helloTitle;
+    public String getEnterTitle() {
+        return enterTitle;
     }
 
-    public void setHelloTitle(String helloTitle) {
-        this.helloTitle = helloTitle;
+    public void setEnterTitle(String enterTitle) {
+        this.enterTitle = enterTitle;
     }
 
-    public String getHelloDesc() {
-        return helloDesc;
+    public String getEnterDesc() {
+        return enterDesc;
     }
 
-    public void setHelloDesc(String helloDesc) {
-        this.helloDesc = helloDesc;
+    public void setEnterDesc(String enterDesc) {
+        this.enterDesc = enterDesc;
     }
 
     public String getExitTitle() {

@@ -81,12 +81,17 @@ public class SettingsActivity extends BaseActivity implements BeaconItemAdapter.
         adapter = new BeaconItemAdapter(blockedBeaconsList,false, true,this);
         recyclerView.setAdapter(adapter);
 
+        name = findViewById(R.id.tv_user_name);
+        email = findViewById(R.id.tv_user_email);
+        profilepic = findViewById(R.id.iv_profile_pic);
+
         if (user != null) {
-            name = findViewById(R.id.tv_user_name);
-            name.setText(user.getDisplayName());
-            email = findViewById(R.id.tv_user_email);
+            if (user.getDisplayName() == null)
+                name.setText(preferencesUtil.getData("KEY_USER_NAME",""));
+            else
+                name.setText(user.getDisplayName());
+
             email.setText(user.getEmail());
-            profilepic = findViewById(R.id.iv_profile_pic);
             Picasso.get().load(user.getPhotoUrl()).into(profilepic);
         }
 

@@ -18,7 +18,37 @@
             android:background="@drawable/search_bar_with_radius"
             app:iconifiedByDefault="false"
             app:layout_constraintTop_toTopOf="parent"
-            app:queryHint="Filter Beacons..." />
+            app:queryHint="Filter Beacons..." >
+
+
+
+        </androidx.appcompat.widget.SearchView>
+
+        <!-- Todo: search viewi expandable yap ve all - my beacon seçeneği koy. -->
+        <LinearLayout
+            android:id="@+id/ll_search_filter"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:orientation="horizontal"
+            android:background="@android:color/white"
+            android:weightSum="2"
+            app:layout_constraintTop_toBottomOf="@id/beacon_search_view"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/iv_all"
+                android:src="@drawable/ic_people_outline_black_24dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_weight="1"/>
+
+            <ImageView
+                android:id="@+id/iv_mine"
+                android:src="@drawable/ic_person_outline_black_24dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_weight="1"/>
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_beacons"
@@ -28,7 +58,7 @@
             android:scrollbars="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/beacon_search_view"
+            app:layout_constraintTop_toBottomOf="@id/ll_search_filter"
             tools:listitem="@layout/item_ibeacon"/>
 
         <TextView

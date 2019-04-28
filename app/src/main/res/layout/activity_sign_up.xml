@@ -100,12 +100,12 @@
             android:layout_height="wrap_content"
             android:hint="@string/hint_reenter_password"
             android:textColor="@android:color/white"
-            android:inputType="textEmailAddress" />
+            android:inputType="textPassword" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/button_login"
+        android:id="@+id/button_sign_up"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_top_large"
