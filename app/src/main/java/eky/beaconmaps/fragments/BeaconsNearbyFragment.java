@@ -236,7 +236,11 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
     private void setBeaconsLayout() {
         beaconManager.getBeaconParsers().clear();
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")); //iBeacon
-        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_URL_LAYOUT));
+
+        /**
+         * TODO: Eddystone url parsing işlemi yapılamadığı için şimdilik rafa kaldırıldı.
+         * beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_URL_LAYOUT));
+         **/
     }
 
     public void initializeCountDownTimer() {
