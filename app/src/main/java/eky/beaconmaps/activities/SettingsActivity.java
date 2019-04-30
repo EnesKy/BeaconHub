@@ -1,7 +1,6 @@
 package eky.beaconmaps.activities;
 
 import android.app.Dialog;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -15,9 +14,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
-import org.altbeacon.beacon.Beacon;
-import org.altbeacon.beacon.utils.UrlBeaconUrlCompressor;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +21,11 @@ import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
-import eky.beaconmaps.adapter.BeaconItemAdapter;
+import eky.beaconmaps.adapter.BeaconAdapter;
+import eky.beaconmaps.model.BeaconData;
 import eky.beaconmaps.utils.PreferencesUtil;
 
-public class SettingsActivity extends BaseActivity implements BeaconItemAdapter.ItemClickListener {
+public class SettingsActivity extends BaseActivity implements BeaconAdapter.ItemClickListener {
 
     public static final String TAG = "SettingsActivity";
 
@@ -40,7 +37,7 @@ public class SettingsActivity extends BaseActivity implements BeaconItemAdapter.
     private GoogleSignInClient mGoogleSignInClient;
     private FirebaseUser user;
     private PreferencesUtil preferencesUtil;
-    private List<Beacon> blockedBeaconsList;
+    private List<BeaconData> blockedBeaconsList;
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
@@ -78,7 +75,8 @@ public class SettingsActivity extends BaseActivity implements BeaconItemAdapter.
         recyclerView = findViewById(R.id.rv_blocked_beacons);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new BeaconItemAdapter(blockedBeaconsList,false, true,this);
+        //adapter = new BeaconItemAdapter(blockedBeaconsList,false, true,this);
+        adapter = new BeaconAdapter(blockedBeaconsList, false, this);
         recyclerView.setAdapter(adapter);
 
         name = findViewById(R.id.tv_user_name);
@@ -87,7 +85,7 @@ public class SettingsActivity extends BaseActivity implements BeaconItemAdapter.
 
         if (user != null) {
             if (user.getDisplayName() == null)
-                name.setText(preferencesUtil.getData("KEY_USER_NAME",""));
+                name.setText(preferencesUtil.getData("KEY_USER_NAME", ""));
             else
                 name.setText(user.getDisplayName());
 
@@ -107,7 +105,12 @@ public class SettingsActivity extends BaseActivity implements BeaconItemAdapter.
         openActivity(null, LoginActivity.class);
     }
 
-    public void openActionDialog(Beacon beacon, boolean isEddystone) { // TODO: Kullanıcının ise farklı text göster.
+    @Override
+    public void onItemClick(int position, View view) {
+        openActionDialog(blockedBeaconsList.get(position));
+    }
+
+    public void openActionDialog(BeaconData beacon) { // TODO: Kullanıcının ise farklı text göster.
         Dialog beacon_dialog;
         TextView tvUnblock, tvWebUrl, tvLocation;
 
@@ -128,20 +131,10 @@ public class SettingsActivity extends BaseActivity implements BeaconItemAdapter.
 
         tvWebUrl = beacon_dialog.findViewById(R.id.tv_visit_website);
         tvWebUrl.setOnClickListener(v -> {
-
-            if (isEddystone) {
-
-                String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
-                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                CustomTabsIntent customTabsIntent = builder.build();
-                customTabsIntent.launchUrl(this, Uri.parse(url));
-
-            }
-
-            beacon_dialog.dismiss();
-        });
-        tvLocation = beacon_dialog.findViewById(R.id.tv_go_location);
-        tvLocation.setOnClickListener(v -> {
+            //String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
+            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+            CustomTabsIntent customTabsIntent = builder.build();
+            //customTabsIntent.launchUrl(this, Uri.parse(url));
 
             beacon_dialog.dismiss();
         });
@@ -149,8 +142,4 @@ public class SettingsActivity extends BaseActivity implements BeaconItemAdapter.
         beacon_dialog.show();
     }
 
-    @Override
-    public void onItemClick(int position, boolean isEddystone, View view) {
-        openActionDialog(blockedBeaconsList.get(position), isEddystone);
-    }
 }

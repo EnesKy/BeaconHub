@@ -33,8 +33,9 @@
 
             <ImageButton
                 android:id="@+id/ib_settings"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:padding="7dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/icon_settings_24dp"
                 android:scaleType="fitXY"

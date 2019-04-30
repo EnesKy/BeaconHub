@@ -3,8 +3,8 @@ package eky.beaconmaps.utils;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import org.altbeacon.beacon.Beacon;
 
+import eky.beaconmaps.model.BeaconData;
 import eky.beaconmaps.model.NotificationData;
 
 public class FirebaseUtil {
@@ -17,11 +17,11 @@ public class FirebaseUtil {
         databaseBook.push().setValue("deneme");
     }
 
-    public static void saveBeaconData(Beacon beacon){
+    public static void saveBeaconData(BeaconData beacon){
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference databaseBook = database.child("beaconData");
-        database.child("beacon-"+beacon.getId1().toString().
-                substring(1,beacon.getId1().toString().length()-1)).setValue(beacon);
+        database.child("beacon-"+beacon.getBeaconID().getProximityUUID().toString().
+                substring(1,beacon.getBeaconID().getProximityUUID().toString().length()-1)).setValue(beacon);
     }
 
     public static void saveNotificationData(NotificationData notification) {

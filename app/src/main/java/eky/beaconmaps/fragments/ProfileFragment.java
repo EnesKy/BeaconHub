@@ -15,8 +15,6 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import org.altbeacon.beacon.Beacon;
-import org.altbeacon.beacon.utils.UrlBeaconUrlCompressor;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,19 +34,20 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
-import eky.beaconmaps.adapter.BeaconItemAdapter;
-import eky.beaconmaps.model.CompanyData;
+import eky.beaconmaps.adapter.BeaconAdapter;
+import eky.beaconmaps.model.BeaconData;
+import eky.beaconmaps.model.NotificationData;
 import eky.beaconmaps.utils.PreferencesUtil;
 
-public class ProfileFragment extends Fragment implements BeaconItemAdapter.ItemClickListener {
+public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClickListener {
 
     private final String TAG = "Profile Fragment";
-    private static final String KEY_COMPANY_DATA = "COMPANY_DATA";
+    private static final String KEY_NOTIFICATION_DATA = "NOTIFICATION_DATA";
 
     private TextView placeholder, title;
     private FirebaseUser user;
     private PreferencesUtil preferencesUtil;
-    public static List<Beacon> myBeaconsList;
+    public static List<BeaconData> myBeaconsList;
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
@@ -86,7 +85,7 @@ public class ProfileFragment extends Fragment implements BeaconItemAdapter.ItemC
         recyclerView = rootView.findViewById(R.id.rv_my_beacons);
         layoutManager = new LinearLayoutManager(inflater.getContext());
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new BeaconItemAdapter(myBeaconsList,false, false, this);
+        adapter = new BeaconAdapter(myBeaconsList, false, this);
         recyclerView.setAdapter(adapter);
 
         title = rootView.findViewById(R.id.tv_title);
@@ -108,7 +107,7 @@ public class ProfileFragment extends Fragment implements BeaconItemAdapter.ItemC
             myBeaconsList.clear();
             myBeaconsList = preferencesUtil.getMyBeaconsList();
             if (adapter == null && myBeaconsList != null) {
-                adapter = new BeaconItemAdapter(myBeaconsList, false, false,this);
+                adapter = new BeaconAdapter(myBeaconsList, false, this);
                 recyclerView.setAdapter(adapter);
             } else {
                 adapter.notifyDataSetChanged();
@@ -121,7 +120,7 @@ public class ProfileFragment extends Fragment implements BeaconItemAdapter.ItemC
             placeholder.setVisibility(View.GONE);
     }
 
-    public void openActionDialog(Beacon beacon, boolean isEddystone) {
+    public void openActionDialog(BeaconData beacon) {
         Dialog beacon_dialog;
         TextView tvSeeNotification, tvAddNotification, tvUpdateNotification;
         TextView tvVisitWebsite, tvAddWebsite, tvUpdateWebsite;
@@ -165,12 +164,11 @@ public class ProfileFragment extends Fragment implements BeaconItemAdapter.ItemC
         tvVisitWebsite = beacon_dialog.findViewById(R.id.tv_visit_website);
         tvVisitWebsite.setOnClickListener(v -> {
 
-            if (isEddystone) {
-                String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
-                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                CustomTabsIntent customTabsIntent = builder.build();
-                customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
-            }
+            //TODO: add url info here
+            //String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
+            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+            CustomTabsIntent customTabsIntent = builder.build();
+            customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
 
         });
 
@@ -204,8 +202,8 @@ public class ProfileFragment extends Fragment implements BeaconItemAdapter.ItemC
     }
 
     @Override
-    public void onItemClick(int position, boolean isEddystone, View view) {
-        openActionDialog(myBeaconsList.get(position), isEddystone);
+    public void onItemClick(int position, View view) {
+        openActionDialog(myBeaconsList.get(position));
     }
 
 
@@ -276,15 +274,15 @@ public class ProfileFragment extends Fragment implements BeaconItemAdapter.ItemC
                 try {
                     JSONObject jsonObject = new JSONObject(result);
 
-                    CompanyData companyData = new CompanyData();
-                    companyData.setCompanyName(jsonObject.getString("companyName"));
-                    companyData.setTitle(jsonObject.getString("title"));
-                    companyData.setEnterTitle(jsonObject.getString("enterTitle"));
-                    companyData.setEnterMessage(jsonObject.getString("enterMessage"));
-                    companyData.setExitTitle(jsonObject.getString("exitTitle"));
-                    companyData.setExitMessage(jsonObject.getString("exitMessage"));
+                    //jsonObject.getString("companyName")
+                    //jsonObject.getString("title")
 
-                    preferencesUtil.saveObject(KEY_COMPANY_DATA, companyData);
+                    NotificationData notificationData = new NotificationData(jsonObject.getString("enterTitle"),
+                            jsonObject.getString("enterMessage"),
+                            jsonObject.getString("exitTitle"),
+                            jsonObject.getString("exitMessage"));
+
+                    preferencesUtil.saveObject(KEY_NOTIFICATION_DATA, notificationData);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

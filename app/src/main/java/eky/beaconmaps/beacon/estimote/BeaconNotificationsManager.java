@@ -35,7 +35,8 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
     private String CHANNEL_ID = "beaconMapsID";
 
     private List<BeaconRegion> regionsToMonitor = new ArrayList<>();
-    private HashMap<String, NotificationData> messages = new HashMap<>();
+    private HashMap<String, NotificationData> notificationDatas = new HashMap<>();
+    private HashMap<String, BeaconID> beaconIDs = new HashMap<>();
 
     private int notificationID = 0;
 
@@ -51,20 +52,22 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
     @Override
     public void onEnteredRegion(BeaconRegion region, List<Beacon> list) {
         Log.d(TAG, "onEnteredRegion: " + region.getIdentifier());
-        NotificationData notificationData = messages.get(region.getIdentifier());
+        NotificationData notificationData = notificationDatas.get(region.getIdentifier());
+        BeaconID beaconID = beaconIDs.get(region.getIdentifier());
 
-        if (notificationData != null && notificationData.getBeaconId().toBeaconRegion().equals(region)) {
-            showNotification(notificationData.getEnterTitle(), notificationData.getEnterDesc());
+        if (notificationData != null && beaconID.toBeaconRegion().equals(region)) {
+            showNotification(notificationData.getEnterTitle(), notificationData.getEnterDesc(), beaconID);
         }
     }
 
     @Override
     public void onExitedRegion(BeaconRegion region) {
         Log.d(TAG, "onExitedRegion: " + region.getIdentifier());
-        NotificationData notificationData = messages.get(region.getIdentifier());
+        NotificationData notificationData = notificationDatas.get(region.getIdentifier());
+        BeaconID beaconID = beaconIDs.get(region.getIdentifier());
 
-        if (notificationData != null && notificationData.getBeaconId().toBeaconRegion().equals(region)) {
-            showNotification(notificationData.getExitTitle(), notificationData.getExitDesc());
+        if (notificationData != null && beaconID.toBeaconRegion().equals(region)) {
+            showNotification(notificationData.getExitTitle(), notificationData.getExitDesc(), beaconID);
         }
     }
 
@@ -81,21 +84,24 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
             isManagerConnected = true;
             for (BeaconRegion region : regionsToMonitor) {
                 beaconManager.startMonitoring(region);
-                beaconManager.setForegroundScanPeriod(3500, 7000); // Scan during 3.5s every 7s
+                beaconManager.setForegroundScanPeriod(5000, 10000); // Scan during 5s every 10s
                 beaconManager.setBackgroundScanPeriod(4000, 20000); // Scan during 4s every 20s
             }
         });
     }
 
-    public void addNotification(NotificationData notificationData) {
-        BeaconRegion region = notificationData.getBeaconId().toBeaconRegion();
-        messages.put(region.getIdentifier(), notificationData);
+    public void addNotification(BeaconID beaconID, NotificationData notificationData) {
+        //TODO: Add as BeaconData from Database. Don't use BeaconID.
+        BeaconRegion region = beaconID.toBeaconRegion();
+        notificationDatas.put(region.getIdentifier(), notificationData);
+        beaconIDs.put(region.getIdentifier(), beaconID);
         regionsToMonitor.add(region);
     }
 
-    private void showNotification(String title, String message) { //, String companyName TODO: companyName i subtitle olarak ekleyebilirsin.
+    private void showNotification(String title, String message, BeaconID beaconID) { //TODO: LatLng ekle. Farklı notificationlarda latlng nasıl ayırt edeceksin???
+                                                                  // companyName i subtitle olarak ekleyebilirsin.
         Intent resultIntent = new Intent(context, MainActivity.class);
-        resultIntent.putExtra("LOC", new LatLng(22.0176751,28.9463934));
+        resultIntent.putExtra("KEY_LOC", new LatLng(41.0463356, 28.9432943));
         PendingIntent resultPendingIntent = PendingIntent.getActivity(
                 context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 

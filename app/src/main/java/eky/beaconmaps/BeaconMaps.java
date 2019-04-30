@@ -42,29 +42,33 @@ public class BeaconMaps extends Application {
 
         //TODO: Notification bilgilerini düzenle. Daha efektif title-desc ekleyebilirsin???
 
-        beaconNotificationsManager.addNotification(new NotificationData(
+        beaconNotificationsManager.addNotification(
                 new BeaconID("E263C169-EB5D-76DA-F938-1BBA59293189", 81, 81),
+                new NotificationData(
                 "Fatih Sultan Mehmet Vakıf Üniversitesine hoşgeldiniz !",
                 "- Gray - ",
                 "Bir daha görüşmek üzere... FSMVÜ",
                 "- Gray - "));
 
-        beaconNotificationsManager.addNotification(new NotificationData(
+        beaconNotificationsManager.addNotification(
                 new BeaconID("B9407F30-F5F8-466E-AFF9-25556B57FE6D", 100, 58168),
+                new NotificationData(
                 "Whopper Menüde Sana Özel İndirim - Burger King",
                 "15 dakika içerisinde yapacağın Whopper Menü siparişinde sana özel %20 indirim ! - Lemon - ",
                 "Afiyet Olsun. Tekrar bekleriz.",
                 "- Lemon - "));
 
-        beaconNotificationsManager.addNotification(new NotificationData(
+        beaconNotificationsManager.addNotification(
                 new BeaconID("B9407F30-F5F8-466E-AFF9-25556B57FE6D", 100, 21066),
+                new NotificationData(
                 "Sana Özel Büyük Fırsat - De Facto",
                 "10 dakika içinde yapacağın alışverişinde aldığın 2.ürüne %50 indirim ! - Purple - ",
                 " - De Facto",
                 " - Purple - "));
 
-        beaconNotificationsManager.addNotification(new NotificationData(
+        beaconNotificationsManager.addNotification(
                 new BeaconID("B9407F30-F5F8-466E-AFF9-25556B57FE6D", 100, 19782),
+                new NotificationData(
                 "Badem'de bugüne özel indirim. - Bilen Kuruyemiş",
                 "Yaş badem bugün %20 indirimli. - Pink - ",
                 " - Bilen Kuruyemiş ",

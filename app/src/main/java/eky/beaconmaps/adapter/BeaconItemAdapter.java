@@ -62,6 +62,7 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
 
     @Override
     public int getItemViewType(int position) {
+
         Beacon beacon = beaconList.get(position);
 
         if (beacon.getServiceUuid() == 0xfeaa && beacon.getBeaconTypeCode() == 0x10) {

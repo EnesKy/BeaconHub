@@ -1,6 +1,7 @@
 package eky.beaconmaps.beacon.estimote;
 
 import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.UUID;
 
@@ -9,6 +10,7 @@ public class BeaconID {
     private UUID proximityUUID;
     private int major;
     private int minor;
+    private LatLng location;
 
     public BeaconID(UUID proximityUUID, int major, int minor) {
         this.proximityUUID = proximityUUID;
@@ -16,8 +18,19 @@ public class BeaconID {
         this.minor = minor;
     }
 
+    public BeaconID(UUID proximityUUID, int major, int minor, LatLng location) {
+        this.proximityUUID = proximityUUID;
+        this.major = major;
+        this.minor = minor;
+        this.location = location;
+    }
+
     public BeaconID(String UUIDString, int major, int minor) {
         this(UUID.fromString(UUIDString), major, minor);
+    }
+
+    public BeaconID(String UUIDString, int major, int minor, LatLng location) {
+        this(UUID.fromString(UUIDString), major, minor, location);
     }
 
     public UUID getProximityUUID() {
@@ -30,6 +43,14 @@ public class BeaconID {
 
     public int getMinor() {
         return minor;
+    }
+
+    public LatLng getLocation() {
+        return location;
+    }
+
+    public void setLocation(LatLng location) {
+        this.location = location;
     }
 
     public BeaconRegion toBeaconRegion() {

@@ -35,6 +35,9 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
     private final LatLng mDefaultLocation = new LatLng(41.0463356, 28.9432943);
     private Location currentLocation;
     private static final int LOCATION_REQUEST_CODE =101;
+    private float zoom_level = 14;
+    public LatLng tempLocation;
+    private View view;
 
     public BeaconMapFragment() {
         // Required empty public constructor
@@ -50,13 +53,14 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
             ActivityCompat.requestPermissions(getActivity(), new String[] {android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
             return;
         }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.fragment_beacon_map, container, false);
+        view = inflater.inflate(R.layout.fragment_beacon_map, container, false);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
@@ -65,7 +69,17 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
         //fetchLastLocation();
 
-        return v;
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (getArguments() != null && getArguments().get("KEY_LOC") != null) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom((LatLng) getArguments().get("KEY_LOC"), zoom_level));
+        }
+
     }
 
     @Override
@@ -73,13 +87,18 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
         mMap = googleMap;
         //mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.gmap_style_night));
 
+        if (tempLocation != null)
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tempLocation, zoom_level));
+        else
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, zoom_level));
+
+
         mMap.addMarker(new MarkerOptions().position(mDefaultLocation).title("Marker in Fsmvü"));
-        float zoom_level = 14;
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, zoom_level));
+
 
         mMap.setOnMapClickListener(latLng -> {
 
-            // Clears the previously touched position
+            //Clears the previously touched position
             //mMap.clear();
 
             /*mMap.addMarker(new MarkerOptions()
@@ -146,8 +165,7 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
      */
     private void getLocationPermission() {
         /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
+         * The result of the permission request is handled by a callback,
          * onRequestPermissionsResult.
          */
         if (ContextCompat.checkSelfPermission(getActivity(),
@@ -194,6 +212,7 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
      * Updates the map's UI settings based on whether the user has granted location permission.
      */
     private void updateLocationUI() {
+
         if (mMap == null) {
             return;
         }

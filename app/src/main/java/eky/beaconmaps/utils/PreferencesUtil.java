@@ -6,11 +6,11 @@ import android.content.SharedPreferences;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.altbeacon.beacon.Beacon;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
+import eky.beaconmaps.model.BeaconData;
 
 public class PreferencesUtil {
     private static final String KEY_SHARED_FILE = "APP_FILE";
@@ -51,30 +51,30 @@ public class PreferencesUtil {
         sharedPreferences.edit().putString(key, new Gson().toJson(object)).apply();
     }
 
-    public void saveMyBeaconsList(List<Beacon> list) {
+    public void saveMyBeaconsList(List<BeaconData> list) {
         sharedPreferences.edit().putString(KEY_MY_BEACONS_LIST, new Gson().toJson(list)).apply();
     }
 
-    public List<Beacon> getMyBeaconsList() {
+    public List<BeaconData> getMyBeaconsList() {
         String allUserData = getData(KEY_MY_BEACONS_LIST, null);
         if (allUserData == null)
             return null;
 
-        Type listType = new TypeToken<ArrayList<Beacon>>() {
+        Type listType = new TypeToken<ArrayList<BeaconData>>() {
         }.getType();
         return new Gson().fromJson(allUserData, listType);
     }
 
-    public void saveBlockedBeaconsList(List<Beacon> list) {
+    public void saveBlockedBeaconsList(List<BeaconData> list) {
         sharedPreferences.edit().putString(KEY_BLOCKED_BEACONS_LIST, new Gson().toJson(list)).apply();
     }
 
-    public List<Beacon> getBlockedBeaconsList() {
+    public List<BeaconData> getBlockedBeaconsList() {
         String allUserData = getData(KEY_BLOCKED_BEACONS_LIST, null);
         if (allUserData == null)
             return null;
 
-        Type listType = new TypeToken<ArrayList<Beacon>>() {
+        Type listType = new TypeToken<ArrayList<BeaconData>>() {
         }.getType();
         return new Gson().fromJson(allUserData, listType);
     }

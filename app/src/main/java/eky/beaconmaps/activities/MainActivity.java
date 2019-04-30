@@ -1,6 +1,7 @@
 package eky.beaconmaps.activities;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -26,7 +28,9 @@ import eky.beaconmaps.fragments.ProfileFragment;
 
 public class MainActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
-    private final Fragment fragment1 = new BeaconMapFragment();
+    private final String TAG = "MainActivity";
+
+    private Fragment fragment1 = new BeaconMapFragment();
     private final Fragment fragment2 = new BeaconsNearbyFragment();
     private final Fragment fragment3 = new ProfileFragment();
     private final FragmentManager fm = getSupportFragmentManager();
@@ -39,6 +43,9 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     private ImageButton buttonSettings;
     public static BottomNavigationView navigation;
     private boolean backPressed = false;
+    private Bundle bundle = new Bundle();
+
+    private LatLng locFromNotification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +97,26 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             openAlertDialog();
             //super.onBackPressed();
         }
+    }
+
+    /**
+     * Notification click event route method.
+     * @param intent
+     */
+    @Override
+    protected void onNewIntent(Intent intent) {
+
+        if (intent.getExtras() != null) {
+            locFromNotification = (LatLng) intent.getExtras().get("KEY_LOC");
+            bundle.putParcelable("KEY_LOC", locFromNotification);
+        }
+
+        if (locFromNotification != null){
+            fragment1.setArguments(bundle);
+            fragment1.onResume();
+        }
+
+        super.onNewIntent(intent);
     }
 
     @Override
@@ -168,7 +195,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         AlertDialog.Builder alertBuild = new AlertDialog.Builder(this)
                 .setTitle("Warning")
                 .setMessage("Are you sure to exit?")
-                .setPositiveButton("OK", (dialog, which) -> super.onBackPressed())
+                .setPositiveButton("OK", (dialog, which) -> finish())
                 .setNegativeButton("CANCEL", (dialog, which) -> dialog.dismiss());
 
         AlertDialog dialog = alertBuild.create();

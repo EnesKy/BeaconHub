@@ -30,7 +30,6 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.LoginActivity"
-            android:launchMode="singleTop"
             android:screenOrientation="portrait">
 
             <!-- android:theme="@style/AppTheme.Login"

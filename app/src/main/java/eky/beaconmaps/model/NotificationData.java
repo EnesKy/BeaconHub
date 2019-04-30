@@ -1,10 +1,7 @@
 package eky.beaconmaps.model;
 
-import eky.beaconmaps.beacon.estimote.BeaconID;
-
 public class NotificationData {
 
-    private BeaconID beaconId;
     private String enterTitle;
     private String enterDesc;
     private String exitTitle;
@@ -12,20 +9,11 @@ public class NotificationData {
 
     public NotificationData() {}
 
-    public NotificationData(BeaconID beaconID, String enterTitle, String enterDesc, String exitTitle, String exitDesc) {
-        this.beaconId = beaconID;
+    public NotificationData(String enterTitle, String enterDesc, String exitTitle, String exitDesc) {
         this.enterTitle = enterTitle;
         this.enterDesc = enterDesc;
         this.exitTitle = exitTitle;
         this.exitDesc = exitDesc;
-    }
-
-    public BeaconID getBeaconId() {
-        return beaconId;
-    }
-
-    public void setBeaconId(BeaconID beaconID) {
-        this.beaconId = beaconID;
     }
 
     public String getEnterTitle() {
