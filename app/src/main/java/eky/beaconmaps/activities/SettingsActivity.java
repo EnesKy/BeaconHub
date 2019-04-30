@@ -92,7 +92,9 @@ public class SettingsActivity extends BaseActivity implements BeaconItemAdapter.
                 name.setText(user.getDisplayName());
 
             email.setText(user.getEmail());
-            Picasso.get().load(user.getPhotoUrl()).into(profilepic);
+
+            if (user.getPhotoUrl() != null) //Todo: null ise default foto görünmüyor???
+                Picasso.get().load(user.getPhotoUrl()).into(profilepic);
         }
 
     }
@@ -105,7 +107,7 @@ public class SettingsActivity extends BaseActivity implements BeaconItemAdapter.
         openActivity(null, LoginActivity.class);
     }
 
-    public void openActionDialog(Beacon beacon, boolean isEddystone) { // TODO: Beacon bilgisi ekle. ?? Kullanıcının ise farklı text göster.
+    public void openActionDialog(Beacon beacon, boolean isEddystone) { // TODO: Kullanıcının ise farklı text göster.
         Dialog beacon_dialog;
         TextView tvUnblock, tvWebUrl, tvLocation;
 

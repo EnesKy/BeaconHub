@@ -2,8 +2,11 @@ package eky.beaconmaps.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +17,17 @@ import com.google.firebase.auth.FirebaseUser;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.utils.UrlBeaconUrlCompressor;
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,9 +37,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
 import eky.beaconmaps.adapter.BeaconItemAdapter;
+import eky.beaconmaps.model.CompanyData;
 import eky.beaconmaps.utils.PreferencesUtil;
 
 public class ProfileFragment extends Fragment implements BeaconItemAdapter.ItemClickListener {
+
+    private final String TAG = "Profile Fragment";
+    private static final String KEY_COMPANY_DATA = "COMPANY_DATA";
 
     private TextView placeholder, title;
     private FirebaseUser user;
@@ -36,6 +53,9 @@ public class ProfileFragment extends Fragment implements BeaconItemAdapter.ItemC
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
+
+    private ProgressDialog pd;
+    private static String url;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -48,11 +68,15 @@ public class ProfileFragment extends Fragment implements BeaconItemAdapter.ItemC
         preferencesUtil = new PreferencesUtil(Objects.requireNonNull(getActivity()));
         myBeaconsList = preferencesUtil.getMyBeaconsList();
         user = FirebaseAuth.getInstance().getCurrentUser();
+
+        //TODO: bu işlemi dialog eventine ekle. URl giriş dialogunu kullan bunda da
+        url = "http://895b8c9f.ngrok.io/getCompanyData";
+        new JsonTask().execute(url);
     }
 
     @SuppressLint("SetTextI18n")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
@@ -67,8 +91,9 @@ public class ProfileFragment extends Fragment implements BeaconItemAdapter.ItemC
 
         title = rootView.findViewById(R.id.tv_title);
 
-        if (user != null)
-            title.setText(user.getDisplayName() + "'s Beacons");
+        //if (user != null)
+        //    title.setText(user.getDisplayName() + "'s Beacons");
+        title.setText("My Beacons");
 
         return rootView;
     }
@@ -77,10 +102,12 @@ public class ProfileFragment extends Fragment implements BeaconItemAdapter.ItemC
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
 
-        if (myBeaconsList.size() != preferencesUtil.getMyBeaconsList().size()) {
+        if (preferencesUtil.getMyBeaconsList() != null &&
+                myBeaconsList.size() != preferencesUtil.getMyBeaconsList().size()) {
+
             myBeaconsList.clear();
             myBeaconsList = preferencesUtil.getMyBeaconsList();
-            if (adapter == null) {
+            if (adapter == null && myBeaconsList != null) {
                 adapter = new BeaconItemAdapter(myBeaconsList, false, false,this);
                 recyclerView.setAdapter(adapter);
             } else {
@@ -88,7 +115,7 @@ public class ProfileFragment extends Fragment implements BeaconItemAdapter.ItemC
             }
         }
 
-        if (myBeaconsList.size() == 0)
+        if (myBeaconsList == null || myBeaconsList.size() == 0)
             placeholder.setVisibility(View.VISIBLE);
         else
             placeholder.setVisibility(View.GONE);
@@ -179,6 +206,90 @@ public class ProfileFragment extends Fragment implements BeaconItemAdapter.ItemC
     @Override
     public void onItemClick(int position, boolean isEddystone, View view) {
         openActionDialog(myBeaconsList.get(position), isEddystone);
+    }
+
+
+    @SuppressLint("StaticFieldLeak")
+    public class JsonTask extends AsyncTask<String, String, String> {
+
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            pd = new ProgressDialog(getActivity());
+            pd.setMessage("Please wait");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        protected String doInBackground(String... params) {
+
+            HttpURLConnection connection = null;
+            BufferedReader reader = null;
+
+            try {
+                URL url = new URL(params[0]);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+
+                InputStream stream = connection.getInputStream();
+                reader = new BufferedReader(new InputStreamReader(stream));
+                StringBuffer buffer = new StringBuffer();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line + "\n");
+                }
+
+                return buffer.toString();
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                try {
+                    if (reader != null) {
+                        reader.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (pd.isShowing()) {
+                pd.dismiss();
+            }
+
+            if (result == null || result.isEmpty()) {
+                Log.d(TAG, "onPostExecute Error.");
+            } else {
+                Log.d(TAG, "onPostExecute result : " + result);
+
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+
+                    CompanyData companyData = new CompanyData();
+                    companyData.setCompanyName(jsonObject.getString("companyName"));
+                    companyData.setTitle(jsonObject.getString("title"));
+                    companyData.setEnterTitle(jsonObject.getString("enterTitle"));
+                    companyData.setEnterMessage(jsonObject.getString("enterMessage"));
+                    companyData.setExitTitle(jsonObject.getString("exitTitle"));
+                    companyData.setExitMessage(jsonObject.getString("exitMessage"));
+
+                    preferencesUtil.saveObject(KEY_COMPANY_DATA, companyData);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 }

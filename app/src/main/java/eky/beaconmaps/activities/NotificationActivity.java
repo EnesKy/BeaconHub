@@ -6,15 +6,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import eky.beaconmaps.BeaconMaps;
 import eky.beaconmaps.R;
 
-public class NotificationActivity extends AppCompatActivity implements View.OnClickListener,
-        SeekBar.OnSeekBarChangeListener {
+public class NotificationActivity extends AppCompatActivity implements View.OnClickListener {
 
     EditText entranceTitle;
     EditText entranceDesc;
@@ -22,7 +20,6 @@ public class NotificationActivity extends AppCompatActivity implements View.OnCl
     EditText exitDesc;
     ImageButton helloIcon;
     ImageButton exitIcon;
-    SeekBar seekBar;
     Button done;
 
     //Dialogdan Beacon seçimi ve Functionlardan Notification seçimi yapıldığında burayı aç
@@ -85,7 +82,7 @@ public class NotificationActivity extends AppCompatActivity implements View.OnCl
                     setNotifications(entranceTitle.getText().toString(),entranceDesc.getText().toString(),
                             exitTitle.getText().toString(), exitDesc.getText().toString());
 
-                    /*NotificationData notificationData = new NotificationData(ConfigureBeaconActivity.getBeaconUuid(), entranceTitle.getText().toString(),
+                    /*NotificationData notificationData = new NotificationData(ConfigureBeaconActivity.getBeaconId(), entranceTitle.getText().toString(),
                             entranceDesc.getText().toString(), exitTitle.getText().toString(), exitDesc.getText().toString());
                     FirebaseUtil.saveNotificationData(notificationData);*/
 
@@ -103,13 +100,4 @@ public class NotificationActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        Toast.makeText(this, "" + (progress + 1), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {}
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {}
 }

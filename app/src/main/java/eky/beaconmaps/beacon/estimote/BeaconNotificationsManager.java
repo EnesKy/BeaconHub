@@ -93,7 +93,7 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
         regionsToMonitor.add(region);
     }
 
-    private void showNotification(String title, String message) {
+    private void showNotification(String title, String message) { //, String companyName TODO: companyName i subtitle olarak ekleyebilirsin.
         Intent resultIntent = new Intent(context, MainActivity.class);
         resultIntent.putExtra("LOC", new LatLng(22.0176751,28.9463934));
         PendingIntent resultPendingIntent = PendingIntent.getActivity(
@@ -105,16 +105,20 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
             notification = new Notification.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.mipmap.beacon_maps_no_background_icon)
                     .setContentTitle(title)
-                    .setContentText(message)
-                    .setAutoCancel(true)
+                    //.setContentText(message)
+                    .setStyle(new Notification.BigTextStyle().bigText(message))
                     .setContentIntent(resultPendingIntent)
+                    //.setSubText(companyName)
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
+                    .setAutoCancel(true)
                     .build();
         } else {
             notification = new NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.mipmap.beacon_maps_no_background_icon)
                     .setContentTitle(title)
-                    .setContentText(message)
+                    //.setContentText(message)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                    //.setSubText(companyName)
                     .setDefaults(NotificationCompat.DEFAULT_ALL)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

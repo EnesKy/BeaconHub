@@ -186,7 +186,10 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
 
     @Override
     public int getItemCount() {
-        return beaconList.size();
+        if (beaconList != null)
+            return beaconList.size();
+        else
+            return 0;
     }
 
     public interface ItemClickListener {
