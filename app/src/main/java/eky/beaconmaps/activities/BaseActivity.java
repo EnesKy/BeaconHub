@@ -11,7 +11,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import eky.beaconmaps.BeaconMaps;
 import eky.beaconmaps.R;
-import me.anwarshahriar.calligrapher.Calligrapher;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -21,8 +20,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Calligrapher calligrapher = new Calligrapher(this);
-        calligrapher.setFont(this, "font/MuseoSans.otf", true);
     }
 
     @Override

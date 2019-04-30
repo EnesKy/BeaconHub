@@ -17,10 +17,9 @@
             android:layout_margin="10dp"
             android:background="@drawable/search_bar_with_radius"
             app:iconifiedByDefault="false"
-            app:layout_constraintTop_toTopOf="parent"
-            app:queryHint="Filter Beacons..." >
-
-
+            android:focusableInTouchMode="true"
+            app:queryHint="Filter Beacons..."
+            app:layout_constraintTop_toTopOf="parent" >
 
         </androidx.appcompat.widget.SearchView>
 

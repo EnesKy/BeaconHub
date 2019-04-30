@@ -41,9 +41,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:16.1.0'
     implementation 'com.google.firebase:firebase-auth:16.2.1'
 
-    implementation 'me.anwarshahriar:calligrapher:1.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.android.support:customtabs:28.0.0'
+    //implementation 'com.squareup.okhttp3:okhttp:3.14.1'
 
     //----Estimote SDK----
     //implementation 'com.estimote:sdk:1.4.5'
