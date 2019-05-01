@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tv_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/space_large"
+        android:text="Location :"
+        android:textColor="@color/rallyGreen"
+        android:textSize="14dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_location_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" 22,123213, 12,124123"
+        android:textSize="14dp"
+        android:textColor="@android:color/white"
+        android:layout_marginStart="@dimen/space_large"
+        app:layout_constraintStart_toEndOf="@id/tv_location"
+        app:layout_constraintTop_toTopOf="@id/tv_location"/>
+
+    <TextView
+        android:id="@+id/tv_title_marker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Marker Title : "
+        android:textColor="@color/rallyGreen"
+        android:textSize="14dp"
+        android:layout_marginTop="@dimen/space_top_large"
+        android:layout_marginStart="@dimen/space_large"
+        app:layout_constraintTop_toBottomOf="@id/tv_location"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <EditText
+        android:id="@+id/et_title_marker"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter marker title here"
+        android:textSize="14dp"
+        android:textColor="@android:color/white"
+        android:textColorHint="@android:color/white"
+        android:layout_marginEnd="@dimen/space_large"
+        android:layout_marginStart="@dimen/space_large"
+        app:layout_constraintTop_toBottomOf="@id/tv_title_marker"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/tv_title_marker_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Marker Description : "
+        android:textColor="@color/rallyGreen"
+        android:textSize="14dp"
+        android:layout_marginTop="@dimen/space_top_large"
+        android:layout_marginStart="@dimen/space_large"
+        app:layout_constraintTop_toBottomOf="@id/et_title_marker"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <EditText
+        android:id="@+id/et_title_marker_desc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter marker description here"
+        android:textSize="14dp"
+        android:textColor="@android:color/white"
+        android:textColorHint="@android:color/white"
+        android:layout_marginEnd="@dimen/space_large"
+        android:layout_marginStart="@dimen/space_large"
+        app:layout_constraintTop_toBottomOf="@id/tv_title_marker_desc"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <fragment xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map_location"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_margin="@dimen/space_large"
+        app:layout_constraintTop_toBottomOf="@id/et_title_marker_desc"
+        tools:context=".activities.LocationActivity" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_apply"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_top_large"
+        android:textAllCaps="false"
+        android:text="@string/title_apply"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/map_location"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

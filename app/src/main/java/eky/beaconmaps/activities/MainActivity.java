@@ -113,7 +113,12 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
         if (locFromNotification != null){
             fragment1.setArguments(bundle);
-            fragment1.onResume();
+
+            // Eğer uygulama açıksa ve görünür fragment beaconMap değilse.
+            if (active != fragment1)
+                navigation.setSelectedItemId(R.id.navigation_beacon_map);
+            else
+                fragment1.onResume();
         }
 
         super.onNewIntent(intent);

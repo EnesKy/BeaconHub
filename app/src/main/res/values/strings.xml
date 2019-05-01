@@ -56,5 +56,13 @@
     <string name="hint_enter_url">Enter the url here...</string>
     <string name="title_apply">Apply</string>
     <string name="placeholder_blocked_beacon">You have no blocked beacon.</string>
+    <string name="title_test_it">Test It</string>
+    <string name="title_done">Done</string>
+    <string name="hint_exit_desc">Exit Description</string>
+    <string name="hint_exit_title">Exit Title</string>
+    <string name="title_notification">BeaconMaps</string>
+    <string name="hint_enter_desc">Entrance Description</string>
+    <string name="hint_enter_title">Entrance Title</string>
+    <string name="title_activity_location">Location</string>
 
 </resources>

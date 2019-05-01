@@ -1,66 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="250dp"
-    android:layout_height="wrap_content"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardCornerRadius="@dimen/default_radius_large"
-    app:cardElevation="4dp"
-    android:backgroundTint="@color/rallyLightGrey">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <androidx.cardview.widget.CardView
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/rallyLightGrey"
+        app:cardCornerRadius="@dimen/default_radius_large"
+        app:cardElevation="4dp">
 
-        <View
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/rallyDarkGrey"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_unblock"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:textSize="@dimen/text_size_xlarge"
-            android:layout_margin="@dimen/space_small"
-            android:text="Unblock"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/rallyGreen"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/space_medium"
+                android:orientation="vertical">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/rallyDarkGrey"/>
+                <TextView
+                    android:id="@+id/tv_uuid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="UUID : 123123089213213218"
+                    android:textColor="@color/rallyGreen"
+                    android:gravity="center"/>
 
-        <TextView
-            android:id="@+id/tv_visit_website"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:textSize="@dimen/text_size_xlarge"
-            android:layout_margin="@dimen/space_small"
-            android:text="Visit Website"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/rallyGreen"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/rallyDarkGrey"/>
+                    <TextView
+                        android:id="@+id/tv_major"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Major : 123"
+                        android:textColor="@color/rallyGreen"
+                        android:gravity="center"/>
 
-        <TextView
-            android:id="@+id/tv_see_location"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:textSize="@dimen/text_size_xlarge"
-            android:layout_margin="@dimen/space_small"
-            android:text="See Location"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@color/rallyGreen"/>
+                    <TextView
+                        android:id="@+id/tv_minor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Minor : 123"
+                        android:textColor="@color/rallyGreen"
+                        android:gravity="center"/>
 
-    </LinearLayout>
+                </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/rallyDarkGrey" />
+
+            <TextView
+                android:id="@+id/tv_unblock"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_margin="@dimen/space_small"
+                android:gravity="center"
+                android:text="Unblock"
+                android:textColor="@color/rallyGreen"
+                android:textSize="@dimen/text_size_xlarge"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

@@ -78,6 +78,7 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
 
         if (getArguments() != null && getArguments().get("KEY_LOC") != null) {
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom((LatLng) getArguments().get("KEY_LOC"), zoom_level));
+            setArguments(null);
         }
 
     }

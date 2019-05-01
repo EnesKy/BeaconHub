@@ -39,6 +39,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
+import eky.beaconmaps.activities.LocationActivity;
 import eky.beaconmaps.adapter.BeaconAdapter;
 import eky.beaconmaps.model.BeaconData;
 import eky.beaconmaps.utils.PreferencesUtil;
@@ -331,7 +332,12 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         });
         tvLocation = beacon_dialog.findViewById(R.id.tv_go_location);
         tvLocation.setOnClickListener(v -> {
-            Toast.makeText(getActivity(), "Clicked to go to location.", Toast.LENGTH_SHORT).show();
+
+            Bundle bundle = new Bundle();
+            //bundle.putParcelable(TAG, beacon);
+            Intent intent = new Intent(getActivity(), LocationActivity.class);
+            startActivity(intent);
+
             beacon_dialog.dismiss();
         });
 

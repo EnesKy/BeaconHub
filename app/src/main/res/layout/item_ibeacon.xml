@@ -12,13 +12,29 @@
     app:cardCornerRadius="@dimen/default_radius_large"
     app:cardElevation="4dp">
 
-    <ImageView
-        android:id="@+id/iv_belongs_to_user"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
-        android:layout_margin="@dimen/space_small"
-        android:background="@drawable/shape_round"
-        android:visibility="gone"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/iv_registered"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_margin="@dimen/space_small"
+            android:background="@drawable/shape_round"
+            android:backgroundTint="@color/rallyBlue"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/iv_belongs_to_user"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginTop="@dimen/space_small"
+            android:background="@drawable/shape_round"
+            android:visibility="gone"/>
+
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

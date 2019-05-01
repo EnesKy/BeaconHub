@@ -32,14 +32,13 @@ public class BeaconMaps extends Application {
                 , "406b37d7508496b9349808f7634c2b58");
 
         beaconManager = org.altbeacon.beacon.BeaconManager.getInstanceForApplication(this);
-
     }
 
     public void enableBeaconNotifications() {
         if (beaconNotificationsEnabled) { return; }
 
         BeaconNotificationsManager beaconNotificationsManager = new BeaconNotificationsManager(this);
-
+        //TODO: Bilgileri databaseden çek. BeaconData tipinde olacağı için location bilgisini de kullan.
         //TODO: Notification bilgilerini düzenle. Daha efektif title-desc ekleyebilirsin???
 
         beaconNotificationsManager.addNotification(

@@ -23,7 +23,8 @@
 
         </androidx.appcompat.widget.SearchView>
 
-        <!-- Todo: search viewi expandable yap ve all - my beacon seçeneği koy. -->
+        <!-- Todo: search viewi expandable yap ve all - my - sisteme ekli seçenekleri koy.  -->
+
         <LinearLayout
             android:id="@+id/ll_search_filter"
             android:layout_width="match_parent"
