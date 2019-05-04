@@ -65,6 +65,7 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
     private FirebaseUser user;
     private PreferencesUtil preferencesUtil;
     public static List<BeaconData> myBeaconsList = new ArrayList<>();
+    private List<BeaconData> blockedBeaconsList;
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
@@ -83,6 +84,17 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
 
         preferencesUtil = new PreferencesUtil(Objects.requireNonNull(getActivity()));
         myBeaconsList = preferencesUtil.getMyBeaconsList();
+        blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
+        if (blockedBeaconsList == null) {
+            blockedBeaconsList = new ArrayList<>();
+        }
+
+        if (blockedBeaconsList.size() > 0 && myBeaconsList != null && myBeaconsList.size() > 0) {
+            for (BeaconData beaconData : myBeaconsList)
+                if (blockedBeaconsList.contains(beaconData))
+                    beaconData.setBlocked(true);
+        }
+
         user = FirebaseAuth.getInstance().getCurrentUser();
 
         //TODO: bu işlemi dialog eventine ekle. URl giriş dialogunu kullan bunda da
@@ -116,11 +128,18 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
         super.onHiddenChanged(hidden);
 
         if (!hidden) {
-            if (preferencesUtil.getMyBeaconsList() != null &&
-                    myBeaconsList.size() != preferencesUtil.getMyBeaconsList().size()) {
+
+            if (preferencesUtil.getMyBeaconsList() != null) {
 
                 myBeaconsList.clear();
                 myBeaconsList.addAll(preferencesUtil.getMyBeaconsList());
+                blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
+
+                if (blockedBeaconsList.size() > 0 && myBeaconsList.size() > 0) {
+                    for (BeaconData beaconData : myBeaconsList)
+                        if (blockedBeaconsList.contains(beaconData))
+                            beaconData.setBlocked(true);
+                }
 
                 if (adapter == null) {
                     adapter = new BeaconAdapter(myBeaconsList, false, this);
@@ -135,7 +154,12 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
             else
                 placeholder.setVisibility(View.GONE);
         }
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        onHiddenChanged(false);
     }
 
     private void openActionDialog(BeaconData beacon) {
@@ -204,15 +228,10 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
         tvAddBlocklist = beacon_dialog.findViewById(R.id.tv_add_blocklist);
         tvAddBlocklist.setOnClickListener(v -> {
 
-            //eğer blocked ise visibility==gone
-
-            if (preferencesUtil.getBlockedBeaconsList() != null) {
-                preferencesUtil.getBlockedBeaconsList().add(beacon);
-            } else {
-                List<BeaconData> list = new ArrayList<>();
-                list.add(beacon);
-                preferencesUtil.saveBlockedBeaconsList(list);
-            }
+            beacon.setBlocked(true);
+            blockedBeaconsList.add(beacon);
+            preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
+            onHiddenChanged(false);
 
             beacon_dialog.dismiss();
         });
@@ -312,6 +331,9 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
             tvSeeLocation.setVisibility(View.GONE);
             tvUpdateLocation.setVisibility(View.GONE);
         }
+
+        if (preferencesUtil.getBlockedBeaconsList().contains(beacon))
+            tvAddBlocklist.setVisibility(View.GONE);
 
         beacon_dialog.show();
     }

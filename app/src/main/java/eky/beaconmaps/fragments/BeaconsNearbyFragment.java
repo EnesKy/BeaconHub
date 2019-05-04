@@ -174,19 +174,28 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
     public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
 
         List<BeaconData> temp = new ArrayList<>();
+        for (Beacon beacon : beacons)
+            temp.add(new BeaconData(beacon));
+
+        List<BeaconData> unblockedBeacons = new ArrayList<>();
+        blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
 
         if (isScanEnabled) {
-
-            for (Beacon blocked : beacons)
-                if (blockedBeaconsList != null && blockedBeaconsList.contains(blocked))
-                    beacons.remove(blocked);
-
+            for (BeaconData unblocked : temp)
+                if (!blockedBeaconsList.contains(unblocked))
+                    unblockedBeacons.add(unblocked);
         }
 
-        if (beacons.size() != 0 && isScanEnabled) {
+        if (unblockedBeacons.size() != 0 && isScanEnabled) {
 
             placeholder.setVisibility(View.GONE);
-            List<Beacon> sortedList = new ArrayList<>(beacons);
+
+            List<Beacon> sortedList = new ArrayList<>();
+
+            for (BeaconData beaconData : unblockedBeacons)
+                sortedList.add(beaconData.getBeacon());
+
+            temp = new ArrayList<>();
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 //Sorting the beacons by their distance to phone.
@@ -340,10 +349,10 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
             });
         }
 
-
         tvBlockBeacon = beacon_dialog.findViewById(R.id.tv_add_blocklist);
         tvBlockBeacon.setOnClickListener(v -> {
 
+            beacon.setBlocked(true);
             blockedBeaconsList.add(beacon);
             preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
 

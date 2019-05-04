@@ -17,6 +17,7 @@ public class BeaconData {
     private NotificationData notificationData;
     private String webUrl;
     private String webServiceUrl;
+    private boolean isBlocked = false;
 
     public BeaconData() {}
 
@@ -91,6 +92,14 @@ public class BeaconData {
 
     public void setWebServiceUrl(String webServiceUrl) {
         this.webServiceUrl = webServiceUrl;
+    }
+
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
     }
 
     @Override

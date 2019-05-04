@@ -74,6 +74,11 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
                 holder.tvMinor.setText("Minor : " + beacon.getBeacon().getId3());
             }
 
+            if (beacon.isBlocked())
+                holder.ivBlocked.setVisibility(View.VISIBLE);
+            else
+                holder.ivBlocked.setVisibility(View.GONE);
+
             holder.llDistance.setVisibility(View.GONE);
             holder.llTx.setVisibility(View.GONE);
             holder.llRssi.setVisibility(View.GONE);
@@ -110,7 +115,7 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
         //View Components;
         private MaterialCardView item;
         private TextView tvUuid, tvMajor, tvMinor, tvUrl, tvLastSeen, tvDistance, tvRssi, tvTx;
-        private ImageView ivBelongstoUser;
+        private ImageView ivBelongstoUser, ivBlocked;
         private LinearLayout llDistance, llRssi, llTx, llUrl;
 
         public ViewHolder(View itemView) {
@@ -127,6 +132,7 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
             tvTx = itemView.findViewById(R.id.tx);
             tvUrl = itemView.findViewById(R.id.tv_url);
             ivBelongstoUser = itemView.findViewById(R.id.iv_belongs_to_user);
+            ivBlocked = itemView.findViewById(R.id.iv_blocked_icon);
             llDistance = itemView.findViewById(R.id.ll_distance);
             llRssi = itemView.findViewById(R.id.rssi_container);
             llTx = itemView.findViewById(R.id.tx_container);

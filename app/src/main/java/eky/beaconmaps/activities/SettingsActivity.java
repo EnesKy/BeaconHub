@@ -135,12 +135,17 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
 
         tvUnblock = beacon_dialog.findViewById(R.id.tv_unblock);
         tvUnblock.setOnClickListener(v -> {
+            beacon.setBlocked(false);
             blockedBeaconsList.remove(beacon);
             preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
 
             blockedBeaconsList.clear();
-            blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
+            blockedBeaconsList.addAll(preferencesUtil.getBlockedBeaconsList());
             adapter.notifyDataSetChanged();
+
+            if (blockedBeaconsList.size() == 0)
+                placeholder.setVisibility(View.VISIBLE);
+
             beacon_dialog.dismiss();
         });
 
