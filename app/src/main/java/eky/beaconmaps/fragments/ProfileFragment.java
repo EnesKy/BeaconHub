@@ -206,7 +206,13 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
 
             //eğer blocked ise visibility==gone
 
-            preferencesUtil.getBlockedBeaconsList().add(beacon);
+            if (preferencesUtil.getBlockedBeaconsList() != null) {
+                preferencesUtil.getBlockedBeaconsList().add(beacon);
+            } else {
+                List<BeaconData> list = new ArrayList<>();
+                list.add(beacon);
+                preferencesUtil.saveBlockedBeaconsList(list);
+            }
 
             beacon_dialog.dismiss();
         });

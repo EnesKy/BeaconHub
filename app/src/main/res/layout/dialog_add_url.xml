@@ -1,28 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center">
+    android:layout_gravity="center"
+    android:padding="@dimen/space_top_large"
+    android:background="@color/rallyLightGrey"
+    android:backgroundTint="@color/rallyLightGrey">
 
     <androidx.cardview.widget.CardView
-        android:layout_width="350dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/rallyLightGrey"
         android:backgroundTint="@color/rallyLightGrey">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_end"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.9"/>
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline_start"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.1"/>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_url"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:focusableInTouchMode="true"
-                android:layout_margin="@dimen/space_large">
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="@id/guideline_start"
+                app:layout_constraintEnd_toEndOf="@id/guideline_end">
 
                 <EditText
                     android:id="@+id/et_url"
@@ -39,7 +57,10 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_margin="@dimen/space_top_large"
-                android:layout_gravity="center">
+                android:layout_gravity="center"
+                app:layout_constraintTop_toBottomOf="@id/til_url"
+                app:layout_constraintStart_toStartOf="@id/til_url"
+                app:layout_constraintEnd_toEndOf="@id/til_url">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_test"
@@ -61,7 +82,7 @@
 
             </LinearLayout>
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
 

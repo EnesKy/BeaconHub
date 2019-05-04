@@ -17,7 +17,6 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
@@ -142,16 +141,6 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
             blockedBeaconsList.clear();
             blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
             adapter.notifyDataSetChanged();
-            beacon_dialog.dismiss();
-        });
-
-        tvWebUrl = beacon_dialog.findViewById(R.id.tv_visit_website);
-        tvWebUrl.setOnClickListener(v -> {
-            //String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
-            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-            CustomTabsIntent customTabsIntent = builder.build();
-            //customTabsIntent.launchUrl(this, Uri.parse(url));
-
             beacon_dialog.dismiss();
         });
 
