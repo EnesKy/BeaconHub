@@ -7,11 +7,11 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.RemoteException;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import androidx.appcompat.widget.SearchView;
@@ -39,7 +38,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
-import eky.beaconmaps.activities.LocationActivity;
+import eky.beaconmaps.activities.MainActivity;
 import eky.beaconmaps.adapter.BeaconAdapter;
 import eky.beaconmaps.model.BeaconData;
 import eky.beaconmaps.utils.PreferencesUtil;
@@ -51,7 +50,7 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
     private BeaconManager beaconManager;
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
+    private BeaconAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private SearchView searchView;
     private CountDownTimer countDownTimer;
@@ -59,6 +58,7 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
     private TextView placeholder;
     private ProgressBar progressBarLoading;
     private FloatingActionButton fabScanControl;
+    private LinearLayout llSearch;
 
     private Boolean isScanEnabled = false;
     private Region all;
@@ -93,6 +93,7 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
         View rootView = inflater.inflate(R.layout.fragment_beacons_nearby, container, false);
 
+        llSearch = rootView.findViewById(R.id.ll_search_filter);
         placeholder = rootView.findViewById(R.id.tv_placeholder);
 
         progressBarLoading = rootView.findViewById(R.id.pb_loading);
@@ -132,6 +133,10 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         switch (v.getId()) {
             case R.id.fab_scan_stopper:
                 scanControl();
+                //llSearch.setVisibility(View.GONE);
+                break;
+            case R.id.beacon_search_view:
+                //llSearch.setVisibility(View.VISIBLE);
                 break;
         }
     }
@@ -189,8 +194,12 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
                 Collections.sort(sortedList, beaconDistanceComparator);
             }
 
-            for(Beacon beacon : sortedList)
+            for(Beacon beacon : sortedList) {
+                //todo: databaseden çektiğin listede yer alıyorsa listeden aldığın beacondata bilgisini döndür.
+
                 temp.add(new BeaconData(beacon));
+                //FirebaseUtil.saveBeaconData(new BeaconData(beacon));
+            }
 
             beaconList.clear();
             beaconList.addAll(temp);
@@ -211,16 +220,16 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
     @Override
     public void onBeaconServiceConnect() {
         try {
-            all = new Region("rangingId", null, null, null);
+            all = new Region("allIBeacons", null, null, null);
             beaconManager.startRangingBeaconsInRegion(all);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
         isScanEnabled = true;
-        beaconManager.setForegroundScanPeriod(1000);
-        beaconManager.setForegroundBetweenScanPeriod(2000);
-        beaconManager.setBackgroundScanPeriod(1000);
-        beaconManager.setBackgroundBetweenScanPeriod(10000);
+        beaconManager.setForegroundScanPeriod(5000);
+        beaconManager.setForegroundBetweenScanPeriod(10000);
+        beaconManager.setBackgroundScanPeriod(5000);
+        beaconManager.setBackgroundBetweenScanPeriod(20000);
         beaconManager.addRangeNotifier(this);
     }
 
@@ -241,36 +250,14 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
     private void setBeaconsLayout() {
         beaconManager.getBeaconParsers().clear();
-        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24")); //iBeacon
+
+        //iBeacon
+        beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
 
         /**
          * TODO: Eddystone URL parsing işlemi yapılamadığı için şimdilik rafa kaldırıldı.
          * beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_URL_LAYOUT));
          **/
-    }
-
-    public void initializeCountDownTimer() {
-        countDownTimer = new CountDownTimer(750, 1000) {
-            public void onTick(long millisUntilFinished) {
-            }
-
-            public void onFinish() {
-                filterBeaconList(query);
-                countDownTimer.cancel();
-            }
-        };
-    }
-
-    private void filterBeaconList(String query) {
-        List<Beacon> temp = new ArrayList<>();
-        for (BeaconData beacon : beaconList) {
-            /*for (Identifier identifier : beacon.getIdentifiers()) {
-                if (identifier.toString().contains(query)) {
-                    temp.add(beacon);
-                }
-            }*/
-        }
-        //TODO: change list with temp. When query used stop scanning beacon until query cancelled.
     }
 
     @Override
@@ -280,24 +267,13 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        newText = newText.toUpperCase(Locale.US);
-        countDownTimer.start();
-        if (!TextUtils.isEmpty(newText)) {
-            if (countDownTimer != null) {
-                countDownTimer.cancel();
-            }
-            countDownTimer.start();
-        }
-        query = newText;
+        stopScanning();
+        adapter.getFilter().filter(newText);
         return false;
     }
 
     @Override
     public void onItemClick(int position, View view) {
-        //Bundle bundle = new Bundle();
-        //bundle.putParcelable(TAG, beaconList.get(position));
-        //Intent intent = new Intent(getActivity(), NotificationActivity.class);
-        //startActivity(intent);
         stopScanning();
 
         openActionDialog(beaconList.get(position));
@@ -311,40 +287,62 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         //TODO: Tıklanan beacon sistemde yer alıyorsa ve url'e sahipse listeden çek ve ekle.
 
         Dialog beacon_dialog;
-        TextView tvNotification;
-        TextView tvWebUrl;
-        TextView tvLocation;
-        TextView tvClaimBeacon;
+        TextView tvBlockBeacon, tvWebUrl, tvLocation, tvClaimBeacon;
+        TextView tvUUID, tvMajor, tvMinor;
 
         beacon_dialog = new Dialog(Objects.requireNonNull(getActivity()));
         beacon_dialog.setTitle("Add action");
         beacon_dialog.setContentView(R.layout.dialog_nearby_beacons);
 
+        tvUUID = beacon_dialog.findViewById(R.id.tv_uuid);
+        tvMajor = beacon_dialog.findViewById(R.id.tv_major);
+        tvMinor = beacon_dialog.findViewById(R.id.tv_minor);
+
+        if (beacon.getBeaconID() != null) {
+            tvUUID.setText("UUID : " + beacon.getBeaconID().getProximityUUID().toString());
+            tvMajor.setText("Major : " + beacon.getBeaconID().getMajor());
+            tvMinor.setText("Minor : " + beacon.getBeaconID().getMinor());
+        }
+        else if (beacon.getBeacon() != null) {
+            tvUUID.setText("UUID : " + beacon.getBeacon().getId1().toString());
+            tvMajor.setText("Major : " + beacon.getBeacon().getId2().toString());
+            tvMinor.setText("Minor : " + beacon.getBeacon().getId3().toString());
+        }
+
         tvWebUrl = beacon_dialog.findViewById(R.id.tv_visit_website);
-        tvWebUrl.setOnClickListener(v -> {
-            //String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
-            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-            CustomTabsIntent customTabsIntent = builder.build();
-            //customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
 
-            Toast.makeText(getActivity(), "Clicked to visit website.", Toast.LENGTH_SHORT).show();
-            beacon_dialog.dismiss();
-        });
+        if (beacon.getWebUrl() == null || beacon.getWebUrl().isEmpty()) {
+            tvWebUrl.setVisibility(View.GONE);
+        } else {
+            tvWebUrl.setOnClickListener(v -> {
+                //String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                CustomTabsIntent customTabsIntent = builder.build();
+                //customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
+
+                Toast.makeText(getActivity(), "Clicked to visit website.", Toast.LENGTH_SHORT).show();
+                beacon_dialog.dismiss();
+            });
+        }
+
         tvLocation = beacon_dialog.findViewById(R.id.tv_go_location);
-        tvLocation.setOnClickListener(v -> {
+        if (beacon.getBeaconID() == null || beacon.getBeaconID().getLocation() == null) {
+            tvLocation.setVisibility(View.GONE);
+        } else {
+            tvLocation.setOnClickListener(v -> {
+                //TODO: Düzenle bu işlemi. Map fragmenta geçiş yapıp lokasyona git.
+                Bundle bundle = new Bundle();
+                //bundle.putParcelable(TAG, beacon);
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                startActivity(intent);
 
-            Bundle bundle = new Bundle();
-            //bundle.putParcelable(TAG, beacon);
-            Intent intent = new Intent(getActivity(), LocationActivity.class);
-            startActivity(intent);
+                beacon_dialog.dismiss();
+            });
+        }
 
-            beacon_dialog.dismiss();
-        });
 
-        tvNotification = beacon_dialog.findViewById(R.id.tv_add_blocklist);
-        tvNotification.setOnClickListener(v -> {
-            //URLParser.urlParse("http://www.google.com", getActivity(), beacon);
-            //URLParser.urlParsing(getActivity(),beacon);
+        tvBlockBeacon = beacon_dialog.findViewById(R.id.tv_add_blocklist);
+        tvBlockBeacon.setOnClickListener(v -> {
 
             blockedBeaconsList.add(beacon);
             preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
@@ -354,12 +352,19 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
         tvClaimBeacon = beacon_dialog.findViewById(R.id.tv_claim_beacon);
         tvClaimBeacon.setOnClickListener(v -> {
+
             Toast.makeText(getActivity(), "Clicked to claim beacon.", Toast.LENGTH_SHORT).show();
 
             claimBeacon(beacon);
 
             beacon_dialog.dismiss();
         });
+
+        if (preferencesUtil.getMyBeaconsList() != null) {
+            if (preferencesUtil.getMyBeaconsList().contains(beacon)) {
+                tvClaimBeacon.setVisibility(View.GONE);
+            }
+        }
 
         beacon_dialog.show();
     }
@@ -376,6 +381,7 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
         mBeaconDataList.add(beacon);
         preferencesUtil.saveMyBeaconsList(mBeaconDataList);
+        //TODO: add to users beacons and registered beacons
         Toast.makeText(getActivity(), "Beacon claim successful.", Toast.LENGTH_SHORT).show();
     }
 

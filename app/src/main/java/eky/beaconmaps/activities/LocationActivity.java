@@ -75,6 +75,7 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
 
                 mMap.addMarker(new MarkerOptions()
                         .position(tempLoc)
+                        .draggable(true)
                         .title(s.toString())
                         .snippet(etDescription.getText().toString()))
                         .showInfoWindow();
@@ -96,6 +97,7 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
                 mMap.clear();
                 mMap.addMarker(new MarkerOptions()
                         .position(tempLoc)
+                        .draggable(true)
                         .title(etTitle.getText().toString())
                         .snippet(s.toString()))
                         .showInfoWindow();
@@ -135,35 +137,13 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
             mMap.clear();
 
             mMap.addMarker(new MarkerOptions()
+                    .draggable(true)
                     .position(tempLoc)
-                    //.icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_icons8_plus))
                     .title("Title")
                     .snippet("Description")).showInfoWindow();
 
             mMap.animateCamera(CameraUpdateFactory.newLatLng(tempLoc));
 
-            /*
-            InfoWindowData info = new InfoWindowData();
-            info.setImage("snowqualmie");
-            info.setId("Beacon ID");
-            info.setName("Beacon Name");
-
-            MapInfoWindowAdapter customInfoWindow = new MapInfoWindowAdapter(getApplicationContext());
-            mMap.setInfoWindowAdapter(customInfoWindow);
-
-            Marker m = mMap.addMarker(new MarkerOptions().position(latLng));
-            m.setTag(info);
-            m.showInfoWindow();
-
-            BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.ic_icons8_plus);
-            markerOptions.icon(icon);
-            */
-
-        });
-
-        mMap.setOnMarkerClickListener(marker -> {
-            marker.showInfoWindow();
-            return true;
         });
 
         mMap.setOnMyLocationButtonClickListener(() -> {
@@ -199,6 +179,7 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
                 } else {
                     mMap.addMarker(new MarkerOptions()
                             .position(tempLoc)
+                            .draggable(true)
                             .title("Title")
                             .snippet("Description")).showInfoWindow();
                 }

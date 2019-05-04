@@ -2,16 +2,26 @@ package eky.beaconmaps.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -26,14 +36,19 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
+import eky.beaconmaps.activities.LocationActivity;
+import eky.beaconmaps.activities.MainActivity;
+import eky.beaconmaps.activities.NotificationActivity;
 import eky.beaconmaps.adapter.BeaconAdapter;
 import eky.beaconmaps.model.BeaconData;
 import eky.beaconmaps.model.NotificationData;
@@ -43,11 +58,13 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
 
     private final String TAG = "Profile Fragment";
     private static final String KEY_NOTIFICATION_DATA = "NOTIFICATION_DATA";
+    private String CHANNEL_ID = "beaconMapsID";
+    private int notificationID = 0;
 
     private TextView placeholder, title;
     private FirebaseUser user;
     private PreferencesUtil preferencesUtil;
-    public static List<BeaconData> myBeaconsList;
+    public static List<BeaconData> myBeaconsList = new ArrayList<>();
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
@@ -89,9 +106,6 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
         recyclerView.setAdapter(adapter);
 
         title = rootView.findViewById(R.id.tv_title);
-
-        //if (user != null)
-        //    title.setText(user.getDisplayName() + "'s Beacons");
         title.setText("My Beacons");
 
         return rootView;
@@ -101,53 +115,89 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
 
-        if (preferencesUtil.getMyBeaconsList() != null &&
-                myBeaconsList.size() != preferencesUtil.getMyBeaconsList().size()) {
+        if (!hidden) {
+            if (preferencesUtil.getMyBeaconsList() != null &&
+                    myBeaconsList.size() != preferencesUtil.getMyBeaconsList().size()) {
 
-            myBeaconsList.clear();
-            myBeaconsList = preferencesUtil.getMyBeaconsList();
-            if (adapter == null && myBeaconsList != null) {
-                adapter = new BeaconAdapter(myBeaconsList, false, this);
-                recyclerView.setAdapter(adapter);
-            } else {
-                adapter.notifyDataSetChanged();
+                myBeaconsList.clear();
+                myBeaconsList.addAll(preferencesUtil.getMyBeaconsList());
+
+                if (adapter == null) {
+                    adapter = new BeaconAdapter(myBeaconsList, false, this);
+                    recyclerView.setAdapter(adapter);
+                } else {
+                    adapter.notifyDataSetChanged();
+                }
             }
+
+            if (myBeaconsList == null || myBeaconsList.size() == 0)
+                placeholder.setVisibility(View.VISIBLE);
+            else
+                placeholder.setVisibility(View.GONE);
         }
 
-        if (myBeaconsList == null || myBeaconsList.size() == 0)
-            placeholder.setVisibility(View.VISIBLE);
-        else
-            placeholder.setVisibility(View.GONE);
     }
 
-    public void openActionDialog(BeaconData beacon) {
+    private void openActionDialog(BeaconData beacon) {
         Dialog beacon_dialog;
+        TextView tvUUID, tvMajor, tvMinor;
         TextView tvSeeNotification, tvAddNotification, tvUpdateNotification;
         TextView tvVisitWebsite, tvAddWebsite, tvUpdateWebsite;
         TextView tvSeeLocation, tvAddLocation, tvUpdateLocation;
+        TextView tvAddWebService, tvUpdateWebService;
         TextView tvAddBlocklist;
 
         beacon_dialog = new Dialog(Objects.requireNonNull(getActivity()));
         beacon_dialog.setContentView(R.layout.dialog_users_beacons);
 
+        tvUUID = beacon_dialog.findViewById(R.id.tv_uuid);
+        tvMajor = beacon_dialog.findViewById(R.id.tv_major);
+        tvMinor = beacon_dialog.findViewById(R.id.tv_minor);
+
+        if (beacon.getBeaconID() != null) {
+            tvUUID.setText("UUID : " + beacon.getBeaconID().getProximityUUID().toString());
+            tvMajor.setText("Major : " + beacon.getBeaconID().getMajor());
+            tvMinor.setText("Minor : " + beacon.getBeaconID().getMinor());
+        }
+        else if (beacon.getBeacon() != null) {
+            tvUUID.setText("UUID : " + beacon.getBeacon().getId1().toString());
+            tvMajor.setText("Major : " + beacon.getBeacon().getId2().toString());
+            tvMinor.setText("Minor : " + beacon.getBeacon().getId3().toString());
+        }
+
+        tvSeeNotification = beacon_dialog.findViewById(R.id.tv_see_notification);
+        tvSeeNotification.setOnClickListener( v -> {
+
+            if (beacon.getNotificationData() != null ) {
+
+                showNotification(beacon.getNotificationData().getEnterTitle(),
+                        beacon.getNotificationData().getEnterDesc(), beacon);
+
+                showNotification(beacon.getNotificationData().getExitTitle(),
+                        beacon.getNotificationData().getExitDesc(), beacon);
+            }
+
+        });
+
         tvAddNotification = beacon_dialog.findViewById(R.id.tv_add_notification);
         tvAddNotification.setOnClickListener(v -> {
 
-            //eğer notificationı varsa visibility==gone
+            //TODO: beacondatayı taşı bundle ya da sharedpref.
+            Bundle bundle = new Bundle();
+            //bundle.putParcelable(TAG, beacon);
+            Intent intent = new Intent(getActivity(), NotificationActivity.class);
+            startActivity(intent);
 
         });
 
-        tvAddWebsite = beacon_dialog.findViewById(R.id.tv_add_website);
-        tvAddWebsite.setOnClickListener(v -> {
+        tvUpdateNotification = beacon_dialog.findViewById(R.id.tv_update_notification);
+        tvUpdateNotification.setOnClickListener(v -> {
 
-            //eğer websitesi varsa visibility==gone
-
-        });
-
-        tvAddLocation = beacon_dialog.findViewById(R.id.tv_add_location);
-        tvAddLocation.setOnClickListener(v -> {
-
-            //eğer locationı varsa visibility==gone
+            //TODO: beacondatayı taşı bundle ya da sharedpref.
+            Bundle bundle = new Bundle();
+            //bundle.putParcelable(TAG, beacon);
+            Intent intent = new Intent(getActivity(), NotificationActivity.class);
+            startActivity(intent);
 
         });
 
@@ -161,44 +211,170 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
             beacon_dialog.dismiss();
         });
 
+        tvAddWebsite = beacon_dialog.findViewById(R.id.tv_add_website);
+        tvAddWebsite.setOnClickListener(v -> {
+
+            openUrlDialog(beacon, false);
+
+        });
+
         tvVisitWebsite = beacon_dialog.findViewById(R.id.tv_visit_website);
         tvVisitWebsite.setOnClickListener(v -> {
-
-            //TODO: add url info here
-            //String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
+            String url = "";
+            if (beacon.getWebUrl() != null && !beacon.getWebUrl().isEmpty())
+                url = beacon.getWebUrl();
             CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
             CustomTabsIntent customTabsIntent = builder.build();
             customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
 
         });
 
+        tvUpdateWebsite = beacon_dialog.findViewById(R.id.tv_update_website);
+        tvUpdateWebsite.setOnClickListener(v -> {
+
+            openUrlDialog(beacon, false);
+
+        });
+
+        tvAddLocation = beacon_dialog.findViewById(R.id.tv_add_location);
+        tvAddLocation.setOnClickListener(v -> {
+
+            //TODO: fill the bundle
+            Bundle bundle = new Bundle();
+            //bundle.putParcelable(TAG, beacon);
+            Intent intent = new Intent(getActivity(), LocationActivity.class);
+            intent.putExtra(TAG, bundle);
+            startActivity(intent);
+
+        });
+
         tvSeeLocation = beacon_dialog.findViewById(R.id.tv_go_location);
         tvSeeLocation.setOnClickListener(v -> {
-            //eğer locationı yoksa visibility==gone
+
+            //TODO: fill the bundle
+            Bundle bundle = new Bundle();
+            //bundle.putParcelable(TAG, beacon);
+            Intent intent = new Intent(getActivity(), LocationActivity.class);
+            intent.putExtra(TAG, bundle);
+            startActivity(intent);
+
         });
 
         tvUpdateLocation = beacon_dialog.findViewById(R.id.tv_update_location);
         tvUpdateLocation.setOnClickListener(v -> {
 
-            //eğer locationı yoksa visibility==gone
+            //TODO: fill the bundle
+            Bundle bundle = new Bundle();
+            //bundle.putParcelable(TAG, beacon);
+            Intent intent = new Intent(getActivity(), LocationActivity.class);
+            intent.putExtra(TAG, bundle);
+            startActivity(intent);
 
         });
 
-        tvUpdateNotification = beacon_dialog.findViewById(R.id.tv_update_notification);
-        tvUpdateNotification.setOnClickListener(v -> {
+        tvAddWebService = beacon_dialog.findViewById(R.id.tv_add_webservice);
+        tvAddWebService.setOnClickListener(v -> {
 
-            //eğer notificationı yoksa visibility==gone
+            openUrlDialog(beacon, true);
+
+        });
+
+        tvUpdateWebService = beacon_dialog.findViewById(R.id.tv_update_webservice);
+        tvUpdateWebService.setOnClickListener(v -> {
+
+            openUrlDialog(beacon, true);
 
         });
 
-        tvUpdateWebsite = beacon_dialog.findViewById(R.id.tv_update_website);
-        tvUpdateWebsite.setOnClickListener(v -> {
+        if (beacon.getNotificationData() != null) {
+            tvSeeNotification.setVisibility(View.GONE);
+            tvUpdateNotification.setVisibility(View.GONE);
+        } else {
+            tvAddNotification.setVisibility(View.GONE);
+        }
 
-            //eğer websitesi yoksa visibility==gone
+        if (beacon.getWebUrl() == null || beacon.getWebUrl().isEmpty()) {
+            tvVisitWebsite.setVisibility(View.GONE);
+            tvUpdateWebsite.setVisibility(View.GONE);
+        } else {
+            tvAddWebsite.setVisibility(View.GONE);
+        }
 
-        });
+        if (beacon.getBeaconID() != null && beacon.getBeaconID().getLocation() != null) {
+            tvAddLocation.setVisibility(View.GONE);
+        } else {
+            tvSeeLocation.setVisibility(View.GONE);
+            tvUpdateLocation.setVisibility(View.GONE);
+        }
 
         beacon_dialog.show();
+    }
+
+    public void openUrlDialog(BeaconData beaconData, boolean forWebService) {
+        Dialog beacon_website;
+        MaterialButton mbApply, mbTest;
+        EditText etURL;
+
+        beacon_website = new Dialog(Objects.requireNonNull(getActivity()));
+        beacon_website.setContentView(R.layout.dialog_add_url);
+
+        etURL = beacon_website.findViewById(R.id.et_url);
+
+        if (forWebService) {
+            if (beaconData.getWebServiceUrl() != null && !beaconData.getWebServiceUrl().isEmpty())
+                etURL.setText(beaconData.getWebServiceUrl());
+        } else {
+            if (beaconData.getWebUrl() != null && !beaconData.getWebUrl().isEmpty())
+                etURL.setText(beaconData.getWebUrl());
+        }
+
+        etURL.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //TODO: check the url
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        mbApply = beacon_website.findViewById(R.id.btn_apply);
+        mbApply.setOnClickListener(v1 -> {
+
+            //TODO: Taşınan beacon bilgisine url i ekle.
+            if (!etURL.getText().toString().isEmpty()) {
+                if (forWebService) {
+                    beaconData.setWebServiceUrl(etURL.getText().toString());
+                } else {
+                    beaconData.setWebUrl(etURL.getText().toString());
+                }
+            }
+
+        });
+
+        mbTest = beacon_website.findViewById(R.id.btn_test);
+        mbTest.setOnClickListener(v1 -> {
+            if (forWebService) {
+
+                //todo: ???
+
+            } else {
+                String url = "";
+                if (!etURL.getText().toString().isEmpty())
+                    url = etURL.getText().toString();
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                CustomTabsIntent customTabsIntent = builder.build();
+                customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
+            }
+
+        });
+
+        beacon_website.show();
     }
 
     @Override
@@ -274,6 +450,8 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
                 try {
                     JSONObject jsonObject = new JSONObject(result);
 
+                    //TODO: İlgili beaconın BeaconData modeline ekle bu bilgileri.
+
                     //jsonObject.getString("companyName")
                     //jsonObject.getString("title")
 
@@ -288,6 +466,54 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
                 }
             }
         }
+    }
+
+    private void showNotification(String title, String message, BeaconData beaconData) {
+        //TODO: LatLng ekle. Farklı notificationlarda latlng nasıl ayırt edeceksin???
+        // companyName i subtitle olarak ekleyebilirsin.
+        Intent resultIntent = new Intent(getActivity(), MainActivity.class);
+        resultIntent.putExtra("KEY_LOC", new LatLng(41.0463356, 28.9432943));
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(
+                getActivity(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification notification;
+
+        String subtext = "";
+
+        if (beaconData.getCompanyName() != null) {
+            subtext = beaconData.getCompanyName();
+        }
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            notification = new Notification.Builder(getActivity(), CHANNEL_ID)
+                    .setSmallIcon(R.mipmap.beacon_maps_no_background_icon)
+                    .setContentTitle(title)
+                    //.setContentText(message)
+                    .setStyle(new Notification.BigTextStyle().bigText(message))
+                    .setContentIntent(resultPendingIntent)
+                    .setSubText(subtext)
+                    .setVisibility(Notification.VISIBILITY_PUBLIC)
+                    .setAutoCancel(true)
+                    .build();
+        } else {
+            notification = new NotificationCompat.Builder(getActivity(), CHANNEL_ID)
+                    .setSmallIcon(R.mipmap.beacon_maps_no_background_icon)
+                    .setContentTitle(title)
+                    //.setContentText(message)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                    .setSubText(subtext)
+                    .setDefaults(NotificationCompat.DEFAULT_ALL)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .setContentIntent(resultPendingIntent)
+                    .setAutoCancel(true)
+                    .build();
+        }
+
+        NotificationManager notificationManager =
+                (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(notificationID++, notification);
+
     }
 
 }

@@ -98,8 +98,9 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
         regionsToMonitor.add(region);
     }
 
-    private void showNotification(String title, String message, BeaconID beaconID) { //TODO: LatLng ekle. Farklı notificationlarda latlng nasıl ayırt edeceksin???
-                                                                  // companyName i subtitle olarak ekleyebilirsin.
+    private void showNotification(String title, String message, BeaconID beaconID) {
+        //TODO: LatLng ekle. Farklı notificationlarda latlng nasıl ayırt edeceksin???
+        // companyName i subtitle olarak ekleyebilirsin.
         Intent resultIntent = new Intent(context, MainActivity.class);
         resultIntent.putExtra("KEY_LOC", new LatLng(41.0463356, 28.9432943));
         PendingIntent resultPendingIntent = PendingIntent.getActivity(

@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -15,6 +17,7 @@ import org.altbeacon.beacon.utils.UrlBeaconUrlCompressor;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,9 +30,10 @@ import eky.beaconmaps.fragments.ProfileFragment;
  * Created by Enes Kamil YILMAZ on 28.03.2019.
  */
 
-public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.BaseViewHolder> {
+public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.BaseViewHolder> implements Filterable {
 
     private List<Beacon> beaconList;
+    private List<Beacon> beaconListFull;
     private ItemClickListener itemClickListener;
     private Boolean isNearby, isSettings;
     private static final int iBeacon = 1;
@@ -55,6 +59,7 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
     public BeaconItemAdapter(List<Beacon> beaconList, boolean isNearby, boolean isSettings,
                              ItemClickListener itemClickListener) {
         this.beaconList = beaconList;
+        beaconListFull = new ArrayList<>(beaconList);
         this.itemClickListener = itemClickListener;
         this.isNearby = isNearby;
         this.isSettings = isSettings;
@@ -196,5 +201,43 @@ public class BeaconItemAdapter extends RecyclerView.Adapter<BeaconItemAdapter.Ba
     public interface ItemClickListener {
         void onItemClick(int position, boolean isEddystone, View view);
     }
+
+    @Override
+    public Filter getFilter() {
+        return beaconFilter;
+    }
+
+    private Filter beaconFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Beacon> filteredList = new ArrayList<>();
+
+            if (constraint == null || constraint.length() == 0) {
+                filteredList.addAll(beaconListFull);
+            } else {
+                String filterPattern = constraint.toString().toLowerCase().trim();
+
+                for (Beacon item : beaconListFull) {
+                    if (item.getId1().toString().toLowerCase().contains(filterPattern)
+                        || item.getId2().toString().toLowerCase().contains(filterPattern)
+                        || item.getId3().toString().toLowerCase().contains(filterPattern)) {
+                        filteredList.add(item);
+                    }
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            beaconList.clear();
+            beaconList.addAll((List) results.values);
+            notifyDataSetChanged();
+        }
+    };
 
 }

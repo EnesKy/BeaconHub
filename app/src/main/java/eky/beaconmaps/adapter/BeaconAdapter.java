@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -11,6 +13,7 @@ import android.widget.TextView;
 import com.google.android.material.card.MaterialCardView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,9 +27,10 @@ import eky.beaconmaps.model.BeaconData;
  * Created by Enes Kamil YILMAZ on 30.04.2019.
  */
 
-public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder>{
+public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder> implements Filterable {
 
     private List<BeaconData> beaconList;
+    private List<BeaconData> beaconListFull;
     private Boolean isNearby;
     private ItemClickListener itemClickListener;
 
@@ -35,6 +39,7 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
 
     public BeaconAdapter(List<BeaconData> beaconList, boolean isNearby, ItemClickListener itemClickListener) {
         this.beaconList = beaconList;
+        beaconListFull = new ArrayList<>(beaconList);
         this.isNearby = isNearby;
         this.itemClickListener = itemClickListener;
     }
@@ -82,6 +87,9 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
             holder.tvRssi.setText("Rssi : " + beacon.getBeacon().getRssi());
             holder.tvTx.setText("Rx : " + beacon.getBeacon().getTxPower());
             holder.tvLastSeen.setText(formatter.format(new Date()));
+
+
+            //TODO: Registered beacon bilgilerini getir. Checkle kayıtlı mı değil mi???
 
             if (ProfileFragment.myBeaconsList != null && ProfileFragment.myBeaconsList.contains(beacon))
                 holder.ivBelongstoUser.setVisibility(View.VISIBLE);
@@ -131,5 +139,43 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
     public interface ItemClickListener {
         void onItemClick(int position, View view);
     }
+
+    @Override
+    public Filter getFilter() {
+        return beaconFilter;
+    }
+
+    private Filter beaconFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<BeaconData> filteredList = new ArrayList<>();
+
+            if (constraint == null || constraint.length() == 0) {
+                filteredList.addAll(beaconListFull);
+            } else {
+                String filterPattern = constraint.toString().toLowerCase().trim();
+
+                for (BeaconData item : beaconListFull) {
+                    if (item.getBeacon().getId1().toString().toLowerCase().contains(filterPattern)
+                            || item.getBeacon().getId2().toString().toLowerCase().contains(filterPattern)
+                            || item.getBeacon().getId3().toString().toLowerCase().contains(filterPattern)) {
+                        filteredList.add(item);
+                    }
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            beaconList.clear();
+            beaconList.addAll((List) results.values);
+            notifyDataSetChanged();
+        }
+    };
 
 }

@@ -75,7 +75,6 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
         recyclerView = findViewById(R.id.rv_blocked_beacons);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        //adapter = new BeaconItemAdapter(blockedBeaconsList,false, true,this);
         adapter = new BeaconAdapter(blockedBeaconsList, false, this);
         recyclerView.setAdapter(adapter);
 
@@ -91,7 +90,8 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
 
             email.setText(user.getEmail());
 
-            if (user.getPhotoUrl() != null) //Todo: null ise default foto görünmüyor???
+            if (user.getPhotoUrl() != null)
+                //Glide.with(this).load(user.getPhotoUrl()).into(profilepic);
                 Picasso.get().load(user.getPhotoUrl()).into(profilepic);
         }
 
@@ -112,11 +112,27 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
 
     public void openActionDialog(BeaconData beacon) { // TODO: Kullanıcının ise farklı text göster.
         Dialog beacon_dialog;
+        TextView tvUUID, tvMajor, tvMinor;
         TextView tvUnblock, tvWebUrl, tvLocation;
 
         beacon_dialog = new Dialog(this);
         beacon_dialog.setTitle("Add action");
         beacon_dialog.setContentView(R.layout.dialog_blocked_beacons);
+
+        tvUUID = beacon_dialog.findViewById(R.id.tv_uuid);
+        tvMajor = beacon_dialog.findViewById(R.id.tv_major);
+        tvMinor = beacon_dialog.findViewById(R.id.tv_minor);
+
+        if (beacon.getBeaconID() != null) {
+            tvUUID.setText("UUID : " + beacon.getBeaconID().getProximityUUID().toString());
+            tvMajor.setText("Major : " + beacon.getBeaconID().getMajor());
+            tvMinor.setText("Minor : " + beacon.getBeaconID().getMinor());
+        }
+        else if (beacon.getBeacon() != null) {
+            tvUUID.setText("UUID : " + beacon.getBeacon().getId1().toString());
+            tvMajor.setText("Major : " + beacon.getBeacon().getId2().toString());
+            tvMinor.setText("Minor : " + beacon.getBeacon().getId3().toString());
+        }
 
         tvUnblock = beacon_dialog.findViewById(R.id.tv_unblock);
         tvUnblock.setOnClickListener(v -> {

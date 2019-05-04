@@ -3,31 +3,48 @@ package eky.beaconmaps.utils;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.List;
 
 import eky.beaconmaps.model.BeaconData;
-import eky.beaconmaps.model.NotificationData;
 
 public class FirebaseUtil {
 
     public static String userIdToken;
 
-    public static void saveBeacon(){
+    public static void saveUsersBeacons(List<BeaconData> beaconDataList){
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference databaseBook = database.child("beacon");
-        databaseBook.push().setValue("deneme");
+        DatabaseReference userDatabase = database.child("users").child("user - " + userIdToken);
+
+        for (BeaconData beaconData : beaconDataList)
+            userDatabase.push().setValue(beaconData);
     }
 
-    public static void saveBeaconData(BeaconData beacon){
+    private static List<BeaconData> getUsersBeacons() {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference databaseBook = database.child("beaconData");
-        database.child("beacon-"+beacon.getBeaconID().getProximityUUID().toString().
-                substring(1,beacon.getBeaconID().getProximityUUID().toString().length()-1)).setValue(beacon);
+        //TODO
+        return null;
     }
 
-    public static void saveNotificationData(NotificationData notification) {
+    public static void registerBeacon(BeaconData beacon){
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference databaseBook = database.child("beaconNotification");
-        //database.child("notification-" + notification.getBeaconId().substring(1,notification.getBeaconId().length()-1)).setValue(notification);
+        DatabaseReference databaseBook = database.child("registeredBeacons");
+        databaseBook.child("beacon - " + beacon.getBeacon().getId1().toString()
+                            + " - " + beacon.getBeacon().getId2().toString()
+                            + " - " + beacon.getBeacon().getId3().toString()).setValue(beacon);
+    }
+
+    public static void updateRegisteredBeacon(BeaconData beaconData) {
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference databaseBook = database.child("registeredBeacons");
+        //databaseBook.getDatabase().
+    }
+
+    private static List<BeaconData> getRegisteredBeacons() {
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        database.child("registeredBeacons");
+
+        //TODO
+        return null;
     }
 
     public static String getUserIdToken() {

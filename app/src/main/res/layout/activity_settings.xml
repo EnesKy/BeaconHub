@@ -118,6 +118,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space_top_large"
+        android:textAllCaps="false"
         app:layout_constraintTop_toBottomOf="@id/tv_user_email"
         app:layout_constraintBottom_toTopOf="@id/tv_blocked_beacons"
         app:layout_constraintStart_toStartOf="parent"

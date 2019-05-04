@@ -35,7 +35,7 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
     private final LatLng mDefaultLocation = new LatLng(41.0463356, 28.9432943);
     private Location currentLocation;
     private static final int LOCATION_REQUEST_CODE =101;
-    private float zoom_level = 14;
+    private float zoom_level = 18;
     public LatLng tempLocation;
     private View view;
 
@@ -67,7 +67,7 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
         mapFragment.getMapAsync(this);
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-        //fetchLastLocation();
+        fetchLastLocation();
 
         return view;
     }
@@ -93,48 +93,34 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
         else
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, zoom_level));
 
-
+        //TODO: Delece this
         mMap.addMarker(new MarkerOptions().position(mDefaultLocation).title("Marker in Fsmvü"));
-
 
         mMap.setOnMapClickListener(latLng -> {
 
-            //Clears the previously touched position
-            //mMap.clear();
+            /*mMap.clear();
 
-            /*mMap.addMarker(new MarkerOptions()
+            //Marker icon
+            //BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.beacon_maps_no_background_icon);
+
+            mMap.addMarker(new MarkerOptions()
                     .position(latLng)
-                    //.icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_icons8_plus))
-                    .title("Beacon"))
-                    .showInfoWindow();*/
+                    //.icon(icon)
+                    .title("Beacon")
+                    .snippet("Description"))
+                    .showInfoWindow();
 
-            /*InfoWindowData info = new InfoWindowData();
-            //info.setImage("snowqualmie");
-            info.setId("Beacon ID");
-            info.setName("Beacon Name");
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));*/
 
-            MapInfoWindowAdapter customInfoWindow = new MapInfoWindowAdapter(getApplicationContext());
-            mMap.setInfoWindowAdapter(customInfoWindow);
-
-            Marker m = mMap.addMarker(new MarkerOptions().position(latLng));
-            m.setTag(info);
-            m.showInfoWindow();*/
-
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-
-            //BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.ic_icons8_plus);
-            //markerOptions.icon(icon);
         });
 
-        mMap.setOnMarkerClickListener(marker -> {
-            marker.showInfoWindow();
+        mMap.setOnMyLocationButtonClickListener(() -> {
+            if (currentLocation != null)
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom
+                        (new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), zoom_level));
+
             return true;
         });
-
-        /*mMap.setOnMyLocationButtonClickListener(() -> {
-            //Toast.makeText(getActivity(), "Clicked to the button", Toast.LENGTH_SHORT).show();
-            return true;
-        });*/
 
         getLocationPermission();
 
@@ -153,7 +139,7 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
                 currentLocation = location;
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                         new LatLng(currentLocation.getLatitude(),
-                                currentLocation.getLongitude()), 17));
+                                currentLocation.getLongitude()), 18));
             }else{
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, 18));
             }
@@ -217,10 +203,13 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
         if (mMap == null) {
             return;
         }
+
         try {
             if (mLocationPermissionGranted) {
                 mMap.setMyLocationEnabled(true);
                 mMap.getUiSettings().setMyLocationButtonEnabled(true);
+                mMap.getUiSettings().setTiltGesturesEnabled(true);
+                mMap.setBuildingsEnabled(true);
             } else {
                 mMap.setMyLocationEnabled(false);
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);

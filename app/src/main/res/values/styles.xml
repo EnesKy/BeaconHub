@@ -9,7 +9,9 @@
         <item name="textInputStyle">@style/TextInputLayoutStyle</item>
         <item name="bottomNavigationStyle">@style/BottomNav</item>
 
+        <item name="android:statusBarColor">@color/rallyDarkGrey</item>
         <item name="android:windowBackground">@color/rallyLightGrey</item>
+        <item name="android:textViewStyle">@style/Font</item>
     </style>
 
     <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
@@ -32,6 +34,10 @@
 
     <style name="SplashScreenTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name ="android:windowBackground"> @drawable/splash_screen</item>
+    </style>
+
+    <style name="Font" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/font</item>
     </style>
 
 </resources>
