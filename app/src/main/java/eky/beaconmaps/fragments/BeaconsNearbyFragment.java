@@ -5,13 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.RemoteException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.LinearLayout;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -34,6 +33,7 @@ import java.util.Objects;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -53,12 +53,10 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
     private BeaconAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private SearchView searchView;
-    private CountDownTimer countDownTimer;
-    private String query;
     private TextView placeholder;
     private ProgressBar progressBarLoading;
     private FloatingActionButton fabScanControl;
-    private LinearLayout llSearch;
+    private ConstraintLayout clSearch, clFilterOptions;
 
     private Boolean isScanEnabled = false;
     private Region all;
@@ -85,7 +83,6 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         beaconManager = BeaconManager.getInstanceForApplication(Objects.requireNonNull(getActivity()));
         setBeaconsLayout();
         beaconManager.bind(this);
-
     }
 
     @Override
@@ -93,7 +90,6 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
         View rootView = inflater.inflate(R.layout.fragment_beacons_nearby, container, false);
 
-        llSearch = rootView.findViewById(R.id.ll_search_filter);
         placeholder = rootView.findViewById(R.id.tv_placeholder);
 
         progressBarLoading = rootView.findViewById(R.id.pb_loading);
@@ -107,12 +103,16 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         recyclerView.setLayoutManager(layoutManager);
 
         searchView = rootView.findViewById(R.id.beacon_search_view);
+        clFilterOptions = rootView.findViewById(R.id.cl_search_options);
+        clSearch = rootView.findViewById(R.id.cl_search);
 
         searchView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             public void onGlobalLayout() {
                 searchView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
+
+        clSearch.setOnClickListener(this);
 
         searchView.setOnQueryTextListener(this);
 
@@ -129,14 +129,23 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        //Makes the keyboard open above the bottom nav view
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab_scan_stopper:
                 scanControl();
-                //llSearch.setVisibility(View.GONE);
                 break;
-            case R.id.beacon_search_view:
-                //llSearch.setVisibility(View.VISIBLE);
+            case R.id.cl_search:
+                if (clFilterOptions.getVisibility() == View.GONE)
+                    clFilterOptions.setVisibility(View.VISIBLE);
+                else
+                    clFilterOptions.setVisibility(View.GONE);
                 break;
         }
     }
@@ -173,6 +182,8 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
     @Override
     public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
 
+        placeholder.setVisibility(View.GONE);
+
         List<BeaconData> temp = new ArrayList<>();
         for (Beacon beacon : beacons)
             temp.add(new BeaconData(beacon));
@@ -180,7 +191,9 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         List<BeaconData> unblockedBeacons = new ArrayList<>();
         blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
 
-        if (isScanEnabled) {
+        if (blockedBeaconsList == null) {
+            unblockedBeacons.addAll(temp);
+        } else {
             for (BeaconData unblocked : temp)
                 if (!blockedBeaconsList.contains(unblocked))
                     unblockedBeacons.add(unblocked);

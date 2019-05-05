@@ -39,7 +39,8 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
 
     public BeaconAdapter(List<BeaconData> beaconList, boolean isNearby, ItemClickListener itemClickListener) {
         this.beaconList = beaconList;
-        beaconListFull = new ArrayList<>(beaconList);
+        if (beaconList != null)
+            beaconListFull = new ArrayList<>(beaconList);
         this.isNearby = isNearby;
         this.itemClickListener = itemClickListener;
     }
