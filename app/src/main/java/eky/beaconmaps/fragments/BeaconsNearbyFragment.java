@@ -14,9 +14,9 @@ import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -287,8 +287,6 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
         openActionDialog(beaconList.get(position));
 
-        Toast.makeText(getActivity(), "Clicked to beacon with uuid: " +
-                beaconList.get(position).getBeacon().getId1(), Toast.LENGTH_LONG).show();
     }
 
     public void openActionDialog(BeaconData beacon) {
@@ -329,7 +327,6 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
                 CustomTabsIntent customTabsIntent = builder.build();
                 //customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
 
-                Toast.makeText(getActivity(), "Clicked to visit website.", Toast.LENGTH_SHORT).show();
                 beacon_dialog.dismiss();
             });
         }
@@ -356,13 +353,19 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
             blockedBeaconsList.add(beacon);
             preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
 
+            Snackbar snack = Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.cl_main),
+                    "Beacon added to Blocklist. \n" +
+                          "You will no longer see this beacon while scanning.", Snackbar.LENGTH_LONG)
+                    .setAction("Ok", view -> {})
+                    .setActionTextColor(getResources().getColor(R.color.rallyGreen));
+            ((TextView) snack.getView().findViewById(com.google.android.material.R.id.snackbar_text)).setSingleLine(false);
+            snack.show();
+
             beacon_dialog.dismiss();
         });
 
         tvClaimBeacon = beacon_dialog.findViewById(R.id.tv_claim_beacon);
         tvClaimBeacon.setOnClickListener(v -> {
-
-            Toast.makeText(getActivity(), "Clicked to claim beacon.", Toast.LENGTH_SHORT).show();
 
             claimBeacon(beacon);
 
@@ -391,7 +394,11 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         mBeaconDataList.add(beacon);
         preferencesUtil.saveMyBeaconsList(mBeaconDataList);
         //TODO: add to users beacons and registered beacons
-        Toast.makeText(getActivity(), "Beacon claim successful.", Toast.LENGTH_SHORT).show();
+        Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.cl_main),
+                "Beacon claim successful.", Snackbar.LENGTH_LONG)
+                .setAction("Ok", view -> { })
+                .setActionTextColor(getResources().getColor(R.color.rallyGreen))
+                .show();
     }
 
 }

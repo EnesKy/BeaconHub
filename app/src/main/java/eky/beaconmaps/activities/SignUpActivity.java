@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -58,11 +59,21 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
                         preferencesUtil.saveData("KEY_USER_NAME", etName.getText().toString());
                         finish();
 
-                        Toast.makeText(SignUpActivity.this, "Success.", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(this.findViewById(R.id.cl_main),
+                                "Success.", Snackbar.LENGTH_LONG)
+                                .setAction("Ok", view -> { })
+                                .setActionTextColor(getResources().getColor(R.color.rallyGreen))
+                                .show();
+
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                        Toast.makeText(SignUpActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+
+                        Snackbar.make(this.findViewById(R.id.cl_main),
+                                "Authentication failed.", Snackbar.LENGTH_LONG)
+                                .setAction("Ok", view -> { })
+                                .setActionTextColor(getResources().getColor(R.color.rallyGreen))
+                                .show();
                     }
                 });
     }

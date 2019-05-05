@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -19,6 +18,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Objects;
 
@@ -121,6 +122,17 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom
                         (new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), zoom_level));
 
+            Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.cl_main),
+                    "Current Location", Snackbar.LENGTH_LONG)
+                    .setAction("Ok", view -> {
+                        Snackbar.make(getActivity().findViewById(R.id.cl_main), "Message is restored!", Snackbar.LENGTH_SHORT)
+                        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
+                        .show();
+                    })
+                    .setActionTextColor(getResources().getColor(R.color.rallyGreen))
+                    .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE)
+                    .show();
+
             return true;
         });
 
@@ -191,7 +203,11 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     fetchLastLocation();
                 } else {
-                    Toast.makeText(getActivity(),"Location permission missing",Toast.LENGTH_SHORT).show();
+                    Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.cl_main),
+                            "Location permission missing", Snackbar.LENGTH_LONG)
+                            .setAction("Ok", view -> { })
+                            .setActionTextColor(getResources().getColor(R.color.rallyGreen))
+                            .show();
                 }
                 break;
         }
