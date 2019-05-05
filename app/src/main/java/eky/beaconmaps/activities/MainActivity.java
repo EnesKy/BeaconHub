@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -204,7 +206,15 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                 .setNegativeButton("CANCEL", (dialog, which) -> dialog.dismiss());
 
         AlertDialog dialog = alertBuild.create();
-        dialog.show();
+        //dialog.show();
+
+        Snackbar.make(this.findViewById(R.id.cl_main),
+                "Do you want to exit?" , Snackbar.LENGTH_LONG)
+                .setAction(" Yes ", view -> { finish(); })
+                .setActionTextColor(getResources().getColor(R.color.rallyGreen))
+                .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE)
+                .show();
+
     }
 
 }

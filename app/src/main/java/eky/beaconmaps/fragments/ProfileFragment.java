@@ -135,6 +135,9 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
                 myBeaconsList.addAll(preferencesUtil.getMyBeaconsList());
                 blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
 
+                if (blockedBeaconsList == null)
+                    blockedBeaconsList = new ArrayList<>();
+
                 if (blockedBeaconsList.size() > 0 && myBeaconsList.size() > 0) {
                     for (BeaconData beaconData : myBeaconsList)
                         if (blockedBeaconsList.contains(beaconData))
@@ -332,8 +335,9 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
             tvUpdateLocation.setVisibility(View.GONE);
         }
 
-        if (preferencesUtil.getBlockedBeaconsList().contains(beacon))
-            tvAddBlocklist.setVisibility(View.GONE);
+        if (preferencesUtil.getBlockedBeaconsList() != null)
+            if (preferencesUtil.getBlockedBeaconsList().contains(beacon))
+                tvAddBlocklist.setVisibility(View.GONE);
 
         beacon_dialog.show();
     }

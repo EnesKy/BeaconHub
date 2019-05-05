@@ -115,7 +115,7 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
                     //.setContentText(message)
                     .setStyle(new Notification.BigTextStyle().bigText(message))
                     .setContentIntent(resultPendingIntent)
-                    //.setSubText(companyName)
+                    .setSubText("Company Name")
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setAutoCancel(true)
                     .build();
@@ -125,7 +125,7 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
                     .setContentTitle(title)
                     //.setContentText(message)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
-                    //.setSubText(companyName)
+                    .setSubText("Company Name")
                     .setDefaults(NotificationCompat.DEFAULT_ALL)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

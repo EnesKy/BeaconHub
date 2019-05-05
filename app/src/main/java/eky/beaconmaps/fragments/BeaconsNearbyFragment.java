@@ -363,6 +363,8 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         tvBlockBeacon.setOnClickListener(v -> {
 
             beacon.setBlocked(true);
+            if (blockedBeaconsList == null)
+                blockedBeaconsList = new ArrayList<>();
             blockedBeaconsList.add(beacon);
             preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
 

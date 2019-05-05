@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -91,20 +92,29 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
         mMap = googleMap;
         //mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.gmap_style_night));
 
+        View locationButton = ((View) this.getView().findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+        //rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+        rlp.setMargins(0, 200, 70, 0);
+
         if (tempLocation != null)
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tempLocation, zoom_level));
         else
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, zoom_level));
 
-        //TODO: Delece this
+        //TODO: Delete this
         mMap.addMarker(new MarkerOptions().position(mDefaultLocation).title("Marker in Fsmvü"));
+
+        Location loc = new Location("Fsm");
+        loc.setLatitude(mDefaultLocation.latitude);
+        loc.setLongitude(mDefaultLocation.longitude);
 
         mMap.setOnMapClickListener(latLng -> {
 
             /*mMap.clear();
 
             //Marker icon
-            //BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.beacon_maps_no_background_icon);
+            //BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.beacon_maps_no_background_icon);*/
 
             mMap.addMarker(new MarkerOptions()
                     .position(latLng)
@@ -113,8 +123,10 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
                     .snippet("Description"))
                     .showInfoWindow();
 
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));*/
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
 
+            loc.setLatitude(latLng.latitude);
+            loc.setLongitude(latLng.longitude);
         });
 
         mMap.setOnMyLocationButtonClickListener(() -> {
@@ -123,12 +135,8 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
                         (new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), zoom_level));
 
             Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.cl_main),
-                    "Current Location", Snackbar.LENGTH_LONG)
-                    .setAction("Ok", view -> {
-                        Snackbar.make(getActivity().findViewById(R.id.cl_main), "Message is restored!", Snackbar.LENGTH_SHORT)
-                        .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_FADE)
-                        .show();
-                    })
+                    "Distance between Current Location and last added marker : " + currentLocation.distanceTo(loc)+ " m", Snackbar.LENGTH_LONG)
+                    .setAction("Ok", view -> { })
                     .setActionTextColor(getResources().getColor(R.color.rallyGreen))
                     .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE)
                     .show();

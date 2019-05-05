@@ -1,5 +1,7 @@
 package eky.beaconmaps.model;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import org.altbeacon.beacon.Beacon;
 
 import eky.beaconmaps.beacon.estimote.BeaconID;
@@ -12,11 +14,12 @@ public class BeaconData {
 
     private Beacon beacon;
     private BeaconID beaconID;
+    private NotificationData notificationData;
     private String companyName; //Google map marker title and notification subtitle
     private String companyDesc; //Google map marker description
-    private NotificationData notificationData;
     private String webUrl;
     private String webServiceUrl;
+    private LatLng location;
     private boolean isBlocked = false;
 
     public BeaconData() {}
@@ -100,6 +103,14 @@ public class BeaconData {
 
     public void setBlocked(boolean blocked) {
         isBlocked = blocked;
+    }
+
+    public LatLng getLocation() {
+        return location;
+    }
+
+    public void setLocation(LatLng location) {
+        this.location = location;
     }
 
     @Override
