@@ -1,8 +1,10 @@
 package eky.beaconmaps.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -32,6 +35,7 @@ import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
+import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -50,7 +54,7 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private final LatLng mDefaultLocation = new LatLng(41.0463356, 28.9432943);
     private Location currentLocation;
-    private static final int LOCATION_REQUEST_CODE =101;
+    private static final int LOCATION_REQUEST_CODE = 101;
     private float zoom_level = 18;
     public LatLng tempLocation;
     private View view;
@@ -74,7 +78,7 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
                 != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getActivity(),
                         android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[] {android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
+            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
             return;
         }
 
@@ -183,8 +187,9 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
                         (new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), zoom_level));
 
             Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.cl_main),
-                    "Distance between Current Location and last added marker : " + currentLocation.distanceTo(loc)+ " m", Snackbar.LENGTH_LONG)
-                    .setAction("Ok", view -> { })
+                    "Distance between Current Location and last added marker : " + currentLocation.distanceTo(loc) + " m", Snackbar.LENGTH_LONG)
+                    .setAction("Ok", view -> {
+                    })
                     .setActionTextColor(getResources().getColor(R.color.rallyGreen))
                     .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE)
                     .show();
@@ -210,7 +215,7 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                         new LatLng(currentLocation.getLatitude(),
                                 currentLocation.getLongitude()), 18));
-            }else{
+            } else {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, 18));
             }
             updateLocationUI();
@@ -261,7 +266,8 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
                 } else {
                     Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.cl_main),
                             "Location permission missing", Snackbar.LENGTH_LONG)
-                            .setAction("Ok", view -> { })
+                            .setAction("Ok", view -> {
+                            })
                             .setActionTextColor(getResources().getColor(R.color.rallyGreen))
                             .show();
                 }
@@ -312,7 +318,7 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
             }*/
 
             BeaconData b1 = new BeaconData("Test 1 Title",
-                    "Test 1 Descpription", "www.fsmvu.com", new LatLng(41.0446681,28.9470421));
+                    "Test 1 Descpription", "www.fsmvu.com", new LatLng(41.0446681, 28.9470421));
 
             BeaconData b2 = new BeaconData("Test 2 Title",
                     "Test 2 Descpription", "www.fsmvu.com", new LatLng(41.044943, 28.945840));
@@ -355,8 +361,7 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
     public void onItemClick(int position, View view) {
         //TODO: OnClickte websiteye ?????
         llMarkerList.setVisibility(View.GONE);
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(markerDataList.get(position).getBeaconData().getLocation(), zoom_level));
-
+        openActionDialog(markerDataList.get(position).getBeaconData());
     }
 
     public Location latLng2Loc(LatLng loc) {
@@ -375,5 +380,36 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
     public boolean onQueryTextChange(String newText) {
         adapter.getFilter().filter(newText);
         return false;
+    }
+
+    public void openActionDialog(BeaconData beacon) {
+        Dialog dialog;
+        TextView tvLocation, tvWebsite;
+
+        dialog = new Dialog(Objects.requireNonNull(getActivity()));
+        dialog.setContentView(R.layout.dialog_marker);
+
+        tvLocation = dialog.findViewById(R.id.tv_see_location);
+        tvWebsite = dialog.findViewById(R.id.tv_visit_website);
+
+        if (beacon.getWebUrl() == null || beacon.getWebUrl().isEmpty())
+            tvWebsite.setVisibility(View.GONE);
+
+        tvLocation.setOnClickListener(v -> {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(beacon.getLocation(), zoom_level));
+            dialog.dismiss();
+        });
+
+        tvWebsite.setOnClickListener(v -> {
+            String url = "https://" + beacon.getWebUrl();
+            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+            CustomTabsIntent customTabsIntent = builder.build();
+            builder.setToolbarColor(ContextCompat.getColor(getActivity(), R.color.rallyGreen));
+            customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
+
+            dialog.dismiss();
+        });
+
+        dialog.show();
     }
 }
