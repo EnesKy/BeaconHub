@@ -47,6 +47,8 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
     private BeaconData beaconData;
     private LatLng tempLoc;
 
+    private String title = "Title", desc = "Description";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,11 +75,13 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
 
                 mMap.clear();
 
+                title = s.toString();
+
                 mMap.addMarker(new MarkerOptions()
                         .position(tempLoc)
                         .draggable(true)
-                        .title(s.toString())
-                        .snippet(etDescription.getText().toString()))
+                        .title(title)
+                        .snippet(desc))
                         .showInfoWindow();
 
             }
@@ -95,11 +99,12 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mMap.clear();
+                desc = s.toString();
                 mMap.addMarker(new MarkerOptions()
                         .position(tempLoc)
                         .draggable(true)
-                        .title(etTitle.getText().toString())
-                        .snippet(s.toString()))
+                        .title(title)
+                        .snippet(desc))
                         .showInfoWindow();
             }
 
@@ -139,8 +144,8 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
             mMap.addMarker(new MarkerOptions()
                     .draggable(true)
                     .position(tempLoc)
-                    .title("Title")
-                    .snippet("Description")).showInfoWindow();
+                    .title(title)
+                    .snippet(desc)).showInfoWindow();
 
             mMap.animateCamera(CameraUpdateFactory.newLatLng(tempLoc));
 
