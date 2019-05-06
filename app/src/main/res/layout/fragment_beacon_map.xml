@@ -4,7 +4,8 @@
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
 
     <fragment
         android:id="@+id/map"
@@ -17,9 +18,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/transparent"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        android:visibility="gone">
 
         <androidx.appcompat.widget.SearchView
+            android:id="@+id/sv_beacon_map"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/space_large"
@@ -29,9 +32,63 @@
             map:layout_constraintTop_toTopOf="parent"
             map:layout_constraintStart_toStartOf="parent"
             map:layout_constraintEnd_toEndOf="parent">
+        </androidx.appcompat.widget.SearchView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_beacon_map"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/space_large"
+            map:layout_constraintTop_toBottomOf="@id/sv_beacon_map"
+            map:layout_constraintStart_toStartOf="parent"
+            map:layout_constraintEnd_toEndOf="parent">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageButton
+        android:id="@+id/ib_open_marker_list"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:src="@drawable/icon_list_24dp"
+        android:scaleType="fitXY"
+        android:padding="@dimen/space_medium"
+        android:layout_margin="8dp"
+        android:background="@drawable/search_bar_with_radius"
+        map:layout_constraintBottom_toTopOf="@id/ll_rv_list"
+        map:layout_constraintStart_toStartOf="parent"/>
+
+    <LinearLayout
+        android:id="@+id/ll_rv_list"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:animateLayoutChanges="true"
+        android:background="@color/rallyLightGrey"
+        android:visibility="gone"
+        android:orientation="vertical"
+        map:layout_constraintBottom_toBottomOf="parent"
+        map:layout_constraintEnd_toEndOf="parent"
+        map:layout_constraintStart_toStartOf="parent">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/sv_marker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/space_large"
+            android:background="@drawable/search_bar_with_radius"
+            map:iconifiedByDefault="false"
+            map:queryHint="Search markers...">
 
         </androidx.appcompat.widget.SearchView>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_marker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            tools:listitem="@layout/item_marker" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

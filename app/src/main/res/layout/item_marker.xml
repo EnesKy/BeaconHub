@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/item_marker"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="8dp"
+    app:cardBackgroundColor="@color/rallyDarkGrey"
+    app:cardCornerRadius="@dimen/default_radius_large"
+    app:cardElevation="3dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:id="@+id/ll_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/inner_middle_horizontal"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <View
+                android:id="@+id/view_name"
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:background="@color/rallyGreen"/>
+
+            <TextView
+                android:id="@+id/tv_company_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:layout_marginStart="8dp"
+                android:maxLines="2"
+                android:textColor="@color/cardPropertyColor"
+                android:text="Company Name"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_desc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/inner_middle_horizontal"
+            app:layout_constraintTop_toBottomOf="@id/ll_name">
+
+            <View
+                android:id="@+id/view_description"
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:background="@color/rallyGreen"/>
+
+            <TextView
+                android:id="@+id/tv_company_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:maxLines="3"
+                android:textColor="@color/cardPropertyColor"
+                android:text="Company Description" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_website"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/inner_middle_horizontal"
+            app:layout_constraintTop_toBottomOf="@id/ll_desc">
+
+            <View
+                android:id="@+id/view_website"
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:background="@color/rallyGreen" />
+
+            <TextView
+                android:id="@+id/tv_company_website"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/cardPropertyColor"
+                android:text="Company Website"/>
+
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/inner_middle_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.75" />
+
+        <LinearLayout
+            android:id="@+id/ll_distance"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="@id/inner_middle_horizontal"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <View
+                android:id="@+id/view_distance"
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:background="@color/rallyGreen" />
+
+            <TextView
+                android:id="@+id/tv_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/cardPropertyColor"
+                android:text="1123 m"/>
+
+        </LinearLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

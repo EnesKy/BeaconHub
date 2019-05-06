@@ -8,7 +8,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
+import android.view.ViewTreeObserver;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -22,15 +24,25 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
+import eky.beaconmaps.adapter.MarkerItemAdapter;
+import eky.beaconmaps.model.BeaconData;
+import eky.beaconmaps.model.MarkerData;
 
-public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
+public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, MarkerItemAdapter.ItemClickListener, SearchView.OnQueryTextListener {
 
     private GoogleMap mMap;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
@@ -42,6 +54,14 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
     private float zoom_level = 18;
     public LatLng tempLocation;
     private View view;
+
+    private SearchView searchView;
+    private RecyclerView recyclerView;
+    private LinearLayout llMarkerList;
+    private MarkerItemAdapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private ImageButton ibMarkerList;
+    private List<MarkerData> markerDataList = new ArrayList<>();
 
     public BeaconMapFragment() {
         // Required empty public constructor
@@ -66,6 +86,30 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
 
         view = inflater.inflate(R.layout.fragment_beacon_map, container, false);
 
+        recyclerView = view.findViewById(R.id.rv_marker);
+        llMarkerList = view.findViewById(R.id.ll_rv_list);
+        layoutManager = new LinearLayoutManager(inflater.getContext());
+        recyclerView.setLayoutManager(layoutManager);
+
+        ibMarkerList = view.findViewById(R.id.ib_open_marker_list);
+        ibMarkerList.setOnClickListener(v -> {
+
+            refreshMarkerList();
+
+            if (llMarkerList.getVisibility() == View.GONE)
+                llMarkerList.setVisibility(View.VISIBLE);
+            else
+                llMarkerList.setVisibility(View.GONE);
+        });
+
+        searchView = view.findViewById(R.id.sv_marker);
+        searchView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            public void onGlobalLayout() {
+                searchView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
+        searchView.setOnQueryTextListener(this);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -81,21 +125,25 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
         super.onResume();
 
         if (getArguments() != null && getArguments().get("KEY_LOC") != null) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom((LatLng) getArguments().get("KEY_LOC"), zoom_level));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom((LatLng) getArguments().get("KEY_LOC"), zoom_level));
             setArguments(null);
         }
+
+        refreshMarkerList();
 
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+
         //mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.gmap_style_night));
 
-        View locationButton = ((View) this.getView().findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+        /*View locationButton = ((View) this.getView().findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
         RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
         //rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-        rlp.setMargins(0, 200, 70, 0);
+        rlp.setMargins(0, 200, 70, 0);*/
 
         if (tempLocation != null)
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tempLocation, zoom_level));
@@ -247,4 +295,85 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    public void refreshMarkerList() {
+        if (currentLocation != null) {
+            //TODO: get registered beacondata list from database and refresh list
+            markerDataList.clear();
+
+            /*for(BeaconData beaconData : LIST) {
+                Location loc = new Location("Temp");
+
+                if(beaconData.getLocation() != null) {
+                    loc.setLatitude(beaconData.getLocation().latitude);
+                    loc.setLongitude(beaconData.getLocation().longitude);
+                    markerDataList.add(new MarkerData(beaconData, currentLocation.distanceTo(loc)));
+                }
+
+            }*/
+
+            BeaconData b1 = new BeaconData("Test 1 Title",
+                    "Test 1 Descpription", "www.fsmvu.com", new LatLng(41.0446681,28.9470421));
+
+            BeaconData b2 = new BeaconData("Test 2 Title",
+                    "Test 2 Descpription", "www.fsmvu.com", new LatLng(41.044943, 28.945840));
+
+            BeaconData b3 = new BeaconData("Test 3 Title",
+                    "Test 3 Descpription", "www.fsmvu.com", new LatLng(41.046869, 28.941817));
+
+            BeaconData b4 = new BeaconData("Test 4 Title",
+                    "Test 4 Descpription", "www.google.com", new LatLng(41.046100, 28.945239));
+
+            markerDataList.add(new MarkerData(b1, currentLocation.distanceTo(latLng2Loc(b1.getLocation()))));
+
+            markerDataList.add(new MarkerData(b2, currentLocation.distanceTo(latLng2Loc(b2.getLocation()))));
+
+            markerDataList.add(new MarkerData(b3, currentLocation.distanceTo(latLng2Loc(b3.getLocation()))));
+
+            markerDataList.add(new MarkerData(b4, currentLocation.distanceTo(latLng2Loc(b4.getLocation()))));
+
+            for (MarkerData markerData : markerDataList)
+                mMap.addMarker(new MarkerOptions().position(markerData.getBeaconData().getLocation()).title("Test"));
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                //Sorting the beacons by their distance to phone.
+                Comparator<MarkerData> markerDistanceComparator = Comparator.comparing(MarkerData::getDistance);
+                Collections.sort(markerDataList, markerDistanceComparator);
+            }
+
+            //TODO: 500m den uzakları listeden çıkartabilirsin???
+
+            if (adapter == null) {
+                adapter = new MarkerItemAdapter(markerDataList, this);
+                recyclerView.setAdapter(adapter);
+            } else {
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    @Override
+    public void onItemClick(int position, View view) {
+        //TODO: OnClickte websiteye ?????
+        llMarkerList.setVisibility(View.GONE);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(markerDataList.get(position).getBeaconData().getLocation(), zoom_level));
+
+    }
+
+    public Location latLng2Loc(LatLng loc) {
+        Location temp = new Location("Temp");
+        temp.setLatitude(loc.latitude);
+        temp.setLongitude(loc.longitude);
+        return temp;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        adapter.getFilter().filter(newText);
+        return false;
+    }
 }

@@ -41,6 +41,13 @@ public class BeaconData {
         this.webServiceUrl = webServiceUrl;
     }
 
+    public BeaconData(String companyName, String companyDesc, String webUrl, LatLng location) {
+        this.companyName = companyName;
+        this.companyDesc = companyDesc;
+        this.webUrl = webUrl;
+        this.location = location;
+    }
+
     public Beacon getBeacon() {
         return beacon;
     }
