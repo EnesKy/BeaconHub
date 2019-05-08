@@ -7,7 +7,8 @@
     android:layout_height="match_parent"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    tools:context=".activities.LoginActivity">
+    tools:context=".activities.LoginActivity"
+    android:id="@+id/cl_main">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"

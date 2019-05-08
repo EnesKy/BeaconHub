@@ -181,10 +181,10 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
         tvMajor = beacon_dialog.findViewById(R.id.tv_major);
         tvMinor = beacon_dialog.findViewById(R.id.tv_minor);
 
-        if (beacon.getBeaconID() != null) {
-            tvUUID.setText("UUID : " + beacon.getBeaconID().getProximityUUID().toString());
-            tvMajor.setText("Major : " + beacon.getBeaconID().getMajor());
-            tvMinor.setText("Minor : " + beacon.getBeaconID().getMinor());
+        if (beacon.getUuid() != null && !beacon.getUuid().isEmpty()) {
+            tvUUID.setText("UUID : " + beacon.getUuid());
+            tvMajor.setText("Major : " + beacon.getMajor());
+            tvMinor.setText("Minor : " + beacon.getMinor());
         }
         else if (beacon.getBeacon() != null) {
             tvUUID.setText("UUID : " + beacon.getBeacon().getId1().toString());
@@ -328,7 +328,7 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
             tvAddWebsite.setVisibility(View.GONE);
         }
 
-        if (beacon.getBeaconID() != null && beacon.getBeaconID().getLocation() != null) {
+        if (beacon.getLocation() != null) {
             tvAddLocation.setVisibility(View.GONE);
         } else {
             tvSeeLocation.setVisibility(View.GONE);

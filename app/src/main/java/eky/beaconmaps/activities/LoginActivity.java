@@ -82,6 +82,7 @@ public class LoginActivity extends BaseActivity {
     @Override
     public void onStart() {
         super.onStart();
+
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
@@ -150,6 +151,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void updateUI(FirebaseUser currentUser) {
+        isNetworkAvailable();
 
         if (currentUser != null) {
             openActivity(null, MainActivity.class);
@@ -158,6 +160,13 @@ public class LoginActivity extends BaseActivity {
                 String idToken = result.getToken();
                 FirebaseUtil.setUserIdToken(idToken);
                 Log.d(TAG, "GetTokenResult result = " + idToken);
+
+                //Fulfilling the data from database
+                FirebaseUtil.saveUsersBeacons(BeaconMaps.getList());
+                FirebaseUtil.refreshBlocklist();
+                FirebaseUtil.refreshRegisteredBeaconMap();
+                FirebaseUtil.refreshUsersBeacons();
+                FirebaseUtil.refreshRegisteredBeaconList();
             });
         } else {
             //continue

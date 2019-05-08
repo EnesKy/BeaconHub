@@ -4,7 +4,30 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/cl_main">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimaryDark"
+        app:contentInsetStart="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tv_toolbar_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Location Settings"
+            android:textColor="@color/rallyGreen"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:gravity = "center"/>
+
+    </androidx.appcompat.widget.Toolbar>
 
     <TextView
         android:id="@+id/tv_location"
@@ -15,7 +38,7 @@
         android:textColor="@color/rallyGreen"
         android:textSize="14dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
     <TextView
         android:id="@+id/tv_location_info"
@@ -84,7 +107,7 @@
         android:id="@+id/map_location"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="275dp"
         android:layout_margin="@dimen/space_large"
         app:layout_constraintTop_toBottomOf="@id/et_title_marker_desc"
         tools:context=".activities.LocationActivity" />
@@ -93,7 +116,7 @@
         android:id="@+id/btn_apply"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_top_large"
+        android:layout_marginTop="@dimen/space_large"
         android:textAllCaps="false"
         android:text="@string/title_apply"
         app:layout_constraintStart_toStartOf="parent"

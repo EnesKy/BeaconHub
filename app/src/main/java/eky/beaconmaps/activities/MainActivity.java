@@ -80,6 +80,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     @Override
     protected void onResume() {
         super.onResume();
+        isNetworkAvailable();
 
         BeaconMaps app = (BeaconMaps) getApplication();
         if (!app.isBeaconNotificationsEnabled()) {
@@ -107,6 +108,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
      */
     @Override
     protected void onNewIntent(Intent intent) {
+        isNetworkAvailable();
 
         if (intent.getExtras() != null) {
             locFromNotification = (LatLng) intent.getExtras().get("KEY_LOC");
@@ -114,7 +116,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         }
 
         if (locFromNotification != null){
-            fragment1.setArguments(bundle);
+            fragment1.setArguments(bundle); // Todo crashes -> java.lang.IllegalStateException: Fragment already added and state has been saved
 
             // Eğer uygulama açıksa ve görünür fragment beaconMap değilse.
             if (active != fragment1)
@@ -178,6 +180,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     }
 
     public void changeFragments() {
+        isNetworkAvailable();
         lastOpened = lastOpenedFragments.get(lastOpenedFragments.size() - 1);
         lastOpenedFragments.remove(lastOpenedFragments.size() - 1);
 

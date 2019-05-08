@@ -65,10 +65,10 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
 
         if (!isNearby) {
 
-            if (beacon.getBeaconID() != null) {
-                holder.tvUuid.setText("UUID : " + beacon.getBeaconID().getProximityUUID());
-                holder.tvMajor.setText("Major : " + beacon.getBeaconID().getMajor());
-                holder.tvMinor.setText("Minor : " + beacon.getBeaconID().getMinor());
+            if (beacon.getUuid() != null && !beacon.getUuid().isEmpty()) {
+                holder.tvUuid.setText("UUID : " + beacon.getUuid());
+                holder.tvMajor.setText("Major : " + beacon.getMajor());
+                holder.tvMinor.setText("Minor : " + beacon.getMinor());
             }  else if (beacon.getBeacon() != null) {
                 holder.tvUuid.setText("UUID : " + beacon.getBeacon().getId1());
                 holder.tvMajor.setText("Major : " + beacon.getBeacon().getId2());

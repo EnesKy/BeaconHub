@@ -150,9 +150,9 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
         rlp.setMargins(0, 200, 70, 0);*/
 
         if (tempLocation != null)
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tempLocation, zoom_level));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(tempLocation, zoom_level));
         else
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, zoom_level));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, zoom_level));
 
         //TODO: Delete this
         mMap.addMarker(new MarkerOptions().position(mDefaultLocation).title("Marker in Fsmvü"));
@@ -212,11 +212,11 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
         task.addOnSuccessListener(location -> {
             if (location != null) {
                 currentLocation = location;
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                         new LatLng(currentLocation.getLatitude(),
                                 currentLocation.getLongitude()), 18));
             } else {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, 18));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, 18));
             }
             updateLocationUI();
         });

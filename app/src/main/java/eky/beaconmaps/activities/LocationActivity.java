@@ -25,11 +25,10 @@ import com.google.android.material.button.MaterialButton;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
 import eky.beaconmaps.R;
 import eky.beaconmaps.model.BeaconData;
 
-public class LocationActivity extends FragmentActivity implements OnMapReadyCallback {
+public class LocationActivity extends BaseActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
@@ -53,6 +52,7 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
+        setSupportActionBar(findViewById(R.id.toolbar));
 
         //TODO: get beacon's beacondata and set if there is a info or not
         //beaconData = new BeaconData();
@@ -119,8 +119,8 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
         });
 
         if (beaconData != null) {
-            if (beaconData.getBeaconID().getLocation() != null)
-                tvLocation.setText(beaconData.getBeaconID().getLocation().toString());
+            if (beaconData.getLocation() != null)
+                tvLocation.setText(beaconData.getLocation().toString());
             if (beaconData.getCompanyName() != null)
                 etTitle.setText(beaconData.getCompanyName());
             if (beaconData.getCompanyDesc() != null)
@@ -177,7 +177,7 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
 
                 tempLoc = new LatLng(location.getLatitude(), location.getLongitude());
 
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tempLoc, 17));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(tempLoc, 17));
 
                 if (beaconData != null) {
                     //TODO: get info and set it to marker.
@@ -190,7 +190,7 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
                 }
 
             }else{
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, 18));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, 18));
             }
             updateLocationUI();
         });

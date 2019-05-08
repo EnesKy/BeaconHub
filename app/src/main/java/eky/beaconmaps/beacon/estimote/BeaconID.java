@@ -12,6 +12,8 @@ public class BeaconID {
     private int minor;
     private LatLng location;
 
+    public BeaconID() { }
+
     public BeaconID(UUID proximityUUID, int major, int minor) {
         this.proximityUUID = proximityUUID;
         this.major = major;

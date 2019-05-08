@@ -21,6 +21,7 @@ import java.util.List;
 import androidx.core.app.NotificationCompat;
 import eky.beaconmaps.R;
 import eky.beaconmaps.activities.MainActivity;
+import eky.beaconmaps.model.BeaconData;
 import eky.beaconmaps.model.NotificationData;
 
 import static androidx.core.content.ContextCompat.getSystemService;
@@ -90,11 +91,11 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
         });
     }
 
-    public void addNotification(BeaconID beaconID, NotificationData notificationData) {
+    public void addNotification(BeaconData beaconData) {
         //TODO: Add as BeaconData from Database. Don't use BeaconID.
-        BeaconRegion region = beaconID.toBeaconRegion();
-        notificationDatas.put(region.getIdentifier(), notificationData);
-        beaconIDs.put(region.getIdentifier(), beaconID);
+        BeaconRegion region = new BeaconID(beaconData.getUuid(), beaconData.getMajor(), beaconData.getMinor()).toBeaconRegion();
+        notificationDatas.put(region.getIdentifier(), beaconData.getNotificationData());
+        beaconIDs.put(region.getIdentifier(), new BeaconID(beaconData.getUuid(), beaconData.getMajor(), beaconData.getMinor()));
         regionsToMonitor.add(region);
     }
 
@@ -102,7 +103,10 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
         //TODO: LatLng ekle. Farklı notificationlarda latlng nasıl ayırt edeceksin???
         // companyName i subtitle olarak ekleyebilirsin.
         Intent resultIntent = new Intent(context, MainActivity.class);
+        //resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         resultIntent.putExtra("KEY_LOC", new LatLng(41.0463356, 28.9432943));
+
         PendingIntent resultPendingIntent = PendingIntent.getActivity(
                 context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 

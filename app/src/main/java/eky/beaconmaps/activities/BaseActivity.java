@@ -1,8 +1,14 @@
 package eky.beaconmaps.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
+
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -71,6 +77,20 @@ public abstract class BaseActivity extends AppCompatActivity {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.setCustomAnimations(enterAnim, exitAnim);
             fragmentTransaction.remove(page).commit();
+        }
+    }
+
+    public void isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
+        } else {
+            Snackbar.make(this.findViewById(R.id.cl_main),
+                    "Internet Connection Is Required" , Snackbar.LENGTH_LONG)
+                    .setAction(" Ok ", view -> { })
+                    .setActionTextColor(getResources().getColor(R.color.rallyGreen))
+                    .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE)
+                    .show();
         }
     }
 

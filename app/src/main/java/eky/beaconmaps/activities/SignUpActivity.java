@@ -38,6 +38,8 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
         signUpButton = findViewById(R.id.button_sign_up);
         signUpButton.setOnClickListener(this);
 
+        isNetworkAvailable();
+
     }
 
     private void createAccount() {

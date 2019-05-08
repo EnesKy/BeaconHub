@@ -4,8 +4,6 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.altbeacon.beacon.Beacon;
 
-import eky.beaconmaps.beacon.estimote.BeaconID;
-
 /**
  * Created by Enes Kamil YILMAZ on 26.04.2019.
  */
@@ -13,7 +11,9 @@ import eky.beaconmaps.beacon.estimote.BeaconID;
 public class BeaconData {
 
     private Beacon beacon;
-    private BeaconID beaconID;
+    private String uuid;
+    private int major;
+    private int minor;
     private NotificationData notificationData;
     private String companyName; //Google map marker title and notification subtitle
     private String companyDesc; //Google map marker description
@@ -24,28 +24,45 @@ public class BeaconData {
 
     public BeaconData() {}
 
-    public BeaconData(BeaconID beaconID) {
-        this.beaconID = beaconID;
-    }
-
     public BeaconData(Beacon beacon) {
         this.beacon = beacon;
     }
 
-    public BeaconData(BeaconID beaconID, String companyName, String companyDesc, NotificationData notificationData, String webUrl, String webServiceUrl) {
-        this.beaconID = beaconID;
-        this.companyName = companyName;
-        this.companyDesc = companyDesc;
-        this.notificationData = notificationData;
-        this.webUrl = webUrl;
-        this.webServiceUrl = webServiceUrl;
+    public BeaconData(String uuid, int major, int minor) {
+        this.uuid = uuid;
+        this.major = major;
+        this.minor = minor;
     }
 
+    public BeaconData(String uuid, int major, int minor, NotificationData notificationData) {
+        this.uuid = uuid;
+        this.major = major;
+        this.minor = minor;
+        this.notificationData = notificationData;
+    }
+
+    //TODO: delete this constructor
     public BeaconData(String companyName, String companyDesc, String webUrl, LatLng location) {
         this.companyName = companyName;
         this.companyDesc = companyDesc;
         this.webUrl = webUrl;
         this.location = location;
+    }
+
+    public BeaconData(Beacon beacon, String uuid, int major, int minor, NotificationData notificationData,
+                      String companyName, String companyDesc, String webUrl, String webServiceUrl,
+                      LatLng location, boolean isBlocked) {
+        this.beacon = beacon;
+        this.uuid = uuid;
+        this.major = major;
+        this.minor = minor;
+        this.notificationData = notificationData;
+        this.companyName = companyName;
+        this.companyDesc = companyDesc;
+        this.webUrl = webUrl;
+        this.webServiceUrl = webServiceUrl;
+        this.location = location;
+        this.isBlocked = isBlocked;
     }
 
     public Beacon getBeacon() {
@@ -54,14 +71,6 @@ public class BeaconData {
 
     public void setBeacon(Beacon beacon) {
         this.beacon = beacon;
-    }
-
-    public BeaconID getBeaconID() {
-        return beaconID;
-    }
-
-    public void setBeaconID(BeaconID beaconID) {
-        this.beaconID = beaconID;
     }
 
     public String getCompanyName() {
@@ -120,6 +129,39 @@ public class BeaconData {
         this.location = location;
     }
 
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public int getMajor() {
+        return major;
+    }
+
+    public void setMajor(int major) {
+        this.major = major;
+    }
+
+    public int getMinor() {
+        return minor;
+    }
+
+    public void setMinor(int minor) {
+        this.minor = minor;
+    }
+
+    public String getIdentity() {
+        if (uuid != null)
+            return uuid + " - " + major + " - " + minor;
+        else if (beacon != null)
+            return beacon.getId1().toString() + " - " + beacon.getId2().toInt() + " - " + beacon.getId3().toInt();
+        else
+            return null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null) {
@@ -136,18 +178,12 @@ public class BeaconData {
 
         BeaconData other = (BeaconData) o;
 
-        if (beaconID != null) {
-            return  beaconID.getMajor() == other.beaconID.getMajor() &&
-                    beaconID.getMinor() == other.beaconID.getMinor() &&
-                    beaconID.getProximityUUID().equals(other.beaconID.getProximityUUID());
-        } else {
-            if (beacon != null && other.beacon != null)
-                return beacon.getIdentifiers().equals(other.beacon.getIdentifiers());
-            else
-                return false;
+        if (uuid != null && !uuid.isEmpty() && major != 0 && minor != 0) {
+            return uuid.equals(other.uuid) &&
+                    major == other.major &&
+                    minor == other.minor;
         }
-
-
+        return false;
     }
 
 }

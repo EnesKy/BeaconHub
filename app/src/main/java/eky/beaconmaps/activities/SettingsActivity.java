@@ -55,6 +55,8 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
             blockedBeaconsList = new ArrayList<>();
         }
 
+        isNetworkAvailable();
+
         placeholder = findViewById(R.id.tv_placeholder);
         if (blockedBeaconsList.size() == 0)
             placeholder.setVisibility(View.VISIBLE);
@@ -92,6 +94,7 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
             if (user.getPhotoUrl() != null)
                 //Glide.with(this).load(user.getPhotoUrl()).into(profilepic);
                 Picasso.get().load(user.getPhotoUrl()).into(profilepic);
+            //TODO: resim yüklenene kadar önceki stock resim görünsün.
         }
 
     }
@@ -122,10 +125,10 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
         tvMajor = beacon_dialog.findViewById(R.id.tv_major);
         tvMinor = beacon_dialog.findViewById(R.id.tv_minor);
 
-        if (beacon.getBeaconID() != null) {
-            tvUUID.setText("UUID : " + beacon.getBeaconID().getProximityUUID().toString());
-            tvMajor.setText("Major : " + beacon.getBeaconID().getMajor());
-            tvMinor.setText("Minor : " + beacon.getBeaconID().getMinor());
+        if (beacon.getUuid() != null && !beacon.getUuid().isEmpty()) {
+            tvUUID.setText("UUID : " + beacon.getUuid());
+            tvMajor.setText("Major : " + beacon.getMajor());
+            tvMinor.setText("Minor : " + beacon.getMinor());
         }
         else if (beacon.getBeacon() != null) {
             tvUUID.setText("UUID : " + beacon.getBeacon().getId1().toString());

@@ -41,6 +41,7 @@ import eky.beaconmaps.R;
 import eky.beaconmaps.activities.MainActivity;
 import eky.beaconmaps.adapter.BeaconAdapter;
 import eky.beaconmaps.model.BeaconData;
+import eky.beaconmaps.utils.FirebaseUtil;
 import eky.beaconmaps.utils.PreferencesUtil;
 
 public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, BeaconConsumer,
@@ -203,10 +204,14 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
             placeholder.setVisibility(View.GONE);
 
+            //FirebaseUtil.saveUsersBeacons(unblockedBeacons);
+
             List<Beacon> sortedList = new ArrayList<>();
 
-            for (BeaconData beaconData : unblockedBeacons)
+            for (BeaconData beaconData : unblockedBeacons) {
                 sortedList.add(beaconData.getBeacon());
+                FirebaseUtil.registerBeacon(beaconData);
+            }
 
             temp = new ArrayList<>();
 
@@ -217,10 +222,11 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
             }
 
             for(Beacon beacon : sortedList) {
-                //todo: databaseden çektiğin listede yer alıyorsa listeden aldığın beacondata bilgisini döndür.
-
-                temp.add(new BeaconData(beacon));
-                //FirebaseUtil.saveBeaconData(new BeaconData(beacon));
+                BeaconData tempData = new BeaconData(beacon.getId1().toString(), beacon.getId2().toInt(), beacon.getId3().toInt());
+                if (FirebaseUtil.refreshRegisteredBeaconMap() != null && FirebaseUtil.refreshRegisteredBeaconMap().containsKey(tempData.getIdentity()))
+                    temp.add(FirebaseUtil.refreshRegisteredBeaconMap().get(tempData.getIdentity()));
+                else
+                    temp.add(new BeaconData(beacon));
             }
 
             beaconList.clear();
@@ -318,10 +324,10 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         tvMajor = beacon_dialog.findViewById(R.id.tv_major);
         tvMinor = beacon_dialog.findViewById(R.id.tv_minor);
 
-        if (beacon.getBeaconID() != null) {
-            tvUUID.setText("UUID : " + beacon.getBeaconID().getProximityUUID().toString());
-            tvMajor.setText("Major : " + beacon.getBeaconID().getMajor());
-            tvMinor.setText("Minor : " + beacon.getBeaconID().getMinor());
+        if (beacon.getUuid() != null && !beacon.getUuid().isEmpty()) {
+            tvUUID.setText("UUID : " + beacon.getUuid());
+            tvMajor.setText("Major : " + beacon.getMajor());
+            tvMinor.setText("Minor : " + beacon.getMinor());
         }
         else if (beacon.getBeacon() != null) {
             tvUUID.setText("UUID : " + beacon.getBeacon().getId1().toString());
@@ -345,7 +351,7 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         }
 
         tvLocation = beacon_dialog.findViewById(R.id.tv_go_location);
-        if (beacon.getBeaconID() == null || beacon.getBeaconID().getLocation() == null) {
+        if (beacon.getLocation() == null) {
             tvLocation.setVisibility(View.GONE);
         } else {
             tvLocation.setOnClickListener(v -> {
