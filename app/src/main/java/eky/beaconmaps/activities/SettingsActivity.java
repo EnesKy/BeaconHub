@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
 import eky.beaconmaps.adapter.BeaconAdapter;
 import eky.beaconmaps.model.BeaconData;
+import eky.beaconmaps.utils.FirebaseUtil;
 import eky.beaconmaps.utils.PreferencesUtil;
 
 public class SettingsActivity extends BaseActivity implements BeaconAdapter.ItemClickListener {
@@ -115,7 +116,7 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
     public void openActionDialog(BeaconData beacon) { // TODO: Kullanıcının ise farklı text göster.
         Dialog beacon_dialog;
         TextView tvUUID, tvMajor, tvMinor;
-        TextView tvUnblock, tvWebUrl, tvLocation;
+        TextView tvUnblock;
 
         beacon_dialog = new Dialog(this);
         beacon_dialog.setTitle("Add action");
@@ -145,6 +146,8 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
             blockedBeaconsList.clear();
             blockedBeaconsList.addAll(preferencesUtil.getBlockedBeaconsList());
             adapter.notifyDataSetChanged();
+
+            FirebaseUtil.removeBlockedBeacon(beacon);
 
             if (blockedBeaconsList.size() == 0)
                 placeholder.setVisibility(View.VISIBLE);

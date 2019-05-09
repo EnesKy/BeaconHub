@@ -19,13 +19,16 @@ public class BeaconData {
     private String companyDesc; //Google map marker description
     private String webUrl;
     private String webServiceUrl;
-    private LatLng location;
+    private Location location;
     private boolean isBlocked = false;
 
     public BeaconData() {}
 
     public BeaconData(Beacon beacon) {
         this.beacon = beacon;
+        this.uuid = beacon.getId1().toString();
+        this.major = beacon.getId2().toInt();
+        this.minor = beacon.getId3().toInt();
     }
 
     public BeaconData(String uuid, int major, int minor) {
@@ -42,7 +45,7 @@ public class BeaconData {
     }
 
     //TODO: delete this constructor
-    public BeaconData(String companyName, String companyDesc, String webUrl, LatLng location) {
+    public BeaconData(String companyName, String companyDesc, String webUrl, Location location) {
         this.companyName = companyName;
         this.companyDesc = companyDesc;
         this.webUrl = webUrl;
@@ -51,7 +54,7 @@ public class BeaconData {
 
     public BeaconData(Beacon beacon, String uuid, int major, int minor, NotificationData notificationData,
                       String companyName, String companyDesc, String webUrl, String webServiceUrl,
-                      LatLng location, boolean isBlocked) {
+                      Location location, boolean isBlocked) {
         this.beacon = beacon;
         this.uuid = uuid;
         this.major = major;
@@ -121,12 +124,20 @@ public class BeaconData {
         isBlocked = blocked;
     }
 
-    public LatLng getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(LatLng location) {
+    public LatLng getLatLng() {
+        return new LatLng(location.lat, location.lng);
+    }
+
+    public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public void setLatLng(LatLng location) {
+        this.location = new Location(location.latitude, location.longitude);
     }
 
     public String getUuid() {
@@ -156,7 +167,7 @@ public class BeaconData {
     public String getIdentity() {
         if (uuid != null)
             return uuid + " - " + major + " - " + minor;
-        else if (beacon != null)
+        else if (beacon != null && beacon.getIdentifiers().size() != 0)
             return beacon.getId1().toString() + " - " + beacon.getId2().toInt() + " - " + beacon.getId3().toInt();
         else
             return null;
@@ -178,12 +189,7 @@ public class BeaconData {
 
         BeaconData other = (BeaconData) o;
 
-        if (uuid != null && !uuid.isEmpty() && major != 0 && minor != 0) {
-            return uuid.equals(other.uuid) &&
-                    major == other.major &&
-                    minor == other.minor;
-        }
-        return false;
+        return getIdentity().equals(other.getIdentity());
     }
 
 }

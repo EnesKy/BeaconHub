@@ -27,6 +27,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import eky.beaconmaps.R;
 import eky.beaconmaps.model.BeaconData;
+import eky.beaconmaps.utils.FirebaseUtil;
+import eky.beaconmaps.utils.PreferencesUtil;
 
 public class LocationActivity extends BaseActivity implements OnMapReadyCallback {
 
@@ -39,23 +41,22 @@ public class LocationActivity extends BaseActivity implements OnMapReadyCallback
     private static final int LOCATION_REQUEST_CODE =101;
     private float zoom_level = 14;
 
+    private TextView tvUUID, tvMajor, tvMinor;
     private EditText etTitle, etDescription;
     private TextView tvLocation;
     private MaterialButton btnApply;
 
     private BeaconData beaconData;
-    private LatLng tempLoc;
+    private LatLng beaconLoc;
+    private PreferencesUtil preferencesUtil;
 
-    private String title = "Title", desc = "Description";
+    private String title = "Company Name", desc = "Company Description";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
         setSupportActionBar(findViewById(R.id.toolbar));
-
-        //TODO: get beacon's beacondata and set if there is a info or not
-        //beaconData = new BeaconData();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -64,31 +65,48 @@ public class LocationActivity extends BaseActivity implements OnMapReadyCallback
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
+        preferencesUtil = new PreferencesUtil(this);
+
+        if (preferencesUtil.getObject("claimed", BeaconData.class) != null)
+            beaconData = preferencesUtil.getObject("claimed", BeaconData.class);
+
+        if (beaconData != null) {
+            if (beaconData.getCompanyName() != null)
+                title = beaconData.getCompanyName();
+
+            if (beaconData.getCompanyDesc() != null)
+                desc = beaconData.getCompanyDesc();
+
+            if (beaconData.getLocation() != null)
+                beaconLoc = beaconData.getLatLng();
+        }
+
         etTitle = findViewById(R.id.et_title_marker);
         etTitle.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
                 mMap.clear();
-
                 title = s.toString();
 
+                LatLng temp;
+                if (beaconLoc != null)
+                    temp = beaconLoc;
+                else
+                    temp = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
                 mMap.addMarker(new MarkerOptions()
-                        .position(tempLoc)
+                        .position(temp)
                         .draggable(true)
                         .title(title)
                         .snippet(desc))
                         .showInfoWindow();
-
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-            }
+            public void afterTextChanged(Editable s) { }
         });
 
         etDescription = findViewById(R.id.et_title_marker_desc);
@@ -100,8 +118,15 @@ public class LocationActivity extends BaseActivity implements OnMapReadyCallback
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mMap.clear();
                 desc = s.toString();
+
+                LatLng temp;
+                if (beaconLoc != null)
+                    temp = beaconLoc;
+                else
+                    temp = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
                 mMap.addMarker(new MarkerOptions()
-                        .position(tempLoc)
+                        .position(temp)
                         .draggable(true)
                         .title(title)
                         .snippet(desc))
@@ -113,18 +138,45 @@ public class LocationActivity extends BaseActivity implements OnMapReadyCallback
         });
 
         tvLocation = findViewById(R.id.tv_location_info);
+
         btnApply = findViewById(R.id.btn_apply);
         btnApply.setOnClickListener(v -> {
-            //TODO: add info to database and sharedprefences.
+
+            beaconData.setLatLng(beaconLoc);
+            beaconData.setCompanyName(etTitle.getText().toString());
+            beaconData.setCompanyDesc(etDescription.getText().toString());
+
+            //TODO: add info to database.
+            preferencesUtil.saveObject("claimed", beaconData);
+
+            FirebaseUtil.updateUsersBeacon(beaconData, "location");
+            preferencesUtil.updateLists(beaconData);
+
+            finish();
         });
 
         if (beaconData != null) {
             if (beaconData.getLocation() != null)
-                tvLocation.setText(beaconData.getLocation().toString());
+                tvLocation.setText(beaconData.getLocation().getLat()+ " , " + beaconData.getLocation().getLng());
             if (beaconData.getCompanyName() != null)
                 etTitle.setText(beaconData.getCompanyName());
             if (beaconData.getCompanyDesc() != null)
                 etDescription.setText(beaconData.getCompanyDesc());
+
+            tvUUID = findViewById(R.id.tv_uuid);
+            tvMajor = findViewById(R.id.tv_major);
+            tvMinor = findViewById(R.id.tv_minor);
+
+            if (beaconData.getUuid() != null && !beaconData.getUuid().isEmpty()) {
+                tvUUID.setText("UUID : " + beaconData.getUuid());
+                tvMajor.setText("Major : " + beaconData.getMajor());
+                tvMinor.setText("Minor : " + beaconData.getMinor());
+            }
+            else if (beaconData.getBeacon() != null) {
+                tvUUID.setText("UUID : " + beaconData.getBeacon().getId1().toString());
+                tvMajor.setText("Major : " + beaconData.getBeacon().getId2().toString());
+                tvMinor.setText("Minor : " + beaconData.getBeacon().getId3().toString());
+            }
         }
 
     }
@@ -135,19 +187,30 @@ public class LocationActivity extends BaseActivity implements OnMapReadyCallback
 
         fetchLastLocation();
 
+        if (beaconLoc != null) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(beaconLoc));
+            mMap.addMarker(new MarkerOptions()
+                    .draggable(true)
+                    .position(beaconLoc)
+                    .title(title)
+                    .snippet(desc)).showInfoWindow();
+        }
+
+
         mMap.setOnMapClickListener(latLng -> {
 
-            tempLoc = latLng;
+            beaconLoc = latLng;
 
             mMap.clear();
 
             mMap.addMarker(new MarkerOptions()
                     .draggable(true)
-                    .position(tempLoc)
+                    .position(beaconLoc)
                     .title(title)
                     .snippet(desc)).showInfoWindow();
 
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(tempLoc));
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(beaconLoc));
+            tvLocation.setText(beaconLoc.latitude + " , " + beaconLoc.longitude);
 
         });
 
@@ -158,7 +221,11 @@ public class LocationActivity extends BaseActivity implements OnMapReadyCallback
             fetchLastLocation();
 
             mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())));
+                    .position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()))
+                    .draggable(true)
+                    .position(beaconLoc)
+                    .title(title)
+                    .snippet(desc)).showInfoWindow();
 
             return true;
         });
@@ -174,23 +241,12 @@ public class LocationActivity extends BaseActivity implements OnMapReadyCallback
         task.addOnSuccessListener(location -> {
             if (location != null) {
                 currentLocation = location;
-
-                tempLoc = new LatLng(location.getLatitude(), location.getLongitude());
-
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(tempLoc, 17));
-
-                if (beaconData != null) {
-                    //TODO: get info and set it to marker.
-                } else {
-                    mMap.addMarker(new MarkerOptions()
-                            .position(tempLoc)
-                            .draggable(true)
-                            .title("Title")
-                            .snippet("Description")).showInfoWindow();
-                }
-
-            }else{
+                beaconLoc = new LatLng(location.getLatitude(), location.getLongitude());
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(beaconLoc, 17));
+                tvLocation.setText(location.getLatitude() + " , " + location.getLongitude());
+            } else {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, 18));
+                tvLocation.setText(mDefaultLocation.latitude + " , " + mDefaultLocation.longitude);
             }
             updateLocationUI();
         });

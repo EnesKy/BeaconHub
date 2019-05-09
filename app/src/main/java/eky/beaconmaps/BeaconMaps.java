@@ -27,7 +27,7 @@ public class BeaconMaps extends Application {
     private boolean haveDetectedBeaconsSinceBoot = false;
     BeaconManager beaconManager;
     private boolean beaconNotificationsEnabled = false;
-    public static List<BeaconData> list;
+    public static List<BeaconData> list = new ArrayList<>();;
 
     public void onCreate() {
         super.onCreate();
@@ -47,7 +47,6 @@ public class BeaconMaps extends Application {
         //TODO: Bilgileri databaseden çek. BeaconData tipinde olacağı için location bilgisini de kullan.
         //TODO: Notification bilgilerini düzenle. Daha efektif title-desc ekleyebilirsin???
 
-        list = new ArrayList<>();
         list.add(new BeaconData("E263C169-EB5D-76DA-F938-1BBA59293189", 81, 81,
                     new NotificationData(
                         "Fatih Sultan Mehmet Vakıf Üniversitesine hoşgeldiniz !",

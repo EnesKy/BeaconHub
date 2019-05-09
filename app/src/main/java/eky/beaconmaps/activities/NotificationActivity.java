@@ -1,16 +1,19 @@
 package eky.beaconmaps.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Toast;
+import android.widget.TextView;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
-import eky.beaconmaps.BeaconMaps;
 import eky.beaconmaps.R;
+import eky.beaconmaps.model.BeaconData;
+import eky.beaconmaps.model.NotificationData;
+import eky.beaconmaps.utils.PreferencesUtil;
 
 public class NotificationActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -21,16 +24,18 @@ public class NotificationActivity extends AppCompatActivity implements View.OnCl
     ImageButton helloIcon;
     ImageButton exitIcon;
     Button done;
-
-    //Dialogdan Beacon seçimi ve Functionlardan Notification seçimi yapıldığında burayı aç
-    //Beacon ın ID sini bundle ile taşı
-    //Functions için TAG belirle ve Beacona tanımla sonrasında form doldurt ve bildirm ekranı oluştur
+    TextView companyName, companyName2;
+    PreferencesUtil preferencesUtil;
+    BeaconData beaconData;
+    private TextView tvUUID, tvMajor, tvMinor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Intent i = getIntent();
+        getIntent();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
+
+        preferencesUtil = new PreferencesUtil(this);
 
         entranceTitle = findViewById(R.id.hello_title);
         entranceDesc = findViewById(R.id.hello_desc);
@@ -38,38 +43,40 @@ public class NotificationActivity extends AppCompatActivity implements View.OnCl
         exitDesc = findViewById(R.id.exit_desc);
         done = findViewById(R.id.btn_done);
         done.setOnClickListener(this);
-    }
 
-    public void setNotifications(final String helloTitle, final String helledesc,
-                                 final String byeTitle, final String byeDesc) {
-        final BeaconMaps application = (BeaconMaps) getApplication();
+        companyName = findViewById(R.id.tv_company_name1);
+        companyName2 = findViewById(R.id.tv_company_name2);
 
-        /*
-        RequirementsWizardFactory.createEstimoteRequirementsWizard()
-                .fulfillRequirements(this,
-                        new Function0<Unit>() {
-                            @Override
-                            public Unit invoke() {
-                                Log.d("BeaconMap", "requirements fulfilled");
-                                application.enableBeaconNotifications(helloTitle, helledesc, byeTitle, byeDesc);
-                                return null;
-                            }
-                        },
-                        new Function1<List<? extends Requirement>, Unit>() {
-                            @Override
-                            public Unit invoke(List<? extends Requirement> requirements) {
-                                Log.e("BeaconMap", "requirements missing: " + requirements);
-                                return null;
-                            }
-                        },
-                        new Function1<Throwable, Unit>() {
-                            @Override
-                            public Unit invoke(Throwable throwable) {
-                                Log.e("BeaconMap", "requirements error: " + throwable);
-                                return null;
-                            }
-                        });
-                        */
+        if (preferencesUtil.getObject("clicked", BeaconData.class) != null) {
+            beaconData = preferencesUtil.getObject("clicked", BeaconData.class);
+            if (beaconData.getCompanyName() != null){
+                companyName.setHint(beaconData.getCompanyName());
+                companyName2.setHint(beaconData.getCompanyName());
+            }
+            if (beaconData.getNotificationData() != null) {
+                entranceTitle.setText(beaconData.getNotificationData().getEnterTitle());
+                entranceDesc.setText(beaconData.getNotificationData().getEnterDesc());
+                exitTitle.setText(beaconData.getNotificationData().getExitTitle());
+                exitDesc.setText(beaconData.getNotificationData().getExitTitle());
+            }
+
+            tvUUID = findViewById(R.id.tv_uuid);
+            tvMajor = findViewById(R.id.tv_major);
+            tvMinor = findViewById(R.id.tv_minor);
+
+            if (beaconData.getUuid() != null && !beaconData.getUuid().isEmpty()) {
+                tvUUID.setText("UUID : " + beaconData.getUuid());
+                tvMajor.setText("Major : " + beaconData.getMajor());
+                tvMinor.setText("Minor : " + beaconData.getMinor());
+            }
+            else if (beaconData.getBeacon() != null) {
+                tvUUID.setText("UUID : " + beaconData.getBeacon().getId1().toString());
+                tvMajor.setText("Major : " + beaconData.getBeacon().getId2().toString());
+                tvMinor.setText("Minor : " + beaconData.getBeacon().getId3().toString());
+            }
+
+        }
+
     }
 
     @Override
@@ -79,24 +86,23 @@ public class NotificationActivity extends AppCompatActivity implements View.OnCl
             case R.id.btn_done:
                 if (!entranceTitle.getText().toString().isEmpty() && !entranceDesc.getText().toString().isEmpty() &&
                         !exitTitle.getText().toString().isEmpty() && !exitDesc.getText().toString().isEmpty()) {
-                    setNotifications(entranceTitle.getText().toString(),entranceDesc.getText().toString(),
+
+                    NotificationData notificationData = new NotificationData(
+                            entranceTitle.getText().toString(), entranceDesc.getText().toString(),
                             exitTitle.getText().toString(), exitDesc.getText().toString());
+                    beaconData.setNotificationData(notificationData);
+                    preferencesUtil.saveObject("clicked", beaconData);
 
-                    /*NotificationData notificationData = new NotificationData(ConfigureBeaconActivity.getBeaconId(), entranceTitle.getText().toString(),
-                            entranceDesc.getText().toString(), exitTitle.getText().toString(), exitDesc.getText().toString());
-                    FirebaseUtil.saveNotificationData(notificationData);*/
+                    //TODO: database e, prefencesa ekle. Sonraki çalıştırmada beaconMaps sayfasında databseden alsın çalışsın.
 
-                    Intent i = new Intent(NotificationActivity.this, MainActivity.class);
-                    startActivity(i);
+                    finish();
                 } else {
-                    Toast.makeText(this, "Fill the blanks", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(findViewById(R.id.cl_main),
+                            "Fill the blank to add notification info.", Snackbar.LENGTH_LONG)
+                            .setActionTextColor(getResources().getColor(R.color.rallyGreen))
+                            .show();
                 }
                 break;
-            case R.id.hello_icon:
-                Toast.makeText(this, "Hello Icon clicked", Toast.LENGTH_SHORT).show();
-            case R.id.exit_icon:
-                Toast.makeText(this, "Exit Icon clicked", Toast.LENGTH_SHORT).show();
-
         }
     }
 

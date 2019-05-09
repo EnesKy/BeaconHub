@@ -31,7 +31,9 @@ import org.altbeacon.beacon.BeaconManager;
 
 import eky.beaconmaps.BeaconMaps;
 import eky.beaconmaps.R;
+import eky.beaconmaps.model.BeaconData;
 import eky.beaconmaps.utils.FirebaseUtil;
+import eky.beaconmaps.utils.PreferencesUtil;
 
 public class LoginActivity extends BaseActivity {
 
@@ -46,6 +48,7 @@ public class LoginActivity extends BaseActivity {
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
+    private PreferencesUtil mPreferencesUtil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +57,8 @@ public class LoginActivity extends BaseActivity {
         setSupportActionBar(findViewById(R.id.toolbar));
 
         FirebaseApp.initializeApp(this);
+
+        mPreferencesUtil = new PreferencesUtil(this);
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -162,7 +167,10 @@ public class LoginActivity extends BaseActivity {
                 Log.d(TAG, "GetTokenResult result = " + idToken);
 
                 //Fulfilling the data from database
-                FirebaseUtil.saveUsersBeacons(BeaconMaps.getList());
+                if (mPreferencesUtil.getBlockedBeaconsList() != null)
+                    for (BeaconData beaconData : mPreferencesUtil.getMyBeaconsList())
+                        FirebaseUtil.claimBeacon(beaconData);
+
                 FirebaseUtil.refreshBlocklist();
                 FirebaseUtil.refreshRegisteredBeaconMap();
                 FirebaseUtil.refreshUsersBeacons();

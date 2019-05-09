@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -26,191 +26,264 @@
                 android:id="@+id/tv_toolbar_title"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:gravity="center"
                 android:text="@string/label_notification_title"
                 android:textColor="@color/rallyGreen"
-                android:textStyle="bold"
                 android:textSize="22sp"
-                android:gravity="center"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.appcompat.widget.Toolbar>
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.2"
-        />
 
-    <TextView
-        android:id="@+id/tv_entrance_explanation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:text="@string/label_entrance_notification_explanation"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textSize="15sp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/guideline" />
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-    <androidx.cardview.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/hello_card_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
-        card_view:cardCornerRadius="8dp"
-        card_view:layout_constraintEnd_toEndOf="parent"
-        card_view:layout_constraintStart_toStartOf="parent"
-        card_view:layout_constraintTop_toBottomOf="@+id/tv_entrance_explanation">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/ll_beacon_data"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="10dp">
-
-            <ImageButton
-                android:id="@+id/hello_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/icon_notification_32dp"
-                card_view:layout_constraintStart_toStartOf="parent"
-                card_view:layout_constraintTop_toTopOf="parent" />
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/space_medium"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/app_name"
+                android:id="@+id/tv_uuid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:focusable="false"
-                android:hint="@string/title_notification"
-                android:textStyle="bold"
-                card_view:layout_constraintStart_toEndOf="@+id/hello_icon"
-                card_view:layout_constraintTop_toTopOf="@id/hello_icon"
-                card_view:layout_constraintBottom_toBottomOf="@id/hello_icon"/>
+                android:gravity="center"
+                android:text="UUID : 123123089213213218"
+                android:textColor="@color/rallyGreen" />
 
-            <EditText
-                android:id="@+id/hello_title"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@android:color/transparent"
-                android:text="@string/hint_enter_title"
-                android:textColor="@android:color/black"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                card_view:layout_constraintTop_toBottomOf="@+id/hello_icon" />
+                android:layout_gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="2">
 
-            <EditText
-                android:id="@+id/hello_desc"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@android:color/transparent"
-                android:hint="@string/hint_enter_desc"
-                android:textSize="15sp"
-                card_view:layout_constraintTop_toBottomOf="@+id/hello_title" />
+                <TextView
+                    android:id="@+id/tv_major"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Major : 123"
+                    android:textColor="@color/rallyGreen" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/tv_minor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Minor : 123"
+                    android:textColor="@color/rallyGreen" />
 
-    </androidx.cardview.widget.CardView>
+            </LinearLayout>
 
-    <TextView
-        android:id="@+id/tv_exit_explanation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_top_large"
-        android:padding="10dp"
-        android:text="@string/label_exit_notification_explanation"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/hello_card_view" />
+        </LinearLayout>
 
-    <androidx.cardview.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/exit_card_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
-        card_view:cardCornerRadius="8dp"
-        card_view:layout_constraintEnd_toEndOf="parent"
-        card_view:layout_constraintStart_toStartOf="parent"
-        card_view:layout_constraintTop_toBottomOf="@+id/tv_exit_explanation">
+        <TextView
+            android:id="@+id/tv_entrance_explanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_top_large"
+            android:padding="10dp"
+            android:text="@string/label_entrance_notification_explanation"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ll_beacon_data" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/hello_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp">
+            android:layout_gravity="center"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            card_view:cardCornerRadius="8dp"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/tv_entrance_explanation">
 
-            <ImageButton
-                android:id="@+id/exit_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/icon_notification_32dp"
-                card_view:layout_constraintStart_toStartOf="parent"
-                card_view:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/app_name_exit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:focusable="false"
-                android:hint="@string/title_notification"
-                android:textStyle="bold"
-                card_view:layout_constraintStart_toEndOf="@+id/exit_icon"
-                card_view:layout_constraintTop_toTopOf="@+id/exit_icon"
-                card_view:layout_constraintBottom_toBottomOf="@+id/exit_icon"/>
-
-            <EditText
-                android:id="@+id/exit_title"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@android:color/transparent"
-                android:text="@string/hint_exit_title"
-                android:textColor="@android:color/black"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                card_view:layout_constraintTop_toBottomOf="@+id/exit_icon" />
+                android:padding="10dp">
 
-            <EditText
-                android:id="@+id/exit_desc"
+                <ImageButton
+                    android:id="@+id/hello_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/icon_notification_32dp"
+                    card_view:layout_constraintStart_toStartOf="parent"
+                    card_view:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/app_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:focusable="false"
+                    android:hint="@string/title_notification"
+                    android:textStyle="bold"
+                    card_view:layout_constraintBottom_toBottomOf="@id/hello_icon"
+                    card_view:layout_constraintStart_toEndOf="@+id/hello_icon"
+                    card_view:layout_constraintTop_toTopOf="@id/hello_icon" />
+
+                <TextView
+                    android:id="@+id/tv_company_name1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:focusable="false"
+                    android:hint="Company Name"
+                    android:textStyle="bold"
+                    card_view:layout_constraintBottom_toBottomOf="@id/app_name"
+                    card_view:layout_constraintStart_toEndOf="@id/app_name"
+                    card_view:layout_constraintTop_toTopOf="@id/app_name" />
+
+                <EditText
+                    android:id="@+id/hello_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@android:color/transparent"
+                    android:text="@string/hint_enter_title"
+                    android:textColor="@android:color/black"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    card_view:layout_constraintTop_toBottomOf="@+id/hello_icon" />
+
+                <EditText
+                    android:id="@+id/hello_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/hint_enter_desc"
+                    android:textSize="15sp"
+                    card_view:layout_constraintTop_toBottomOf="@+id/hello_title" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/tv_exit_explanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_top_large"
+            android:padding="10dp"
+            android:text="@string/label_exit_notification_explanation"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/hello_card_view" />
+
+        <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/exit_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            card_view:cardCornerRadius="8dp"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toBottomOf="@+id/tv_exit_explanation">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@android:color/transparent"
-                android:hint="@string/hint_exit_desc"
-                android:textSize="15sp"
-                card_view:layout_constraintTop_toBottomOf="@+id/exit_title" />
+                android:padding="10dp">
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <ImageButton
+                    android:id="@+id/exit_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/icon_notification_32dp"
+                    card_view:layout_constraintStart_toStartOf="parent"
+                    card_view:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.cardview.widget.CardView>
+                <TextView
+                    android:id="@+id/app_name_exit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:focusable="false"
+                    android:hint="@string/title_notification"
+                    android:textStyle="bold"
+                    card_view:layout_constraintBottom_toBottomOf="@+id/exit_icon"
+                    card_view:layout_constraintStart_toEndOf="@+id/exit_icon"
+                    card_view:layout_constraintTop_toTopOf="@+id/exit_icon" />
 
-    <Button
-        android:id="@+id/btn_done"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_top_large"
-        android:text="@string/title_done"
-        android:textAllCaps="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/exit_card_view" />
+                <TextView
+                    android:id="@+id/tv_company_name2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:focusable="false"
+                    android:hint="Company Name"
+                    android:textStyle="bold"
+                    card_view:layout_constraintBottom_toBottomOf="@id/app_name_exit"
+                    card_view:layout_constraintStart_toEndOf="@id/app_name_exit"
+                    card_view:layout_constraintTop_toTopOf="@id/app_name_exit" />
 
+                <EditText
+                    android:id="@+id/exit_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@android:color/transparent"
+                    android:text="@string/hint_exit_title"
+                    android:textColor="@android:color/black"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    card_view:layout_constraintTop_toBottomOf="@+id/exit_icon" />
+
+                <EditText
+                    android:id="@+id/exit_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/hint_exit_desc"
+                    android:textSize="15sp"
+                    card_view:layout_constraintTop_toBottomOf="@+id/exit_title" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <Button
+            android:id="@+id/btn_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_top_large"
+            android:text="@string/title_done"
+            android:textAllCaps="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/exit_card_view" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

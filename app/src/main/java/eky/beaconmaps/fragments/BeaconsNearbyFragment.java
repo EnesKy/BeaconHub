@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.view.LayoutInflater;
@@ -38,6 +39,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
+import eky.beaconmaps.activities.LocationActivity;
 import eky.beaconmaps.activities.MainActivity;
 import eky.beaconmaps.adapter.BeaconAdapter;
 import eky.beaconmaps.model.BeaconData;
@@ -66,6 +68,7 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
     private List<BeaconData> beaconList = new ArrayList<>();
     private List<BeaconData> blockedBeaconsList;
     private List<BeaconData> mBeaconDataList = new ArrayList<>();
+    private List<BeaconData> registeredBeaconList = new ArrayList<>();
 
     public BeaconsNearbyFragment() {
         // Required empty public constructor
@@ -79,6 +82,15 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
         if (blockedBeaconsList == null) {
             blockedBeaconsList = new ArrayList<>();
+        }
+
+        if (FirebaseUtil.registeredBeaconList.size() > 0) {
+            registeredBeaconList = FirebaseUtil.registeredBeaconList;
+            preferencesUtil.saveRegisteredList(registeredBeaconList);
+        } else {
+            if (preferencesUtil.getRegisteredBeaconList() != null) {
+                registeredBeaconList = preferencesUtil.getRegisteredBeaconList();
+            }
         }
 
         beaconManager = BeaconManager.getInstanceForApplication(Objects.requireNonNull(getActivity()));
@@ -102,6 +114,8 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         recyclerView = rootView.findViewById(R.id.rv_beacons);
         layoutManager = new LinearLayoutManager(inflater.getContext());
         recyclerView.setLayoutManager(layoutManager);
+        adapter = new BeaconAdapter(beaconList, true, this);
+        recyclerView.setAdapter(adapter);
 
         searchView = rootView.findViewById(R.id.beacon_search_view);
         clFilterOptions = rootView.findViewById(R.id.cl_search_options);
@@ -183,19 +197,17 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
     @Override
     public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
 
-        placeholder.setVisibility(View.GONE);
-
-        List<BeaconData> temp = new ArrayList<>();
+        List<BeaconData> beaconDataList = new ArrayList<>();
         for (Beacon beacon : beacons)
-            temp.add(new BeaconData(beacon));
+            beaconDataList.add(new BeaconData(beacon));
 
         List<BeaconData> unblockedBeacons = new ArrayList<>();
         blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
 
         if (blockedBeaconsList == null) {
-            unblockedBeacons.addAll(temp);
+            unblockedBeacons.addAll(beaconDataList);
         } else {
-            for (BeaconData unblocked : temp)
+            for (BeaconData unblocked : beaconDataList)
                 if (!blockedBeaconsList.contains(unblocked))
                     unblockedBeacons.add(unblocked);
         }
@@ -204,16 +216,15 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
             placeholder.setVisibility(View.GONE);
 
-            //FirebaseUtil.saveUsersBeacons(unblockedBeacons);
+            //FirebaseUtil.claimBeacon(unblockedBeacons);
 
             List<Beacon> sortedList = new ArrayList<>();
 
             for (BeaconData beaconData : unblockedBeacons) {
                 sortedList.add(beaconData.getBeacon());
-                FirebaseUtil.registerBeacon(beaconData);
             }
 
-            temp = new ArrayList<>();
+            beaconDataList = new ArrayList<>();
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 //Sorting the beacons by their distance to phone.
@@ -222,15 +233,28 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
             }
 
             for(Beacon beacon : sortedList) {
-                BeaconData tempData = new BeaconData(beacon.getId1().toString(), beacon.getId2().toInt(), beacon.getId3().toInt());
-                if (FirebaseUtil.refreshRegisteredBeaconMap() != null && FirebaseUtil.refreshRegisteredBeaconMap().containsKey(tempData.getIdentity()))
-                    temp.add(FirebaseUtil.refreshRegisteredBeaconMap().get(tempData.getIdentity()));
-                else
-                    temp.add(new BeaconData(beacon));
+                BeaconData beaconTemp = new BeaconData(beacon);
+                if (FirebaseUtil.registeredBeaconMap != null && FirebaseUtil.registeredBeaconMap.containsKey(beaconTemp.getIdentity())) {
+
+                    BeaconData beaconData = FirebaseUtil.registeredBeaconMap.get(beaconTemp.getIdentity());
+
+                    assert beaconData != null;
+                    if (beaconData.getWebUrl() != null)
+                        beaconTemp.setWebUrl(beaconData.getWebUrl());
+
+                    if (beaconData.getLocation() != null)
+                        beaconTemp.setLocation(beaconData.getLocation());
+
+                    beaconDataList.add(beaconTemp);
+
+                } else {
+                    beaconDataList.add(new BeaconData(beacon));
+                }
+
             }
 
             beaconList.clear();
-            beaconList.addAll(temp);
+            beaconList.addAll(beaconDataList);
 
             if (adapter == null) {
                 adapter = new BeaconAdapter(beaconList, true, this);
@@ -310,8 +334,6 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
     public void openActionDialog(BeaconData beacon) {
 
-        //TODO: Tıklanan beacon sistemde yer alıyorsa ve url'e sahipse listeden çek ve ekle.
-
         Dialog beacon_dialog;
         TextView tvBlockBeacon, tvWebUrl, tvLocation, tvClaimBeacon;
         TextView tvUUID, tvMajor, tvMinor;
@@ -341,10 +363,10 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
             tvWebUrl.setVisibility(View.GONE);
         } else {
             tvWebUrl.setOnClickListener(v -> {
-                //String url = UrlBeaconUrlCompressor.uncompress(beacon.getId1().toByteArray());
+                String url = beacon.getWebUrl();
                 CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
                 CustomTabsIntent customTabsIntent = builder.build();
-                //customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
+                customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
 
                 beacon_dialog.dismiss();
             });
@@ -355,11 +377,14 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
             tvLocation.setVisibility(View.GONE);
         } else {
             tvLocation.setOnClickListener(v -> {
-                //TODO: Düzenle bu işlemi. Map fragmenta geçiş yapıp lokasyona git.
-                Bundle bundle = new Bundle();
-                //bundle.putParcelable(TAG, beacon);
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                startActivity(intent);
+
+                if (beacon.getLocation() != null) {
+                    //TODO: main activity deyken main e geçiş????
+                    Intent resultIntent = new Intent(getActivity(), MainActivity.class);
+                    resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    resultIntent.putExtra("KEY_LOC", beacon.getLatLng());
+                    startActivity(resultIntent);
+                }
 
                 beacon_dialog.dismiss();
             });
@@ -373,6 +398,10 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
                 blockedBeaconsList = new ArrayList<>();
             blockedBeaconsList.add(beacon);
             preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
+
+            FirebaseUtil.add2Blocklist(beacon);
+            FirebaseUtil.updateUsersBeacon(beacon, "block");
+            preferencesUtil.updateLists(beacon);
 
             Snackbar snack = Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.cl_main),
                     "Beacon added to Blocklist. \n" +
@@ -393,8 +422,8 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
             beacon_dialog.dismiss();
         });
 
-        if (preferencesUtil.getMyBeaconsList() != null) {
-            if (preferencesUtil.getMyBeaconsList().contains(beacon)) {
+        if (preferencesUtil.getRegisteredBeaconList() != null) {
+            if (preferencesUtil.getRegisteredBeaconList().contains(beacon)) {
                 tvClaimBeacon.setVisibility(View.GONE);
             }
         }
@@ -404,8 +433,6 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
     public void claimBeacon(BeaconData beacon) {
 
-        // TODO: Sistemde yer alan bir beacon ise bu seçenek görünmemeli ve sahip olduğu özellikler gösterilmeli.
-
         mBeaconDataList = preferencesUtil.getMyBeaconsList();
 
         if (mBeaconDataList == null) {
@@ -414,6 +441,23 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
         mBeaconDataList.add(beacon);
         preferencesUtil.saveMyBeaconsList(mBeaconDataList);
+
+        List<BeaconData> list = new ArrayList<>();
+
+        if (preferencesUtil.getRegisteredBeaconList() != null)
+            list = preferencesUtil.getRegisteredBeaconList();
+
+        list.add(beacon);
+
+        preferencesUtil.saveRegisteredList(list);
+
+        FirebaseUtil.registerBeacon(beacon);
+        FirebaseUtil.claimBeacon(beacon);
+
+        Intent intent = new Intent(getActivity(), LocationActivity.class);
+        preferencesUtil.saveObject("claimed", beacon);
+        startActivity(intent);
+
         //TODO: add to users beacons and registered beacons
         Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.cl_main),
                 "Beacon claim successful.", Snackbar.LENGTH_LONG)

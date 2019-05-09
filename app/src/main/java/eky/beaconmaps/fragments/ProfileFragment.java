@@ -52,6 +52,7 @@ import eky.beaconmaps.activities.NotificationActivity;
 import eky.beaconmaps.adapter.BeaconAdapter;
 import eky.beaconmaps.model.BeaconData;
 import eky.beaconmaps.model.NotificationData;
+import eky.beaconmaps.utils.FirebaseUtil;
 import eky.beaconmaps.utils.PreferencesUtil;
 
 public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClickListener {
@@ -209,10 +210,8 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
         tvAddNotification = beacon_dialog.findViewById(R.id.tv_add_notification);
         tvAddNotification.setOnClickListener(v -> {
 
-            //TODO: beacondatayı taşı bundle ya da sharedpref.
-            Bundle bundle = new Bundle();
-            //bundle.putParcelable(TAG, beacon);
             Intent intent = new Intent(getActivity(), NotificationActivity.class);
+            preferencesUtil.saveObject("clicked", beacon);
             startActivity(intent);
 
         });
@@ -220,10 +219,8 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
         tvUpdateNotification = beacon_dialog.findViewById(R.id.tv_update_notification);
         tvUpdateNotification.setOnClickListener(v -> {
 
-            //TODO: beacondatayı taşı bundle ya da sharedpref.
-            Bundle bundle = new Bundle();
-            //bundle.putParcelable(TAG, beacon);
             Intent intent = new Intent(getActivity(), NotificationActivity.class);
+            preferencesUtil.saveObject("clicked", beacon);
             startActivity(intent);
 
         });
@@ -267,11 +264,8 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
         tvAddLocation = beacon_dialog.findViewById(R.id.tv_add_location);
         tvAddLocation.setOnClickListener(v -> {
 
-            //TODO: fill the bundle
-            Bundle bundle = new Bundle();
-            //bundle.putParcelable(TAG, beacon);
             Intent intent = new Intent(getActivity(), LocationActivity.class);
-            intent.putExtra(TAG, bundle);
+            preferencesUtil.saveObject("claimed", beacon);
             startActivity(intent);
 
         });
@@ -279,23 +273,15 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
         tvSeeLocation = beacon_dialog.findViewById(R.id.tv_go_location);
         tvSeeLocation.setOnClickListener(v -> {
 
-            //TODO: fill the bundle
-            Bundle bundle = new Bundle();
-            //bundle.putParcelable(TAG, beacon);
-            Intent intent = new Intent(getActivity(), LocationActivity.class);
-            intent.putExtra(TAG, bundle);
-            startActivity(intent);
+            //TODO: BeaconMap geçişi
 
         });
 
         tvUpdateLocation = beacon_dialog.findViewById(R.id.tv_update_location);
         tvUpdateLocation.setOnClickListener(v -> {
 
-            //TODO: fill the bundle
-            Bundle bundle = new Bundle();
-            //bundle.putParcelable(TAG, beacon);
             Intent intent = new Intent(getActivity(), LocationActivity.class);
-            intent.putExtra(TAG, bundle);
+            preferencesUtil.saveObject("claimed", beacon);
             startActivity(intent);
 
         });
@@ -382,9 +368,14 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
             if (!etURL.getText().toString().isEmpty()) {
                 if (forWebService) {
                     beaconData.setWebServiceUrl(etURL.getText().toString());
+                    FirebaseUtil.updateUsersBeacon(beaconData, "webService");
+                    preferencesUtil.updateLists(beaconData);
                 } else {
                     beaconData.setWebUrl(etURL.getText().toString());
+                    FirebaseUtil.updateUsersBeacon(beaconData,"website");
+                    preferencesUtil.updateLists(beaconData);
                 }
+
             }
 
         });

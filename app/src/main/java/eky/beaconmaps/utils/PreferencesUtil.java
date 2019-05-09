@@ -15,6 +15,7 @@ import eky.beaconmaps.model.BeaconData;
 public class PreferencesUtil {
     private static final String KEY_SHARED_FILE = "APP_FILE";
     private static final String KEY_MY_BEACONS_LIST = "MY_BEACONS_LIST";
+    private static final String KEY_REGISTERED_BEACON_LIST = "REGISTERED_BEACON_LIST";
     private static final String KEY_BLOCKED_BEACONS_LIST = "BLOCKED_BEACONS_LIST";
     private final SharedPreferences sharedPreferences;
 
@@ -65,8 +66,29 @@ public class PreferencesUtil {
         return new Gson().fromJson(allUserData, listType);
     }
 
+    public void saveRegisteredList(List<BeaconData> list) {
+        sharedPreferences.edit().putString(KEY_REGISTERED_BEACON_LIST, new Gson().toJson(list)).apply();
+    }
+
+    public List<BeaconData> getRegisteredBeaconList() {
+        String allUserData = getData(KEY_REGISTERED_BEACON_LIST, null);
+        if (allUserData == null)
+            return null;
+
+        Type listType = new TypeToken<ArrayList<BeaconData>>() {
+        }.getType();
+        return new Gson().fromJson(allUserData, listType);
+    }
+
     public void saveBlockedBeaconsList(List<BeaconData> list) {
         sharedPreferences.edit().putString(KEY_BLOCKED_BEACONS_LIST, new Gson().toJson(list)).apply();
+    }
+
+    public void updateLists(BeaconData beaconData) {
+
+        saveMyBeaconsList(FirebaseUtil.usersBeacons);
+        saveRegisteredList(FirebaseUtil.registeredBeaconList);
+
     }
 
     public List<BeaconData> getBlockedBeaconsList() {

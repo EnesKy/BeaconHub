@@ -64,7 +64,7 @@
         android:layout_width="match_parent"
         android:layout_height="400dp"
         android:animateLayoutChanges="true"
-        android:background="@color/rallyLightGrey"
+        android:background="#E0000000"
         android:visibility="gone"
         android:orientation="vertical"
         map:layout_constraintBottom_toBottomOf="parent"

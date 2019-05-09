@@ -20,8 +20,8 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import eky.beaconmaps.R;
-import eky.beaconmaps.fragments.ProfileFragment;
 import eky.beaconmaps.model.BeaconData;
+import eky.beaconmaps.utils.FirebaseUtil;
 
 /**
  * Created by Enes Kamil YILMAZ on 30.04.2019.
@@ -86,20 +86,30 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
             holder.tvLastSeen.setVisibility(View.GONE);
         } else {
 
-            holder.tvUuid.setText("UUID : " + beacon.getBeacon().getId1());
-            holder.tvMajor.setText("Major : " + beacon.getBeacon().getId2());
-            holder.tvMinor.setText("Minor : " + beacon.getBeacon().getId3());
+            if (beacon.getUuid() != null || !beacon.getUuid().isEmpty()) {
+                holder.tvUuid.setText("UUID : " + beacon.getUuid());
+                holder.tvMajor.setText("Major : " + beacon.getMajor());
+                holder.tvMinor.setText("Minor : " + beacon.getMinor());
+            } else {
+                holder.tvUuid.setText("UUID : " + beacon.getBeacon().getId1());
+                holder.tvMajor.setText("Major : " + beacon.getBeacon().getId2());
+                holder.tvMinor.setText("Minor : " + beacon.getBeacon().getId3());
+            }
+
             holder.tvDistance.setText(Double.toString(beacon.getBeacon().getDistance()).substring(0,5));
             holder.tvRssi.setText("Rssi : " + beacon.getBeacon().getRssi());
             holder.tvTx.setText("Rx : " + beacon.getBeacon().getTxPower());
             holder.tvLastSeen.setText(formatter.format(new Date()));
 
-
-            //TODO: Registered beacon bilgilerini getir. Checkle kayıtlı mı değil mi???
-
-            if (ProfileFragment.myBeaconsList != null && ProfileFragment.myBeaconsList.contains(beacon))
-                holder.ivBelongstoUser.setVisibility(View.VISIBLE);
+            if (beacon.getWebUrl() != null)
+                holder.tvUrl.setText(beacon.getWebUrl());
         }
+
+        if (FirebaseUtil.registeredBeaconMap.get(beacon.getIdentity()) != null)
+            holder.ivRegistered.setVisibility(View.VISIBLE);
+
+        if (FirebaseUtil.usersBeacons.contains(beacon))
+            holder.ivBelongstoUser.setVisibility(View.VISIBLE);
 
     }
 
@@ -116,7 +126,7 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
         //View Components;
         private MaterialCardView item;
         private TextView tvUuid, tvMajor, tvMinor, tvUrl, tvLastSeen, tvDistance, tvRssi, tvTx;
-        private ImageView ivBelongstoUser, ivBlocked;
+        private ImageView ivBelongstoUser, ivBlocked, ivRegistered;
         private LinearLayout llDistance, llRssi, llTx, llUrl;
 
         public ViewHolder(View itemView) {
@@ -134,6 +144,7 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
             tvUrl = itemView.findViewById(R.id.tv_url);
             ivBelongstoUser = itemView.findViewById(R.id.iv_belongs_to_user);
             ivBlocked = itemView.findViewById(R.id.iv_blocked_icon);
+            ivRegistered = itemView.findViewById(R.id.iv_registered);
             llDistance = itemView.findViewById(R.id.ll_distance);
             llRssi = itemView.findViewById(R.id.rssi_container);
             llTx = itemView.findViewById(R.id.tx_container);

@@ -24,7 +24,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -161,12 +160,12 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
         loc.setLatitude(mDefaultLocation.latitude);
         loc.setLongitude(mDefaultLocation.longitude);
 
-        mMap.setOnMapClickListener(latLng -> {
+        /*mMap.setOnMapClickListener(latLng -> {
 
-            /*mMap.clear();
+            //mMap.clear();
 
             //Marker icon
-            //BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.beacon_maps_no_background_icon);*/
+            //BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.beacon_maps_no_background_icon);
 
             mMap.addMarker(new MarkerOptions()
                     .position(latLng)
@@ -195,11 +194,9 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
                     .show();
 
             return true;
-        });
+        });*/
 
         getLocationPermission();
-
-        //fetchLastLocation();
 
     }
 
@@ -318,27 +315,27 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
             }*/
 
             BeaconData b1 = new BeaconData("Test 1 Title",
-                    "Test 1 Descpription", "www.fsmvu.com", new LatLng(41.0446681, 28.9470421));
+                    "Test 1 Descpription", "www.fsmvu.com", new eky.beaconmaps.model.Location(41.0446681, 28.9470421));
 
             BeaconData b2 = new BeaconData("Test 2 Title",
-                    "Test 2 Descpription", "www.fsmvu.com", new LatLng(41.044943, 28.945840));
+                    "Test 2 Descpription", "www.fsmvu.com", new eky.beaconmaps.model.Location(41.044943, 28.945840));
 
             BeaconData b3 = new BeaconData("Test 3 Title",
-                    "Test 3 Descpription", "www.fsmvu.com", new LatLng(41.046869, 28.941817));
+                    "Test 3 Descpription", "www.fsmvu.com", new eky.beaconmaps.model.Location(41.046869, 28.941817));
 
             BeaconData b4 = new BeaconData("Test 4 Title",
-                    "Test 4 Descpription", "www.google.com", new LatLng(41.046100, 28.945239));
+                    "Test 4 Descpription", "www.google.com", new eky.beaconmaps.model.Location(41.046100, 28.945239));
 
-            markerDataList.add(new MarkerData(b1, currentLocation.distanceTo(latLng2Loc(b1.getLocation()))));
+            markerDataList.add(new MarkerData(b1, currentLocation.distanceTo(latLng2Loc(b1.getLatLng()))));
 
-            markerDataList.add(new MarkerData(b2, currentLocation.distanceTo(latLng2Loc(b2.getLocation()))));
+            markerDataList.add(new MarkerData(b2, currentLocation.distanceTo(latLng2Loc(b2.getLatLng()))));
 
-            markerDataList.add(new MarkerData(b3, currentLocation.distanceTo(latLng2Loc(b3.getLocation()))));
+            markerDataList.add(new MarkerData(b3, currentLocation.distanceTo(latLng2Loc(b3.getLatLng()))));
 
-            markerDataList.add(new MarkerData(b4, currentLocation.distanceTo(latLng2Loc(b4.getLocation()))));
+            markerDataList.add(new MarkerData(b4, currentLocation.distanceTo(latLng2Loc(b4.getLatLng()))));
 
             for (MarkerData markerData : markerDataList)
-                mMap.addMarker(new MarkerOptions().position(markerData.getBeaconData().getLocation()).title("Test"));
+                mMap.addMarker(new MarkerOptions().position(markerData.getBeaconData().getLatLng()).title("Test"));
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 //Sorting the beacons by their distance to phone.
@@ -359,7 +356,6 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
 
     @Override
     public void onItemClick(int position, View view) {
-        //TODO: OnClickte websiteye ?????
         llMarkerList.setVisibility(View.GONE);
         openActionDialog(markerDataList.get(position).getBeaconData());
     }
@@ -396,7 +392,7 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
             tvWebsite.setVisibility(View.GONE);
 
         tvLocation.setOnClickListener(v -> {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(beacon.getLocation(), zoom_level));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(beacon.getLatLng(), zoom_level));
             dialog.dismiss();
         });
 

@@ -26,11 +26,85 @@ public class FirebaseUtil {
     public static List<BeaconData> registeredBeaconList = new ArrayList<>();
     public static Map<String, BeaconData> registeredBeaconMap = new HashMap<>();
 
-    public static void saveUsersBeacons(List<BeaconData> beaconDataList){
+    public static void claimBeacon(BeaconData beaconData){
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference userDatabase = database.child("userBeacons").child("user - " + getUserIdToken().substring(0,20));
-        if (beaconDataList != null || beaconDataList.size() != 0)
-            userDatabase.setValue(beaconDataList);
+        DatabaseReference usersBeacons = database.child("userBeacons").child("user - " + getUserIdToken().substring(0,20));
+        DatabaseReference beacon = usersBeacons.child(beaconData.getIdentity());
+        beacon.setValue(beaconData);
+    }
+
+    public static void registerBeacon(BeaconData beacon) {
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference registeredBeacons = database.child("registeredBeacons");
+        DatabaseReference registerBeacon = registeredBeacons.child(beacon.getIdentity());
+        registerBeacon.setValue(beacon);
+    }
+
+    public static void add2Blocklist(BeaconData beaconData) {
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference userDatabase = database.child("usersBlocklist").child("user - " + getUserIdToken().substring(0,20));
+        DatabaseReference blockList = userDatabase.child(beaconData.getIdentity());
+        blockList.setValue(beaconData);
+    }
+
+    public static void updateUsersBeacon(BeaconData beaconData, String type) {
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference usersBeacons = database.child("userBeacons").child("user - " + getUserIdToken().substring(0,20));
+        DatabaseReference beacon = usersBeacons.child(beaconData.getIdentity());
+
+        HashMap updates = new HashMap();
+
+        if (type.equals("location")) {
+            updates.put("location", beaconData.getLocation());
+            updates.put("companyName", beaconData.getCompanyName());
+            updates.put("companyDesc", beaconData.getCompanyDesc());
+            updateRegisteredBeacon(beaconData, "location", updates);
+        } else if (type.equals("notification")) {
+            updates.put("notificationData", beaconData.getNotificationData());
+            updateRegisteredBeacon(beaconData, "notification", updates);
+        } else if (type.equals("website")) {
+            updates.put("webUrl", beaconData.getWebUrl());
+            updateRegisteredBeacon(beaconData, "website", updates);
+        } else if (type.equals("webService")) {
+            updates.put("webServiceUrl", beaconData.getWebServiceUrl());
+            updateRegisteredBeacon(beaconData, "webService", updates);
+        } else if (type.equals("block")) {
+            updates.put("isBlocked", beaconData.isBlocked());
+            updateRegisteredBeacon(beaconData, "block", updates);
+        }
+
+        beacon.updateChildren(updates);
+
+    }
+
+    public static void updateRegisteredBeacon(BeaconData beaconData, String type, HashMap updates) {
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference registeredBeacons = database.child("registeredBeacons");
+        DatabaseReference registerBeacon = registeredBeacons.child(beaconData.getIdentity());
+
+        if (type.equals("location")) {
+            updates.put("location", beaconData.getLocation());
+            updates.put("companyName", beaconData.getCompanyName());
+            updates.put("companyDesc", beaconData.getCompanyDesc());
+        } else if (type.equals("notification")) {
+            updates.put("notificationData", beaconData.getNotificationData());
+        } else if (type.equals("website")) {
+            updates.put("webUrl", beaconData.getWebUrl());
+        } else if (type.equals("webService")) {
+            updates.put("webServiceUrl", beaconData.getWebServiceUrl());
+        } else if (type.equals("block")) {
+            updates.put("isBlocked", beaconData.isBlocked());
+        }
+
+        registerBeacon.updateChildren(updates);
+
+    }
+
+    public static void removeBlockedBeacon(BeaconData beaconData) {
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference blockedBeacon = database.child("userBlocklist").child("user - " + getUserIdToken().substring(0,20));
+        blockedBeacon.child(beaconData.getIdentity()).removeValue(
+                (databaseError, databaseReference) -> Log.d(TAG, "Beacon removed from blocklist."));
     }
 
     public static void refreshUsersBeacons() {
@@ -40,6 +114,7 @@ public class FirebaseUtil {
         userDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                usersBeacons.clear();
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                     usersBeacons.add(postSnapshot.getValue(BeaconData.class));
                 }
@@ -56,23 +131,16 @@ public class FirebaseUtil {
 
     }
 
-    public static void registerBeacon(BeaconData beacon) {
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference registeredBeacons = database.child("registeredBeacons");
-        DatabaseReference registerBeacon = registeredBeacons.child(beacon.getIdentity());
-        registerBeacon.setValue(beacon);
-    }
-
     public static void refreshRegisteredBeaconList() {
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference registeredBeacons = database.child("registeredBeacons");
-        DatabaseReference beacon = registeredBeacons.child("beaconData");
 
-        beacon.addValueEventListener(new ValueEventListener() {
+        registeredBeacons.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 registeredBeaconList.clear();
+
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                     registeredBeaconList.add(postSnapshot.getValue(BeaconData.class));
                 }
@@ -93,11 +161,11 @@ public class FirebaseUtil {
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference registeredBeacons = database.child("registeredBeacons");
-        DatabaseReference beacon = registeredBeacons.child("beaconData");
 
-        beacon.addValueEventListener(new ValueEventListener() {
+        registeredBeacons.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                registeredBeaconMap.clear();
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                     BeaconData temp = postSnapshot.getValue(BeaconData.class);
                     if (temp != null && temp.getIdentity() != null)
@@ -120,13 +188,6 @@ public class FirebaseUtil {
         return registeredBeaconMap;
     }
 
-    public static void add2Blocklist(BeaconData beaconData) {
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference userDatabase = database.child("usersBlocklist").child("user - " + getUserIdToken().substring(0,20));
-        if (!beaconData.isBlocked())
-            userDatabase.setValue(beaconData);
-    }
-
     public static void refreshBlocklist() {
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
@@ -135,6 +196,7 @@ public class FirebaseUtil {
         userDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                blocklist.clear();
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                     blocklist.add(postSnapshot.getValue(BeaconData.class));
                 }
