@@ -53,6 +53,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
+                android:id="@+id/ll_buttons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -81,6 +82,19 @@
                     android:layout_marginStart="@dimen/space_top_large"/>
 
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_websservice_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="14dp"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="@dimen/space_medium"
+                app:layout_constraintTop_toBottomOf="@id/ll_buttons"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="gone"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

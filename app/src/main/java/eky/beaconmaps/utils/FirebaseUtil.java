@@ -21,7 +21,7 @@ public class FirebaseUtil {
     public static String userIdToken;
     private static boolean failed = false;
 
-    public static List<BeaconData> usersBeacons = new ArrayList<>();
+    public static List<BeaconData> usersBeaconList = new ArrayList<>();
     public static List<BeaconData> blocklist = new ArrayList<>();
     public static List<BeaconData> registeredBeaconList = new ArrayList<>();
     public static Map<String, BeaconData> registeredBeaconMap = new HashMap<>();
@@ -33,11 +33,25 @@ public class FirebaseUtil {
         beacon.setValue(beaconData);
     }
 
+    public static void removeClaimedBeacon(BeaconData beaconData) {
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference usersBeacons = database.child("userBeacons").child("user - " + getUserIdToken().substring(0,20));
+        usersBeacons.child(beaconData.getIdentity()).removeValue(
+                (databaseError, databaseReference) -> Log.d(TAG, "Beacon removed from blocklist."));
+    }
+
     public static void registerBeacon(BeaconData beacon) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference registeredBeacons = database.child("registeredBeacons");
         DatabaseReference registerBeacon = registeredBeacons.child(beacon.getIdentity());
         registerBeacon.setValue(beacon);
+    }
+
+    public static void removeRegisteredBeacon(BeaconData beaconData) {
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference registeredBeacons = database.child("registeredBeacons");
+        registeredBeacons.child(beaconData.getIdentity()).removeValue(
+                (databaseError, databaseReference) -> Log.d(TAG, "Beacon removed from blocklist."));
     }
 
     public static void add2Blocklist(BeaconData beaconData) {
@@ -47,7 +61,15 @@ public class FirebaseUtil {
         blockList.setValue(beaconData);
     }
 
-    public static void updateUsersBeacon(BeaconData beaconData, String type) {
+    public static void removeBlockedBeacon(BeaconData beaconData) {
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference userDatabase = database.child("usersBlocklist").child("user - " + getUserIdToken().substring(0,20));
+        DatabaseReference blockList = userDatabase.child(beaconData.getIdentity());
+        blockList.removeValue(
+                (databaseError, databaseReference) -> Log.d(TAG, "Beacon removed from blocklist."));
+    }
+
+    public static void updateBeaconData(BeaconData beaconData, String type) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference usersBeacons = database.child("userBeacons").child("user - " + getUserIdToken().substring(0,20));
         DatabaseReference beacon = usersBeacons.child(beaconData.getIdentity());
@@ -67,6 +89,10 @@ public class FirebaseUtil {
             updateRegisteredBeacon(beaconData, "website", updates);
         } else if (type.equals("webService")) {
             updates.put("webServiceUrl", beaconData.getWebServiceUrl());
+            updates.put("webUrl", beaconData.getWebUrl());
+            updates.put("companyName", beaconData.getCompanyName());
+            updates.put("companyDesc", beaconData.getCompanyDesc());
+            updates.put("notificationData", beaconData.getNotificationData());
             updateRegisteredBeacon(beaconData, "webService", updates);
         } else if (type.equals("block")) {
             updates.put("isBlocked", beaconData.isBlocked());
@@ -92,6 +118,10 @@ public class FirebaseUtil {
             updates.put("webUrl", beaconData.getWebUrl());
         } else if (type.equals("webService")) {
             updates.put("webServiceUrl", beaconData.getWebServiceUrl());
+            updates.put("webUrl", beaconData.getWebUrl());
+            updates.put("companyName", beaconData.getCompanyName());
+            updates.put("companyDesc", beaconData.getCompanyDesc());
+            updates.put("notificationData", beaconData.getNotificationData());
         } else if (type.equals("block")) {
             updates.put("isBlocked", beaconData.isBlocked());
         }
@@ -100,23 +130,20 @@ public class FirebaseUtil {
 
     }
 
-    public static void removeBlockedBeacon(BeaconData beaconData) {
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference blockedBeacon = database.child("userBlocklist").child("user - " + getUserIdToken().substring(0,20));
-        blockedBeacon.child(beaconData.getIdentity()).removeValue(
-                (databaseError, databaseReference) -> Log.d(TAG, "Beacon removed from blocklist."));
-    }
-
     public static void refreshUsersBeacons() {
+
+        claimBeacon(new BeaconData("temp"));
+        removeClaimedBeacon(new BeaconData("temp"));
+
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference userDatabase = database.child("userBeacons").child("user - " + getUserIdToken().substring(0,20));
 
         userDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                usersBeacons.clear();
+                usersBeaconList.clear();
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                    usersBeacons.add(postSnapshot.getValue(BeaconData.class));
+                    usersBeaconList.add(postSnapshot.getValue(BeaconData.class));
                 }
                 setFailed(false);
             }
@@ -132,6 +159,9 @@ public class FirebaseUtil {
     }
 
     public static void refreshRegisteredBeaconList() {
+
+        registerBeacon(new BeaconData("temp"));
+        removeRegisteredBeacon(new BeaconData("temp"));
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference registeredBeacons = database.child("registeredBeacons");
@@ -158,6 +188,9 @@ public class FirebaseUtil {
     }
 
     public static Map<String, BeaconData> refreshRegisteredBeaconMap() {
+
+        registerBeacon(new BeaconData("temp2"));
+        removeRegisteredBeacon(new BeaconData("temp2"));
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference registeredBeacons = database.child("registeredBeacons");
@@ -189,6 +222,9 @@ public class FirebaseUtil {
     }
 
     public static void refreshBlocklist() {
+
+        add2Blocklist(new BeaconData("temp"));
+        removeBlockedBeacon(new BeaconData("temp"));
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
         DatabaseReference userDatabase = database.child("usersBlocklist").child("user - " + getUserIdToken().substring(0,20));

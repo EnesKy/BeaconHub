@@ -1,6 +1,7 @@
 package eky.beaconmaps.activities;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,6 +13,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -51,7 +53,8 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
         setSupportActionBar(findViewById(R.id.toolbar));
 
         preferencesUtil = new PreferencesUtil(this);
-        blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
+        //blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
+        blockedBeaconsList = FirebaseUtil.blocklist;
         if (blockedBeaconsList == null) {
             blockedBeaconsList = new ArrayList<>();
         }
@@ -94,7 +97,17 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
 
             if (user.getPhotoUrl() != null)
                 //Glide.with(this).load(user.getPhotoUrl()).into(profilepic);
-                Picasso.get().load(user.getPhotoUrl()).into(profilepic);
+                Picasso.get().load(user.getPhotoUrl()).into(profilepic, new Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+
+                    }
+                });
             //TODO: resim yüklenene kadar önceki stock resim görünsün.
         }
 
@@ -105,7 +118,9 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
         mAuth.signOut();
         mGoogleSignInClient.signOut();
 
-        openActivity(null, LoginActivity.class);
+        Intent i = new Intent(this, LoginActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(i);
     }
 
     @Override
@@ -141,13 +156,15 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
         tvUnblock.setOnClickListener(v -> {
             beacon.setBlocked(false);
             blockedBeaconsList.remove(beacon);
-            preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
-
-            blockedBeaconsList.clear();
-            blockedBeaconsList.addAll(preferencesUtil.getBlockedBeaconsList());
-            adapter.notifyDataSetChanged();
+            //preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
 
             FirebaseUtil.removeBlockedBeacon(beacon);
+            FirebaseUtil.updateBeaconData(beacon, "block");
+            preferencesUtil.updateLists();
+
+            blockedBeaconsList.clear();
+            blockedBeaconsList.addAll(FirebaseUtil.blocklist);
+            adapter.notifyDataSetChanged();
 
             if (blockedBeaconsList.size() == 0)
                 placeholder.setVisibility(View.VISIBLE);

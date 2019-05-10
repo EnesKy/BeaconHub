@@ -20,7 +20,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -74,6 +73,10 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
 
     private ProgressDialog pd;
     private static String url;
+    private String serviceResult;
+    private BeaconData tempBeacon;
+
+    TextView serviceResults;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -84,8 +87,13 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
         super.onCreate(savedInstanceState);
 
         preferencesUtil = new PreferencesUtil(Objects.requireNonNull(getActivity()));
+
+        //myBeaconsList = FirebaseUtil.usersBeaconList;
+        //blockedBeaconsList = FirebaseUtil.blocklist;
+
         myBeaconsList = preferencesUtil.getMyBeaconsList();
         blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
+
         if (blockedBeaconsList == null) {
             blockedBeaconsList = new ArrayList<>();
         }
@@ -97,10 +105,6 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
         }
 
         user = FirebaseAuth.getInstance().getCurrentUser();
-
-        //TODO: bu işlemi dialog eventine ekle. URl giriş dialogunu kullan bunda da
-        url = "http://895b8c9f.ngrok.io/getCompanyData";
-        new JsonTask().execute(url);
     }
 
     @SuppressLint("SetTextI18n")
@@ -128,13 +132,16 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
 
+        preferencesUtil.updateLists();
+
         if (!hidden) {
 
+            //if (FirebaseUtil.usersBeaconList != null) {
             if (preferencesUtil.getMyBeaconsList() != null) {
-
                 myBeaconsList.clear();
+                //myBeaconsList.addAll(FirebaseUtil.usersBeaconList);
                 myBeaconsList.addAll(preferencesUtil.getMyBeaconsList());
-                blockedBeaconsList = preferencesUtil.getBlockedBeaconsList();
+                blockedBeaconsList = FirebaseUtil.blocklist;
 
                 if (blockedBeaconsList == null)
                     blockedBeaconsList = new ArrayList<>();
@@ -164,6 +171,7 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
     public void onResume() {
         super.onResume();
         onHiddenChanged(false);
+        preferencesUtil.updateLists();
     }
 
     private void openActionDialog(BeaconData beacon) {
@@ -204,6 +212,7 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
                 showNotification(beacon.getNotificationData().getExitTitle(),
                         beacon.getNotificationData().getExitDesc(), beacon);
             }
+            beacon_dialog.dismiss();
 
         });
 
@@ -213,6 +222,7 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
             Intent intent = new Intent(getActivity(), NotificationActivity.class);
             preferencesUtil.saveObject("clicked", beacon);
             startActivity(intent);
+            beacon_dialog.dismiss();
 
         });
 
@@ -222,6 +232,7 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
             Intent intent = new Intent(getActivity(), NotificationActivity.class);
             preferencesUtil.saveObject("clicked", beacon);
             startActivity(intent);
+            beacon_dialog.dismiss();
 
         });
 
@@ -232,6 +243,9 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
             blockedBeaconsList.add(beacon);
             preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
             onHiddenChanged(false);
+            FirebaseUtil.removeBlockedBeacon(beacon);
+            FirebaseUtil.updateBeaconData(beacon, "block");
+            preferencesUtil.updateLists();
 
             beacon_dialog.dismiss();
         });
@@ -251,6 +265,7 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
             CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
             CustomTabsIntent customTabsIntent = builder.build();
             customTabsIntent.launchUrl(getActivity(), Uri.parse(url));
+            beacon_dialog.dismiss();
 
         });
 
@@ -267,13 +282,18 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
             Intent intent = new Intent(getActivity(), LocationActivity.class);
             preferencesUtil.saveObject("claimed", beacon);
             startActivity(intent);
+            beacon_dialog.dismiss();
 
         });
 
         tvSeeLocation = beacon_dialog.findViewById(R.id.tv_go_location);
         tvSeeLocation.setOnClickListener(v -> {
 
-            //TODO: BeaconMap geçişi
+            Intent resultIntent = new Intent(getActivity(), MainActivity.class);
+            resultIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+            resultIntent.putExtra("KEY_LOC", beacon.getLatLng());
+            startActivity(resultIntent);
+            beacon_dialog.dismiss();
 
         });
 
@@ -283,6 +303,7 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
             Intent intent = new Intent(getActivity(), LocationActivity.class);
             preferencesUtil.saveObject("claimed", beacon);
             startActivity(intent);
+            beacon_dialog.dismiss();
 
         });
 
@@ -300,7 +321,7 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
 
         });
 
-        if (beacon.getNotificationData() != null) {
+        if (beacon.getNotificationData() == null) {
             tvSeeNotification.setVisibility(View.GONE);
             tvUpdateNotification.setVisibility(View.GONE);
         } else {
@@ -314,15 +335,21 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
             tvAddWebsite.setVisibility(View.GONE);
         }
 
-        if (beacon.getLocation() != null) {
+        if (beacon.getWebServiceUrl() == null) {
+            tvUpdateWebService.setVisibility(View.GONE);
+        } else {
+            tvAddWebService.setVisibility(View.GONE);
+        }
+
+        if (beacon.getLocation() == null) {
             tvAddLocation.setVisibility(View.GONE);
         } else {
             tvSeeLocation.setVisibility(View.GONE);
             tvUpdateLocation.setVisibility(View.GONE);
         }
 
-        if (preferencesUtil.getBlockedBeaconsList() != null)
-            if (preferencesUtil.getBlockedBeaconsList().contains(beacon))
+        if (FirebaseUtil.blocklist != null)
+            if (FirebaseUtil.blocklist.contains(beacon))
                 tvAddBlocklist.setVisibility(View.GONE);
 
         beacon_dialog.show();
@@ -341,6 +368,7 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
         if (forWebService) {
             if (beaconData.getWebServiceUrl() != null && !beaconData.getWebServiceUrl().isEmpty())
                 etURL.setText(beaconData.getWebServiceUrl());
+                url = beaconData.getWebServiceUrl();
         } else {
             if (beaconData.getWebUrl() != null && !beaconData.getWebUrl().isEmpty())
                 etURL.setText(beaconData.getWebUrl());
@@ -353,7 +381,13 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //TODO: check the url
+                try {
+                    url = s.toString();
+                    URL newURL = new URL(url);
+                } catch (MalformedURLException e) {
+                    etURL.setError("Malformed URL");
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -364,27 +398,29 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
         mbApply = beacon_website.findViewById(R.id.btn_apply);
         mbApply.setOnClickListener(v1 -> {
 
-            //TODO: Taşınan beacon bilgisine url i ekle.
             if (!etURL.getText().toString().isEmpty()) {
                 if (forWebService) {
-                    beaconData.setWebServiceUrl(etURL.getText().toString());
-                    FirebaseUtil.updateUsersBeacon(beaconData, "webService");
-                    preferencesUtil.updateLists(beaconData);
+                    FirebaseUtil.updateBeaconData(tempBeacon, "webService");
+                    preferencesUtil.updateLists();
                 } else {
                     beaconData.setWebUrl(etURL.getText().toString());
-                    FirebaseUtil.updateUsersBeacon(beaconData,"website");
-                    preferencesUtil.updateLists(beaconData);
+                    FirebaseUtil.updateBeaconData(beaconData,"website");
+                    preferencesUtil.updateLists();
                 }
-
             }
 
         });
+
+        serviceResults = beacon_website.findViewById(R.id.tv_websservice_results);
 
         mbTest = beacon_website.findViewById(R.id.btn_test);
         mbTest.setOnClickListener(v1 -> {
             if (forWebService) {
 
-                //todo: ???
+                tempBeacon = beaconData;
+                new JsonTask().execute(etURL.getText().toString());
+                serviceResults.setVisibility(View.VISIBLE);
+                serviceResults.setText(serviceResult);
 
             } else {
                 String url = "";
@@ -471,20 +507,30 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
                 Log.d(TAG, "onPostExecute result : " + result);
 
                 try {
+                    serviceResult = result;
+
                     JSONObject jsonObject = new JSONObject(result);
 
-                    //TODO: İlgili beaconın BeaconData modeline ekle bu bilgileri.
-
-                    //jsonObject.getString("companyName")
-                    //jsonObject.getString("title")
+                    String companyName = jsonObject.getString("markerTitle");
+                    String companyDesc = jsonObject.getString("markerDesc");
+                    String website = jsonObject.getString("website");
 
                     NotificationData notificationData = new NotificationData(jsonObject.getString("enterTitle"),
                             jsonObject.getString("enterMessage"),
                             jsonObject.getString("exitTitle"),
                             jsonObject.getString("exitMessage"));
 
-                    preferencesUtil.saveObject(KEY_NOTIFICATION_DATA, notificationData);
+                    tempBeacon.setCompanyName(companyName);
+                    tempBeacon.setCompanyDesc(companyDesc);
+                    tempBeacon.setWebUrl(website);
+                    tempBeacon.setWebServiceUrl(url);
+                    tempBeacon.setNotificationData(notificationData);
+
+                    serviceResults.setText("Success ! \n" + serviceResult);
+
                 } catch (JSONException e) {
+
+                    serviceResults.setText("Failure !");
                     e.printStackTrace();
                 }
             }
@@ -492,10 +538,9 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
     }
 
     private void showNotification(String title, String message, BeaconData beaconData) {
-        //TODO: LatLng ekle. Farklı notificationlarda latlng nasıl ayırt edeceksin???
-        // companyName i subtitle olarak ekleyebilirsin.
         Intent resultIntent = new Intent(getActivity(), MainActivity.class);
-        resultIntent.putExtra("KEY_LOC", new LatLng(41.0463356, 28.9432943));
+        if (beaconData.getLocation() != null)
+            resultIntent.putExtra("KEY_LOC", beaconData.getLatLng());
         PendingIntent resultPendingIntent = PendingIntent.getActivity(
                 getActivity(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 

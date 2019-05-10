@@ -92,7 +92,7 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
     }
 
     public void addNotification(BeaconData beaconData) {
-        //TODO: Add as BeaconData from Database. Don't use BeaconID.
+        //TODO: Add as BeaconData from Database.
         BeaconRegion region = new BeaconID(beaconData.getUuid(), beaconData.getMajor(), beaconData.getMinor()).toBeaconRegion();
         notificationDatas.put(region.getIdentifier(), beaconData.getNotificationData());
         beaconIDs.put(region.getIdentifier(), new BeaconID(beaconData.getUuid(), beaconData.getMajor(), beaconData.getMinor()));

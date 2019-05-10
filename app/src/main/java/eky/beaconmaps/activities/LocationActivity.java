@@ -88,21 +88,26 @@ public class LocationActivity extends BaseActivity implements OnMapReadyCallback
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mMap.clear();
-                title = s.toString();
 
-                LatLng temp;
-                if (beaconLoc != null)
-                    temp = beaconLoc;
-                else
-                    temp = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                if (mMap != null) {
 
-                mMap.addMarker(new MarkerOptions()
-                        .position(temp)
-                        .draggable(true)
-                        .title(title)
-                        .snippet(desc))
-                        .showInfoWindow();
+                    mMap.clear();
+                    title = s.toString();
+
+                    LatLng temp;
+                    if (beaconLoc != null)
+                        temp = beaconLoc;
+                    else
+                        temp = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
+                    mMap.addMarker(new MarkerOptions()
+                            .position(temp)
+                            .draggable(true)
+                            .title(title)
+                            .snippet(desc))
+                            .showInfoWindow();
+                }
+
             }
 
             @Override
@@ -116,21 +121,25 @@ public class LocationActivity extends BaseActivity implements OnMapReadyCallback
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mMap.clear();
-                desc = s.toString();
 
-                LatLng temp;
-                if (beaconLoc != null)
-                    temp = beaconLoc;
-                else
-                    temp = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                if (mMap != null) {
+                    mMap.clear();
+                    desc = s.toString();
 
-                mMap.addMarker(new MarkerOptions()
-                        .position(temp)
-                        .draggable(true)
-                        .title(title)
-                        .snippet(desc))
-                        .showInfoWindow();
+                    LatLng temp;
+                    if (beaconLoc != null)
+                        temp = beaconLoc;
+                    else
+                        temp = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
+                    mMap.addMarker(new MarkerOptions()
+                            .position(temp)
+                            .draggable(true)
+                            .title(title)
+                            .snippet(desc))
+                            .showInfoWindow();
+                }
+
             }
 
             @Override
@@ -142,15 +151,15 @@ public class LocationActivity extends BaseActivity implements OnMapReadyCallback
         btnApply = findViewById(R.id.btn_apply);
         btnApply.setOnClickListener(v -> {
 
-            beaconData.setLatLng(beaconLoc);
+            beaconData.setLocation(new eky.beaconmaps.model.Location(beaconLoc.latitude, beaconLoc.longitude));
             beaconData.setCompanyName(etTitle.getText().toString());
             beaconData.setCompanyDesc(etDescription.getText().toString());
 
             //TODO: add info to database.
             preferencesUtil.saveObject("claimed", beaconData);
 
-            FirebaseUtil.updateUsersBeacon(beaconData, "location");
-            preferencesUtil.updateLists(beaconData);
+            FirebaseUtil.updateBeaconData(beaconData, "location");
+            preferencesUtil.updateLists();
 
             finish();
         });

@@ -33,6 +33,7 @@
     </style>
 
     <style name="SplashScreenTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
         <item name ="android:windowBackground"> @drawable/splash_screen</item>
     </style>
 

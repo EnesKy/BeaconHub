@@ -92,8 +92,11 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
     @Override
     public void onBackPressed() {
-        //TODO:onBackPressed için iki kere geri tuşuna basılması gereken durumlar oluşmuş. Kontrol et.
-        if (!lastOpenedFragments.isEmpty()) {
+
+        if (BeaconMapFragment.isMarkerListOpen) {
+            BeaconMapFragment.llMarkerList.setVisibility(View.GONE);
+            BeaconMapFragment.isMarkerListOpen = false;
+        } else if (!lastOpenedFragments.isEmpty()) {
             changeFragments();
         } else {
             lastOpened = null;

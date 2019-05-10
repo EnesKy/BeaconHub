@@ -84,13 +84,6 @@ public class PreferencesUtil {
         sharedPreferences.edit().putString(KEY_BLOCKED_BEACONS_LIST, new Gson().toJson(list)).apply();
     }
 
-    public void updateLists(BeaconData beaconData) {
-
-        saveMyBeaconsList(FirebaseUtil.usersBeacons);
-        saveRegisteredList(FirebaseUtil.registeredBeaconList);
-
-    }
-
     public List<BeaconData> getBlockedBeaconsList() {
         String allUserData = getData(KEY_BLOCKED_BEACONS_LIST, null);
         if (allUserData == null)
@@ -99,6 +92,17 @@ public class PreferencesUtil {
         Type listType = new TypeToken<ArrayList<BeaconData>>() {
         }.getType();
         return new Gson().fromJson(allUserData, listType);
+    }
+
+    public void updateLists() {
+        if (FirebaseUtil.usersBeaconList != null && FirebaseUtil.usersBeaconList.size() > 0)
+            saveMyBeaconsList(FirebaseUtil.usersBeaconList);
+
+        if (FirebaseUtil.registeredBeaconList != null && FirebaseUtil.registeredBeaconList.size() > 0)
+            saveRegisteredList(FirebaseUtil.registeredBeaconList);
+
+        if (FirebaseUtil.blocklist != null)
+            saveBlockedBeaconsList(FirebaseUtil.blocklist);
     }
 
 }

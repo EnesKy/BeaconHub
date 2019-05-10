@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import eky.beaconmaps.R;
 import eky.beaconmaps.model.BeaconData;
 import eky.beaconmaps.model.NotificationData;
+import eky.beaconmaps.utils.FirebaseUtil;
 import eky.beaconmaps.utils.PreferencesUtil;
 
 public class NotificationActivity extends AppCompatActivity implements View.OnClickListener {
@@ -74,9 +75,7 @@ public class NotificationActivity extends AppCompatActivity implements View.OnCl
                 tvMajor.setText("Major : " + beaconData.getBeacon().getId2().toString());
                 tvMinor.setText("Minor : " + beaconData.getBeacon().getId3().toString());
             }
-
         }
-
     }
 
     @Override
@@ -93,13 +92,17 @@ public class NotificationActivity extends AppCompatActivity implements View.OnCl
                     beaconData.setNotificationData(notificationData);
                     preferencesUtil.saveObject("clicked", beaconData);
 
-                    //TODO: database e, prefencesa ekle. Sonraki çalıştırmada beaconMaps sayfasında databseden alsın çalışsın.
+                    FirebaseUtil.updateBeaconData(beaconData, "notification");
+                    preferencesUtil.updateLists();
+
+                    Snackbar.make(findViewById(R.id.cl_main),
+                            "Successful.", Snackbar.LENGTH_LONG)
+                            .show();
 
                     finish();
                 } else {
                     Snackbar.make(findViewById(R.id.cl_main),
                             "Fill the blank to add notification info.", Snackbar.LENGTH_LONG)
-                            .setActionTextColor(getResources().getColor(R.color.rallyGreen))
                             .show();
                 }
                 break;

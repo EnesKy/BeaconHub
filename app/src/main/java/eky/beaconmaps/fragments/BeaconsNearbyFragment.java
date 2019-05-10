@@ -397,11 +397,10 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
             if (blockedBeaconsList == null)
                 blockedBeaconsList = new ArrayList<>();
             blockedBeaconsList.add(beacon);
-            preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
-
+            //preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
             FirebaseUtil.add2Blocklist(beacon);
-            FirebaseUtil.updateUsersBeacon(beacon, "block");
-            preferencesUtil.updateLists(beacon);
+            FirebaseUtil.updateBeaconData(beacon, "block");
+            preferencesUtil.updateLists();
 
             Snackbar snack = Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.cl_main),
                     "Beacon added to Blocklist. \n" +
@@ -422,8 +421,8 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
             beacon_dialog.dismiss();
         });
 
-        if (preferencesUtil.getRegisteredBeaconList() != null) {
-            if (preferencesUtil.getRegisteredBeaconList().contains(beacon)) {
+        if (FirebaseUtil.registeredBeaconList != null) {
+            if (FirebaseUtil.registeredBeaconList.contains(beacon)) {
                 tvClaimBeacon.setVisibility(View.GONE);
             }
         }
@@ -433,26 +432,18 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
     public void claimBeacon(BeaconData beacon) {
 
-        mBeaconDataList = preferencesUtil.getMyBeaconsList();
+        //mBeaconDataList = preferencesUtil.getMyBeaconsList();
+        mBeaconDataList = FirebaseUtil.usersBeaconList;
 
         if (mBeaconDataList == null) {
             mBeaconDataList = new ArrayList<>();
         }
 
         mBeaconDataList.add(beacon);
-        preferencesUtil.saveMyBeaconsList(mBeaconDataList);
-
-        List<BeaconData> list = new ArrayList<>();
-
-        if (preferencesUtil.getRegisteredBeaconList() != null)
-            list = preferencesUtil.getRegisteredBeaconList();
-
-        list.add(beacon);
-
-        preferencesUtil.saveRegisteredList(list);
-
-        FirebaseUtil.registerBeacon(beacon);
+        //preferencesUtil.saveMyBeaconsList(mBeaconDataList);
         FirebaseUtil.claimBeacon(beacon);
+        FirebaseUtil.registerBeacon(beacon);
+        preferencesUtil.updateLists();
 
         Intent intent = new Intent(getActivity(), LocationActivity.class);
         preferencesUtil.saveObject("claimed", beacon);

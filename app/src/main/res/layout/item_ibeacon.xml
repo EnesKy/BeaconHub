@@ -51,8 +51,6 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/iv_registered"/>
 
-            <!--TODO: registered ın eventini oluştur-->
-
             <ImageView
                 android:id="@+id/iv_registered"
                 android:src="@drawable/ic_cloud_done_black_24dp"

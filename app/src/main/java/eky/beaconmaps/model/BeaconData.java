@@ -20,9 +20,15 @@ public class BeaconData {
     private String webUrl;
     private String webServiceUrl;
     private Location location;
-    private boolean isBlocked = false;
+    private boolean isBlocked;
+    private String update = "";
 
     public BeaconData() {}
+
+    //Use this for database update
+    public BeaconData(String update) {
+        this.update = update;
+    }
 
     public BeaconData(Beacon beacon) {
         this.beacon = beacon;
@@ -129,15 +135,14 @@ public class BeaconData {
     }
 
     public LatLng getLatLng() {
-        return new LatLng(location.lat, location.lng);
+        if (location != null)
+            return new LatLng(location.lat, location.lng);
+        else
+            return null;
     }
 
     public void setLocation(Location location) {
         this.location = location;
-    }
-
-    public void setLatLng(LatLng location) {
-        this.location = new Location(location.latitude, location.longitude);
     }
 
     public String getUuid() {
@@ -170,7 +175,7 @@ public class BeaconData {
         else if (beacon != null && beacon.getIdentifiers().size() != 0)
             return beacon.getId1().toString() + " - " + beacon.getId2().toInt() + " - " + beacon.getId3().toInt();
         else
-            return null;
+            return update;
     }
 
     @Override

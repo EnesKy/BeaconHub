@@ -108,7 +108,7 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
         if (FirebaseUtil.registeredBeaconMap.get(beacon.getIdentity()) != null)
             holder.ivRegistered.setVisibility(View.VISIBLE);
 
-        if (FirebaseUtil.usersBeacons.contains(beacon))
+        if (FirebaseUtil.usersBeaconList.contains(beacon))
             holder.ivBelongstoUser.setVisibility(View.VISIBLE);
 
     }

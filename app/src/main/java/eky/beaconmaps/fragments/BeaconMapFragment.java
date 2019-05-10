@@ -44,6 +44,8 @@ import eky.beaconmaps.R;
 import eky.beaconmaps.adapter.MarkerItemAdapter;
 import eky.beaconmaps.model.BeaconData;
 import eky.beaconmaps.model.MarkerData;
+import eky.beaconmaps.utils.FirebaseUtil;
+import eky.beaconmaps.utils.PreferencesUtil;
 
 public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, MarkerItemAdapter.ItemClickListener, SearchView.OnQueryTextListener {
 
@@ -60,11 +62,13 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
 
     private SearchView searchView;
     private RecyclerView recyclerView;
-    private LinearLayout llMarkerList;
+    public static LinearLayout llMarkerList;
     private MarkerItemAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private ImageButton ibMarkerList;
     private List<MarkerData> markerDataList = new ArrayList<>();
+    private PreferencesUtil mPreferencesUtil;
+    public static boolean isMarkerListOpen = false;
 
     public BeaconMapFragment() {
         // Required empty public constructor
@@ -94,15 +98,22 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
         layoutManager = new LinearLayoutManager(inflater.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
+        mPreferencesUtil = new PreferencesUtil(Objects.requireNonNull(getActivity()));
+        mPreferencesUtil.updateLists();
+
         ibMarkerList = view.findViewById(R.id.ib_open_marker_list);
         ibMarkerList.setOnClickListener(v -> {
 
             refreshMarkerList();
 
-            if (llMarkerList.getVisibility() == View.GONE)
+            if (llMarkerList.getVisibility() == View.GONE) {
                 llMarkerList.setVisibility(View.VISIBLE);
-            else
+                isMarkerListOpen = true;
+            } else {
                 llMarkerList.setVisibility(View.GONE);
+                isMarkerListOpen = false;
+            }
+
         });
 
         searchView = view.findViewById(R.id.sv_marker);
@@ -300,7 +311,6 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
 
     public void refreshMarkerList() {
         if (currentLocation != null) {
-            //TODO: get registered beacondata list from database and refresh list
             markerDataList.clear();
 
             /*for(BeaconData beaconData : LIST) {
@@ -313,6 +323,10 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
                 }
 
             }*/
+
+            for (BeaconData beaconData : FirebaseUtil.registeredBeaconList)
+                if (beaconData.getNotificationData() !=null && beaconData.getLocation() != null)
+                    markerDataList.add(new MarkerData(beaconData, currentLocation.distanceTo(latLng2Loc(beaconData.getLatLng()))));
 
             BeaconData b1 = new BeaconData("Test 1 Title",
                     "Test 1 Descpription", "www.fsmvu.com", new eky.beaconmaps.model.Location(41.0446681, 28.9470421));

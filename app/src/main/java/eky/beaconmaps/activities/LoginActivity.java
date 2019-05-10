@@ -31,7 +31,6 @@ import org.altbeacon.beacon.BeaconManager;
 
 import eky.beaconmaps.BeaconMaps;
 import eky.beaconmaps.R;
-import eky.beaconmaps.model.BeaconData;
 import eky.beaconmaps.utils.FirebaseUtil;
 import eky.beaconmaps.utils.PreferencesUtil;
 
@@ -166,15 +165,10 @@ public class LoginActivity extends BaseActivity {
                 FirebaseUtil.setUserIdToken(idToken);
                 Log.d(TAG, "GetTokenResult result = " + idToken);
 
-                //Fulfilling the data from database
-                if (mPreferencesUtil.getBlockedBeaconsList() != null)
-                    for (BeaconData beaconData : mPreferencesUtil.getMyBeaconsList())
-                        FirebaseUtil.claimBeacon(beaconData);
-
-                FirebaseUtil.refreshBlocklist();
-                FirebaseUtil.refreshRegisteredBeaconMap();
                 FirebaseUtil.refreshUsersBeacons();
                 FirebaseUtil.refreshRegisteredBeaconList();
+                FirebaseUtil.refreshRegisteredBeaconMap();
+                FirebaseUtil.refreshBlocklist();
             });
         } else {
             //continue
