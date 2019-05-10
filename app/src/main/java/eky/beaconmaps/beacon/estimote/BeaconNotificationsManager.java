@@ -12,7 +12,6 @@ import android.util.Log;
 import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
 import com.estimote.coresdk.recognition.packets.Beacon;
 import com.estimote.coresdk.service.BeaconManager;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,8 +35,7 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
     private String CHANNEL_ID = "beaconMapsID";
 
     private List<BeaconRegion> regionsToMonitor = new ArrayList<>();
-    private HashMap<String, NotificationData> notificationDatas = new HashMap<>();
-    private HashMap<String, BeaconID> beaconIDs = new HashMap<>();
+    private HashMap<String, BeaconData> beaconDataMap = new HashMap<>();
 
     private int notificationID = 0;
 
@@ -53,22 +51,26 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
     @Override
     public void onEnteredRegion(BeaconRegion region, List<Beacon> list) {
         Log.d(TAG, "onEnteredRegion: " + region.getIdentifier());
-        NotificationData notificationData = notificationDatas.get(region.getIdentifier());
-        BeaconID beaconID = beaconIDs.get(region.getIdentifier());
+        BeaconData beaconData = beaconDataMap.get(region.getIdentifier());
+        assert beaconData != null;
+        NotificationData notificationData = beaconData.getNotificationData();
+        BeaconID beaconID = new BeaconID(beaconData.getUuid(), beaconData.getMajor(), beaconData.getMinor());
 
         if (notificationData != null && beaconID.toBeaconRegion().equals(region)) {
-            showNotification(notificationData.getEnterTitle(), notificationData.getEnterDesc(), beaconID);
+            showNotification(notificationData.getEnterTitle(), notificationData.getEnterDesc(), beaconData);
         }
     }
 
     @Override
     public void onExitedRegion(BeaconRegion region) {
         Log.d(TAG, "onExitedRegion: " + region.getIdentifier());
-        NotificationData notificationData = notificationDatas.get(region.getIdentifier());
-        BeaconID beaconID = beaconIDs.get(region.getIdentifier());
+        BeaconData beaconData = beaconDataMap.get(region.getIdentifier());
+        assert beaconData != null;
+        NotificationData notificationData = beaconData.getNotificationData();
+        BeaconID beaconID = new BeaconID(beaconData.getUuid(), beaconData.getMajor(), beaconData.getMinor());
 
         if (notificationData != null && beaconID.toBeaconRegion().equals(region)) {
-            showNotification(notificationData.getExitTitle(), notificationData.getExitDesc(), beaconID);
+            showNotification(notificationData.getExitTitle(), notificationData.getExitDesc(), beaconData);
         }
     }
 
@@ -92,20 +94,21 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
     }
 
     public void addNotification(BeaconData beaconData) {
-        //TODO: Add as BeaconData from Database.
         BeaconRegion region = new BeaconID(beaconData.getUuid(), beaconData.getMajor(), beaconData.getMinor()).toBeaconRegion();
-        notificationDatas.put(region.getIdentifier(), beaconData.getNotificationData());
-        beaconIDs.put(region.getIdentifier(), new BeaconID(beaconData.getUuid(), beaconData.getMajor(), beaconData.getMinor()));
+        beaconDataMap.put(region.getIdentifier(), beaconData);
         regionsToMonitor.add(region);
     }
 
-    private void showNotification(String title, String message, BeaconID beaconID) {
-        //TODO: LatLng ekle. Farklı notificationlarda latlng nasıl ayırt edeceksin???
-        // companyName i subtitle olarak ekleyebilirsin.
+    private void showNotification(String title, String message, BeaconData beaconData) {
+
         Intent resultIntent = new Intent(context, MainActivity.class);
         //resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        resultIntent.putExtra("KEY_LOC", new LatLng(41.0463356, 28.9432943));
+        resultIntent.putExtra("NOTIFICATION_CLICK", beaconData.getIdentity());
+
+        String companyName = "Company Name";
+        if (beaconData.getCompanyName() != null)
+            companyName = beaconData.getCompanyName();
 
         PendingIntent resultPendingIntent = PendingIntent.getActivity(
                 context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -119,7 +122,7 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
                     //.setContentText(message)
                     .setStyle(new Notification.BigTextStyle().bigText(message))
                     .setContentIntent(resultPendingIntent)
-                    .setSubText("Company Name")
+                    .setSubText(companyName)
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setAutoCancel(true)
                     .build();
@@ -129,7 +132,7 @@ public class BeaconNotificationsManager implements BeaconManager.BeaconMonitorin
                     .setContentTitle(title)
                     //.setContentText(message)
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
-                    .setSubText("Company Name")
+                    .setSubText(companyName)
                     .setDefaults(NotificationCompat.DEFAULT_ALL)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

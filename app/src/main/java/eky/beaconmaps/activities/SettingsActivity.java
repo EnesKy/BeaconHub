@@ -100,7 +100,7 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
                 Picasso.get().load(user.getPhotoUrl()).into(profilepic, new Callback() {
                     @Override
                     public void onSuccess() {
-
+                        //TODO: resim yüklenene kadar önceki stock resim görünsün.
                     }
 
                     @Override
@@ -108,7 +108,6 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
 
                     }
                 });
-            //TODO: resim yüklenene kadar önceki stock resim görünsün.
         }
 
     }
@@ -128,7 +127,7 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
         openActionDialog(blockedBeaconsList.get(position));
     }
 
-    public void openActionDialog(BeaconData beacon) { // TODO: Kullanıcının ise farklı text göster.
+    public void openActionDialog(BeaconData beacon) {
         Dialog beacon_dialog;
         TextView tvUUID, tvMajor, tvMinor;
         TextView tvUnblock;

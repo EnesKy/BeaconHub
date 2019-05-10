@@ -155,7 +155,6 @@ public class LocationActivity extends BaseActivity implements OnMapReadyCallback
             beaconData.setCompanyName(etTitle.getText().toString());
             beaconData.setCompanyDesc(etDescription.getText().toString());
 
-            //TODO: add info to database.
             preferencesUtil.saveObject("claimed", beaconData);
 
             FirebaseUtil.updateBeaconData(beaconData, "location");

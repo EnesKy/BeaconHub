@@ -164,9 +164,6 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
         else
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, zoom_level));
 
-        //TODO: Delete this
-        mMap.addMarker(new MarkerOptions().position(mDefaultLocation).title("Marker in Fsmvü"));
-
         Location loc = new Location("Fsm");
         loc.setLatitude(mDefaultLocation.latitude);
         loc.setLongitude(mDefaultLocation.longitude);

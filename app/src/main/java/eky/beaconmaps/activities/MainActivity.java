@@ -27,6 +27,8 @@ import eky.beaconmaps.R;
 import eky.beaconmaps.fragments.BeaconMapFragment;
 import eky.beaconmaps.fragments.BeaconsNearbyFragment;
 import eky.beaconmaps.fragments.ProfileFragment;
+import eky.beaconmaps.model.BeaconData;
+import eky.beaconmaps.utils.PreferencesUtil;
 
 public class MainActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -46,14 +48,18 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     public static BottomNavigationView navigation;
     private boolean backPressed = false;
     private Bundle bundle = new Bundle();
+    private PreferencesUtil preferencesUtil;
 
     private LatLng locFromNotification;
+    private String notificationIdentity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getIntent();
         setContentView(R.layout.activity_main);
+
+        preferencesUtil = new PreferencesUtil(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbarTitle = toolbar.findViewById(R.id.tv_toolbar_title);
@@ -114,12 +120,29 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         isNetworkAvailable();
 
         if (intent.getExtras() != null) {
-            locFromNotification = (LatLng) intent.getExtras().get("KEY_LOC");
-            bundle.putParcelable("KEY_LOC", locFromNotification);
+            if (intent.getExtras().get("NOTIFICATION_CLICK") != null) {
+                String identity = (String) intent.getExtras().get("NOTIFICATION_CLICK");
+                if (preferencesUtil.getRegisteredBeaconList() != null) {
+                    for (BeaconData beaconData : preferencesUtil.getRegisteredBeaconList()) {
+                        if (beaconData.getIdentity().equals(identity)) {
+                            if (beaconData.getLocation() != null) {
+                                locFromNotification = beaconData.getLatLng();
+                                bundle.putParcelable("KEY_LOC", locFromNotification);
+                            }
+                        }
+                    }
+                }
+            } else if (intent.getExtras().get("KEY_LOC") != null) {
+
+                locFromNotification = (LatLng) intent.getExtras().get("KEY_LOC");
+                bundle.putParcelable("KEY_LOC", locFromNotification);
+
+            }
         }
 
         if (locFromNotification != null){
-            fragment1.setArguments(bundle); // Todo crashes -> java.lang.IllegalStateException: Fragment already added and state has been saved
+            fragment1.setArguments(bundle);
+            // Todo crashes -> java.lang.IllegalStateException: Fragment already added and state has been saved
 
             // Eğer uygulama açıksa ve görünür fragment beaconMap değilse.
             if (active != fragment1)

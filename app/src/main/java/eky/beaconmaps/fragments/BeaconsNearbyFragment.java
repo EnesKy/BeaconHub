@@ -307,7 +307,7 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
 
         /**
-         * TODO: Eddystone URL parsing işlemi yapılamadığı için şimdilik rafa kaldırıldı.
+         * Eddystone URL parsing işlemi yapılamadığı için şimdilik rafa kaldırıldı.
          * beaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(BeaconParser.EDDYSTONE_URL_LAYOUT));
          **/
     }
@@ -379,11 +379,11 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
             tvLocation.setOnClickListener(v -> {
 
                 if (beacon.getLocation() != null) {
-                    //TODO: main activity deyken main e geçiş????
                     Intent resultIntent = new Intent(getActivity(), MainActivity.class);
-                    resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    resultIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
                     resultIntent.putExtra("KEY_LOC", beacon.getLatLng());
                     startActivity(resultIntent);
+                    beacon_dialog.dismiss();
                 }
 
                 beacon_dialog.dismiss();
@@ -452,7 +452,6 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
         preferencesUtil.saveObject("claimed", beacon);
         startActivity(intent);
 
-        //TODO: add to users beacons and registered beacons
         Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.cl_main),
                 "Beacon claim successful.", Snackbar.LENGTH_LONG)
                 .setAction("Ok", view -> { })

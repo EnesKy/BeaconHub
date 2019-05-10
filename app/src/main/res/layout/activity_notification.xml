@@ -168,6 +168,7 @@
                     android:textColor="@android:color/black"
                     android:textSize="15sp"
                     android:textStyle="bold"
+                    android:maxLines="1"
                     card_view:layout_constraintTop_toBottomOf="@+id/hello_icon" />
 
                 <EditText
@@ -255,6 +256,7 @@
                     android:background="@android:color/transparent"
                     android:hint="@string/hint_exit_title"
                     android:textColor="@android:color/black"
+                    android:maxLines="1"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     card_view:layout_constraintTop_toBottomOf="@+id/exit_icon" />
