@@ -62,7 +62,7 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
         isNetworkAvailable();
 
         placeholder = findViewById(R.id.tv_placeholder);
-        if (blockedBeaconsList.size() == 0)
+        if (blockedBeaconsList.size() == 0 && FirebaseUtil.blocklist.size() == 0)
             placeholder.setVisibility(View.VISIBLE);
 
         // Configure Google Sign In
@@ -155,18 +155,19 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
         tvUnblock = beacon_dialog.findViewById(R.id.tv_unblock);
         tvUnblock.setOnClickListener(v -> {
             beacon.setBlocked(false);
-            blockedBeaconsList.remove(beacon);
-            //preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
 
+            if (preferencesUtil.getMyBeaconsList() != null && preferencesUtil.getMyBeaconsList().contains(beacon))
+                FirebaseUtil.updateBeaconData(beacon, "block");
+
+            blockedBeaconsList.remove(beacon);
             FirebaseUtil.removeBlockedBeacon(beacon);
-            FirebaseUtil.updateBeaconData(beacon, "block");
+
             preferencesUtil.updateLists();
 
-            blockedBeaconsList.clear();
-            blockedBeaconsList.addAll(FirebaseUtil.blocklist);
-            adapter.notifyDataSetChanged();
+            adapter = new BeaconAdapter(FirebaseUtil.blocklist, false, this);
+            recyclerView.setAdapter(adapter);
 
-            if (blockedBeaconsList.size() == 0)
+            if (blockedBeaconsList.size() == 0 && FirebaseUtil.blocklist.size() == 0)
                 placeholder.setVisibility(View.VISIBLE);
 
             beacon_dialog.dismiss();

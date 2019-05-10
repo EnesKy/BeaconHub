@@ -141,16 +141,10 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
                 myBeaconsList.clear();
                 //myBeaconsList.addAll(FirebaseUtil.usersBeaconList);
                 myBeaconsList.addAll(preferencesUtil.getMyBeaconsList());
-                blockedBeaconsList = FirebaseUtil.blocklist;
 
-                if (blockedBeaconsList == null)
-                    blockedBeaconsList = new ArrayList<>();
-
-                if (blockedBeaconsList.size() > 0 && myBeaconsList.size() > 0) {
-                    for (BeaconData beaconData : myBeaconsList)
-                        if (blockedBeaconsList.contains(beaconData))
-                            beaconData.setBlocked(true);
-                }
+                for (BeaconData beaconData : myBeaconsList)
+                    if (beaconData.getUuid() == null)
+                        myBeaconsList.remove(beaconData);
 
                 if (adapter == null) {
                     adapter = new BeaconAdapter(myBeaconsList, false, this);
@@ -171,7 +165,6 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
     public void onResume() {
         super.onResume();
         onHiddenChanged(false);
-        preferencesUtil.updateLists();
     }
 
     private void openActionDialog(BeaconData beacon) {
@@ -408,6 +401,8 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
                     preferencesUtil.updateLists();
                 }
             }
+
+            onHiddenChanged(false);
 
         });
 

@@ -399,7 +399,10 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
             blockedBeaconsList.add(beacon);
             //preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
             FirebaseUtil.add2Blocklist(beacon);
-            FirebaseUtil.updateBeaconData(beacon, "block");
+
+            if (preferencesUtil.getMyBeaconsList() != null && preferencesUtil.getMyBeaconsList().contains(beacon))
+                FirebaseUtil.updateBeaconData(beacon, "block");
+
             preferencesUtil.updateLists();
 
             Snackbar snack = Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.cl_main),
