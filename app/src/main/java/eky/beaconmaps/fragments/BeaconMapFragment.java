@@ -3,10 +3,13 @@ package eky.beaconmaps.fragments;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +25,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
@@ -168,41 +172,67 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
         loc.setLatitude(mDefaultLocation.latitude);
         loc.setLongitude(mDefaultLocation.longitude);
 
-        /*mMap.setOnMapClickListener(latLng -> {
 
-            //mMap.clear();
+        mMap.setOnInfoWindowClickListener(Marker::hideInfoWindow);
+        /*Snackbar snackbar = Snackbar.make(getActivity().findViewById(R.id.cl_main),
+                marker.getTitle() + "\n" + marker.getSnippet(),
+                Snackbar.LENGTH_LONG)
+                .setAction("Ok", view -> { })
+                .setActionTextColor(getResources().getColor(R.color.rallyGreen));
 
-            //Marker icon
-            //BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.beacon_maps_no_background_icon);
+        View sbView = snackbar.getView();
+        TextView textView = sbView.findViewById(com.google.android.material.R.id.snackbar_text);
 
-            mMap.addMarker(new MarkerOptions()
-                    .position(latLng)
-                    //.icon(icon)
-                    .title("Beacon")
-                    .snippet("Description"))
-                    .showInfoWindow();
+        // For multi-line text, limit max line count.
+        textView.setMaxLines(3);
 
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-
-            loc.setLatitude(latLng.latitude);
-            loc.setLongitude(latLng.longitude);
-        });
+        snackbar.show();
 
         mMap.setOnMyLocationButtonClickListener(() -> {
             if (currentLocation != null)
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom
                         (new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), zoom_level));
 
-            Snackbar.make(Objects.requireNonNull(getActivity()).findViewById(R.id.cl_main),
-                    "Distance between Current Location and last added marker : " + currentLocation.distanceTo(loc) + " m", Snackbar.LENGTH_LONG)
-                    .setAction("Ok", view -> {
-                    })
-                    .setActionTextColor(getResources().getColor(R.color.rallyGreen))
-                    .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE)
-                    .show();
-
             return true;
         });*/
+
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+            @Override
+            public View getInfoWindow(Marker arg0) {
+                return null;
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+
+                LinearLayout info = new LinearLayout(getActivity());
+                info.setOrientation(LinearLayout.VERTICAL);
+
+                TextView title = new TextView(getActivity());
+                title.setTextColor(Color.BLACK);
+                title.setGravity(Gravity.CENTER);
+                title.setTypeface(null, Typeface.BOLD);
+                title.setMaxLines(2);
+                title.setMaxWidth(350);
+
+                String titleStr = marker.getTitle();
+
+                title.setText(titleStr);
+
+                TextView snippet = new TextView(getActivity());
+                snippet.setTextColor(Color.GRAY);
+                String snippetStr = marker.getSnippet();
+                snippet.setText(snippetStr);
+                snippet.setMaxLines(3);
+                snippet.setMaxWidth(350);
+
+                info.addView(title);
+                info.addView(snippet);
+
+                return info;
+            }
+        });
 
         getLocationPermission();
 
@@ -217,11 +247,12 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
         task.addOnSuccessListener(location -> {
             if (location != null) {
                 currentLocation = location;
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(currentLocation.getLatitude(),
+                if (mMap != null)
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(),
                                 currentLocation.getLongitude()), 18));
             } else {
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, 18));
+                if (mMap != null)
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mDefaultLocation, 18));
             }
             updateLocationUI();
         });
@@ -310,32 +341,21 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
         if (currentLocation != null) {
             markerDataList.clear();
 
-            /*for(BeaconData beaconData : LIST) {
-                Location loc = new Location("Temp");
-
-                if(beaconData.getLocation() != null) {
-                    loc.setLatitude(beaconData.getLocation().latitude);
-                    loc.setLongitude(beaconData.getLocation().longitude);
-                    markerDataList.add(new MarkerData(beaconData, currentLocation.distanceTo(loc)));
-                }
-
-            }*/
-
             for (BeaconData beaconData : FirebaseUtil.registeredBeaconList)
                 if (beaconData.getNotificationData() !=null && beaconData.getLocation() != null)
                     markerDataList.add(new MarkerData(beaconData, currentLocation.distanceTo(latLng2Loc(beaconData.getLatLng()))));
 
-            BeaconData b1 = new BeaconData("Test 1 Title",
-                    "Test 1 Descpription", "www.fsmvu.com", new eky.beaconmaps.model.Location(41.0446681, 28.9470421));
+            BeaconData b1 = new BeaconData("Arçelik Yetkili Servis",
+                    "7/24 Çağrı Merkezi : 444 0 888", "www.fsmvu.com", new eky.beaconmaps.model.Location(41.0446681, 28.9470421));
 
-            BeaconData b2 = new BeaconData("Test 2 Title",
-                    "Test 2 Descpription", "www.fsmvu.com", new eky.beaconmaps.model.Location(41.044943, 28.945840));
+            BeaconData b2 = new BeaconData("Sütlüce Market",
+                    "Toptan fiyatına, Perakende Satış", "www.sutluce.com", new eky.beaconmaps.model.Location(41.044943, 28.945840));
 
-            BeaconData b3 = new BeaconData("Test 3 Title",
-                    "Test 3 Descpription", "www.fsmvu.com", new eky.beaconmaps.model.Location(41.046869, 28.941817));
+            BeaconData b3 = new BeaconData("Teknosa",
+                    "Herkes için teknoloji", "www.teknosa.com", new eky.beaconmaps.model.Location(41.046869, 28.941817));
 
-            BeaconData b4 = new BeaconData("Test 4 Title",
-                    "Test 4 Descpription", "www.google.com", new eky.beaconmaps.model.Location(41.046100, 28.945239));
+            BeaconData b4 = new BeaconData("LC Waikiki",
+                    "İyi giyinmek herkesin hakkıdır", "www.lcwaikiki.com", new eky.beaconmaps.model.Location(41.046100, 28.945239));
 
             markerDataList.add(new MarkerData(b1, currentLocation.distanceTo(latLng2Loc(b1.getLatLng()))));
 
@@ -345,8 +365,14 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
 
             markerDataList.add(new MarkerData(b4, currentLocation.distanceTo(latLng2Loc(b4.getLatLng()))));
 
-            for (MarkerData markerData : markerDataList)
-                mMap.addMarker(new MarkerOptions().position(markerData.getBeaconData().getLatLng()).title("Test"));
+            for (MarkerData markerData : markerDataList) {
+                mMap.addMarker(new MarkerOptions()
+                        .position(markerData.getBeaconData().getLatLng())
+                        .title(markerData.getBeaconData().getCompanyName())
+                        .snippet(markerData.getBeaconData().getCompanyDesc()))
+                        .showInfoWindow();
+            }
+
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 //Sorting the beacons by their distance to phone.

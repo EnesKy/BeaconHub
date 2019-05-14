@@ -57,12 +57,6 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
 
         BeaconData beacon = beaconList.get(position);
 
-        if (beacon.getWebUrl() != null) {
-            holder.tvUrl.setText("Website : " + beacon.getWebUrl());
-        } else {
-            holder.llUrl.setVisibility(View.GONE);
-        }
-
         if (!isNearby) {
 
             if (beacon.getUuid() != null && !beacon.getUuid().isEmpty()) {
@@ -101,8 +95,18 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
             holder.tvTx.setText("Rx : " + beacon.getBeacon().getTxPower());
             holder.tvLastSeen.setText(formatter.format(new Date()));
 
-            if (beacon.getWebUrl() != null)
-                holder.tvUrl.setText(beacon.getWebUrl());
+
+            if (beacon.getCompanyName() != null)
+                holder.tvCompanyName.setText("Company Name : " + beacon.getCompanyName());
+            else
+                holder.llCompanyName.setVisibility(View.GONE);
+
+            if (beacon.getWebUrl() != null) {
+                holder.tvUrl.setText("Website : " + beacon.getWebUrl());
+            } else {
+                holder.llUrl.setVisibility(View.GONE);
+            }
+
         }
 
         if (FirebaseUtil.registeredBeaconMap.get(beacon.getIdentity()) != null)
@@ -125,9 +129,9 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
 
         //View Components;
         private MaterialCardView item;
-        private TextView tvUuid, tvMajor, tvMinor, tvUrl, tvLastSeen, tvDistance, tvRssi, tvTx;
+        private TextView tvUuid, tvMajor, tvMinor, tvUrl, tvLastSeen, tvDistance, tvRssi, tvTx, tvCompanyName;
         private ImageView ivBelongstoUser, ivBlocked, ivRegistered;
-        private LinearLayout llDistance, llRssi, llTx, llUrl;
+        private LinearLayout llDistance, llRssi, llTx, llUrl, llCompanyName;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -142,6 +146,7 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
             tvRssi = itemView.findViewById(R.id.rssi);
             tvTx = itemView.findViewById(R.id.tx);
             tvUrl = itemView.findViewById(R.id.tv_url);
+            tvCompanyName = itemView.findViewById(R.id.tv_company_name);
             ivBelongstoUser = itemView.findViewById(R.id.iv_belongs_to_user);
             ivBlocked = itemView.findViewById(R.id.iv_blocked_icon);
             ivRegistered = itemView.findViewById(R.id.iv_registered);
@@ -149,6 +154,7 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
             llRssi = itemView.findViewById(R.id.rssi_container);
             llTx = itemView.findViewById(R.id.tx_container);
             llUrl = itemView.findViewById(R.id.url_container);
+            llCompanyName = itemView.findViewById(R.id.ll_company_name);
 
             item.setOnClickListener(v -> itemClickListener.onItemClick((getAdapterPosition()), itemView));
         }

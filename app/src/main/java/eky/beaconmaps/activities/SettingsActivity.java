@@ -11,6 +11,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Callback;
@@ -75,7 +76,13 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
         user = mAuth.getCurrentUser();
 
         btnSignOut = findViewById(R.id.btn_sign_out);
-        btnSignOut.setOnClickListener(v -> signOut());
+        btnSignOut.setOnClickListener(v -> {
+            Snackbar.make(this.findViewById(R.id.cl_main),
+                    "Are you sure?", Snackbar.LENGTH_LONG)
+                    .setAction("Ok", view -> { signOut(); })
+                    .setActionTextColor(getResources().getColor(R.color.rallyGreen))
+                    .show();
+        });
 
         recyclerView = findViewById(R.id.rv_blocked_beacons);
         layoutManager = new LinearLayoutManager(this);
@@ -116,6 +123,8 @@ public class SettingsActivity extends BaseActivity implements BeaconAdapter.Item
         // Firebase sign out
         mAuth.signOut();
         mGoogleSignInClient.signOut();
+
+        preferencesUtil.clearAllData();
 
         Intent i = new Intent(this, LoginActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

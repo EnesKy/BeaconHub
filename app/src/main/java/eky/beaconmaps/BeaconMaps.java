@@ -48,13 +48,13 @@ public class BeaconMaps extends Application {
 
         BeaconNotificationsManager beaconNotificationsManager = new BeaconNotificationsManager(this);
 
-        //TODO: Bilgileri databaseden çek. BeaconData tipinde olacağı için location bilgisini de kullan.
-
         if (preferencesUtil.getRegisteredBeaconList() != null && preferencesUtil.getRegisteredBeaconList().size() > 0 ) {
 
             for (BeaconData beaconData : preferencesUtil.getRegisteredBeaconList()) {
-                if (beaconData.getNotificationData() != null)
-                    list.add(beaconData);
+                if (beaconData.getNotificationData() != null && !beaconData.isBlocked()) {
+                    if (!beaconData.isBlocked())
+                        list.add(beaconData);
+                }
             }
 
         } else {

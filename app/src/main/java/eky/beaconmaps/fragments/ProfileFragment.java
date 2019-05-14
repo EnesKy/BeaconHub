@@ -18,11 +18,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -75,6 +78,8 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
     private static String url;
     private String serviceResult;
     private BeaconData tempBeacon;
+    private TextView name, email;
+    private ImageView profilepic;
 
     TextView serviceResults;
 
@@ -105,6 +110,7 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
         }
 
         user = FirebaseAuth.getInstance().getCurrentUser();
+
     }
 
     @SuppressLint("SetTextI18n")
@@ -124,6 +130,33 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
 
         title = rootView.findViewById(R.id.tv_title);
         title.setText("My Beacons");
+
+        name = rootView.findViewById(R.id.tv_user_name);
+        email = rootView.findViewById(R.id.tv_user_email);
+        profilepic = rootView.findViewById(R.id.iv_profile_pic);
+
+        if (user != null) {
+            if (user.getDisplayName() == null)
+                name.setText(preferencesUtil.getData("KEY_USER_NAME", ""));
+            else
+                name.setText(user.getDisplayName());
+
+            email.setText(user.getEmail());
+
+            if (user.getPhotoUrl() != null)
+                //Glide.with(this).load(user.getPhotoUrl()).into(profilepic);
+                Picasso.get().load(user.getPhotoUrl()).into(profilepic, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        //TODO: resim yüklenene kadar önceki stock resim görünsün.
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+
+                    }
+                });
+        }
 
         return rootView;
     }

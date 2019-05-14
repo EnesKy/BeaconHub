@@ -135,15 +135,47 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/line_type">
 
+            <LinearLayout
+                android:id="@+id/ll_company_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <View
+                    android:id="@+id/view_company_name"
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/rallyGreen"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_company_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/cardPropertyColor"
+                    tools:text="Company Name : Company Name" />
+
+            </LinearLayout>
+            
+
+
             <!-- Proximity UUID -->
 
             <View
                 android:id="@+id/uuid_icon"
                 android:layout_width="2dp"
                 android:layout_height="20dp"
+                android:layout_marginTop="8dp"
                 android:background="@color/rallyGreen"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/ll_company_name"
+                app:layout_constraintStart_toStartOf="parent"
+                 />
 
             <TextView
                 android:id="@+id/proximity_uuid"

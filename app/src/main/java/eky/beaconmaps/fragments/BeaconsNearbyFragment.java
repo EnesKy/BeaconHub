@@ -216,8 +216,6 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
             placeholder.setVisibility(View.GONE);
 
-            //FirebaseUtil.claimBeacon(unblockedBeacons);
-
             List<Beacon> sortedList = new ArrayList<>();
 
             for (BeaconData beaconData : unblockedBeacons) {
@@ -244,6 +242,9 @@ public class BeaconsNearbyFragment extends Fragment implements RangeNotifier, Be
 
                     if (beaconData.getLocation() != null)
                         beaconTemp.setLocation(beaconData.getLocation());
+
+                    if (beaconData.getCompanyName() != null)
+                        beaconTemp.setCompanyName(beaconData.getCompanyName());
 
                     beaconDataList.add(beaconTemp);
 

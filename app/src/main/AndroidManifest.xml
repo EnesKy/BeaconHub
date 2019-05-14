@@ -45,6 +45,7 @@
 
         <activity
             android:name=".activities.MainActivity"
+            android:configChanges="orientation"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
 

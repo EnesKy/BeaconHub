@@ -50,7 +50,6 @@ public class BeaconData {
         this.notificationData = notificationData;
     }
 
-    //TODO: delete this constructor
     public BeaconData(String companyName, String companyDesc, String webUrl, Location location) {
         this.companyName = companyName;
         this.companyDesc = companyDesc;

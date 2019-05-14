@@ -64,6 +64,18 @@
         app:layout_constraintStart_toEndOf="@id/iv_profile_pic"
         app:layout_constraintTop_toBottomOf="@id/tv_user_name" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_sign_out"
+        android:text="Log out"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_top_large"
+        android:textAllCaps="false"
+        app:layout_constraintTop_toBottomOf="@id/tv_user_email"
+        app:layout_constraintBottom_toTopOf="@id/tv_blocked_beacons"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <TextView
         android:id="@+id/tv_blocked_beacons"
         android:layout_width="match_parent"
@@ -113,16 +125,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_sign_out"
-        android:text="Sign Out"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_top_large"
-        android:textAllCaps="false"
-        app:layout_constraintTop_toBottomOf="@id/tv_user_email"
-        app:layout_constraintBottom_toTopOf="@id/tv_blocked_beacons"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
