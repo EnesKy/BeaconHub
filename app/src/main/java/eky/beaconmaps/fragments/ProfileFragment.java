@@ -169,11 +169,14 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
 
         if (!hidden) {
 
+            if (myBeaconsList == null)
+                myBeaconsList = new ArrayList<>();
+
             //if (FirebaseUtil.usersBeaconList != null) {
             if (preferencesUtil.getMyBeaconsList() != null) {
                 myBeaconsList.clear();
                 //myBeaconsList.addAll(FirebaseUtil.usersBeaconList);
-                myBeaconsList.addAll(preferencesUtil.getMyBeaconsList());
+                myBeaconsList.addAll(FirebaseUtil.usersBeaconList);
 
                 for (BeaconData beaconData : myBeaconsList)
                     if (beaconData.getUuid() == null)
@@ -269,7 +272,7 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
             blockedBeaconsList.add(beacon);
             preferencesUtil.saveBlockedBeaconsList(blockedBeaconsList);
             onHiddenChanged(false);
-            FirebaseUtil.removeBlockedBeacon(beacon);
+            //FirebaseUtil.removeBlockedBeacon(beacon);
             FirebaseUtil.updateBeaconData(beacon, "block");
             preferencesUtil.updateLists();
 
@@ -368,10 +371,10 @@ public class ProfileFragment extends Fragment implements BeaconAdapter.ItemClick
         }
 
         if (beacon.getLocation() == null) {
-            tvAddLocation.setVisibility(View.GONE);
-        } else {
             tvSeeLocation.setVisibility(View.GONE);
             tvUpdateLocation.setVisibility(View.GONE);
+        } else {
+            tvAddLocation.setVisibility(View.GONE);
         }
 
         if (FirebaseUtil.blocklist != null)

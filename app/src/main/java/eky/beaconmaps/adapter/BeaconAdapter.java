@@ -57,6 +57,17 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
 
         BeaconData beacon = beaconList.get(position);
 
+        if (beacon.getCompanyName() != null && !beacon.getCompanyName().isEmpty())
+            holder.tvCompanyName.setText("Company Name : " + beacon.getCompanyName());
+        else
+            holder.llCompanyName.setVisibility(View.GONE);
+
+        if (beacon.getWebUrl() != null) {
+            holder.tvUrl.setText("Website : " + beacon.getWebUrl());
+        } else {
+            holder.llUrl.setVisibility(View.GONE);
+        }
+
         if (!isNearby) {
 
             if (beacon.getUuid() != null && !beacon.getUuid().isEmpty()) {
@@ -94,18 +105,6 @@ public class BeaconAdapter extends RecyclerView.Adapter<BeaconAdapter.ViewHolder
             holder.tvRssi.setText("Rssi : " + beacon.getBeacon().getRssi());
             holder.tvTx.setText("Rx : " + beacon.getBeacon().getTxPower());
             holder.tvLastSeen.setText(formatter.format(new Date()));
-
-
-            if (beacon.getCompanyName() != null)
-                holder.tvCompanyName.setText("Company Name : " + beacon.getCompanyName());
-            else
-                holder.llCompanyName.setVisibility(View.GONE);
-
-            if (beacon.getWebUrl() != null) {
-                holder.tvUrl.setText("Website : " + beacon.getWebUrl());
-            } else {
-                holder.llUrl.setVisibility(View.GONE);
-            }
 
         }
 

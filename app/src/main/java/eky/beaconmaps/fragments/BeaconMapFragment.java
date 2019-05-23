@@ -105,6 +105,8 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
         mPreferencesUtil = new PreferencesUtil(Objects.requireNonNull(getActivity()));
         mPreferencesUtil.updateLists();
 
+        refreshMarkerList();
+
         ibMarkerList = view.findViewById(R.id.ib_open_marker_list);
         ibMarkerList.setOnClickListener(v -> {
 
@@ -357,13 +359,14 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
             BeaconData b4 = new BeaconData("LC Waikiki",
                     "İyi giyinmek herkesin hakkıdır", "www.lcwaikiki.com", new eky.beaconmaps.model.Location(41.046100, 28.945239));
 
-            markerDataList.add(new MarkerData(b1, currentLocation.distanceTo(latLng2Loc(b1.getLatLng()))));
+            //markerDataList.add(new MarkerData(b1, currentLocation.distanceTo(latLng2Loc(b1.getLatLng()))));
+
 
             markerDataList.add(new MarkerData(b2, currentLocation.distanceTo(latLng2Loc(b2.getLatLng()))));
 
-            markerDataList.add(new MarkerData(b3, currentLocation.distanceTo(latLng2Loc(b3.getLatLng()))));
+            //markerDataList.add(new MarkerData(b3, currentLocation.distanceTo(latLng2Loc(b3.getLatLng()))));
 
-            markerDataList.add(new MarkerData(b4, currentLocation.distanceTo(latLng2Loc(b4.getLatLng()))));
+            //markerDataList.add(new MarkerData(b4, currentLocation.distanceTo(latLng2Loc(b4.getLatLng()))));
 
             for (MarkerData markerData : markerDataList) {
                 mMap.addMarker(new MarkerOptions()
@@ -393,7 +396,7 @@ public class BeaconMapFragment extends Fragment implements OnMapReadyCallback, M
 
     @Override
     public void onItemClick(int position, View view) {
-        llMarkerList.setVisibility(View.GONE);
+        //llMarkerList.setVisibility(View.GONE);
         openActionDialog(markerDataList.get(position).getBeaconData());
     }
 

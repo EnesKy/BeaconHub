@@ -28,14 +28,14 @@ public class FirebaseUtil {
 
     public static void claimBeacon(BeaconData beaconData){
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference usersBeacons = database.child("userBeacons").child("user - " + getUserIdToken().substring(0,20));
+        DatabaseReference usersBeacons = database.child("userBeacons").child("user - " + getUserIdToken().substring(getUserIdToken().length() - 20));
         DatabaseReference beacon = usersBeacons.child(beaconData.getIdentity());
         beacon.setValue(beaconData);
     }
 
     public static void removeClaimedBeacon(BeaconData beaconData) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference usersBeacons = database.child("userBeacons").child("user - " + getUserIdToken().substring(0,20));
+        DatabaseReference usersBeacons = database.child("userBeacons").child("user - " + getUserIdToken().substring(getUserIdToken().length() - 20));
         usersBeacons.child(beaconData.getIdentity()).removeValue(
                 (databaseError, databaseReference) -> Log.d(TAG, "Beacon removed from blocklist."));
     }
@@ -56,14 +56,14 @@ public class FirebaseUtil {
 
     public static void add2Blocklist(BeaconData beaconData) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference userDatabase = database.child("usersBlocklist").child("user - " + getUserIdToken().substring(0,20));
+        DatabaseReference userDatabase = database.child("usersBlocklist").child("user - " + getUserIdToken().substring(getUserIdToken().length() - 20));
         DatabaseReference blockList = userDatabase.child(beaconData.getIdentity());
         blockList.setValue(beaconData);
     }
 
     public static void removeBlockedBeacon(BeaconData beaconData) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference userDatabase = database.child("usersBlocklist").child("user - " + getUserIdToken().substring(0,20));
+        DatabaseReference userDatabase = database.child("usersBlocklist").child("user - " + getUserIdToken().substring(getUserIdToken().length() - 20));
         DatabaseReference blockList = userDatabase.child(beaconData.getIdentity());
         blockList.removeValue(
                 (databaseError, databaseReference) -> Log.d(TAG, "Beacon removed from blocklist."));
@@ -71,7 +71,7 @@ public class FirebaseUtil {
 
     public static void updateBeaconData(BeaconData beaconData, String type) {
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference usersBeacons = database.child("userBeacons").child("user - " + getUserIdToken().substring(0,20));
+        DatabaseReference usersBeacons = database.child("userBeacons").child("user - " + getUserIdToken().substring(getUserIdToken().length() - 20));
         DatabaseReference beacon = usersBeacons.child(beaconData.getIdentity());
 
         HashMap updates = new HashMap();
@@ -136,7 +136,7 @@ public class FirebaseUtil {
         removeClaimedBeacon(new BeaconData("temp"));
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference userDatabase = database.child("userBeacons").child("user - " + getUserIdToken().substring(0,20));
+        DatabaseReference userDatabase = database.child("userBeacons").child("user - " + getUserIdToken().substring(getUserIdToken().length() - 20));
 
         userDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -227,7 +227,7 @@ public class FirebaseUtil {
         removeBlockedBeacon(new BeaconData("temp"));
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference userDatabase = database.child("usersBlocklist").child("user - " + getUserIdToken().substring(0,20));
+        DatabaseReference userDatabase = database.child("usersBlocklist").child("user - " + getUserIdToken().substring(getUserIdToken().length() - 20));
 
         userDatabase.addValueEventListener(new ValueEventListener() {
             @Override
